@@ -12,3 +12,18 @@
 .priorityInput{padding:10px;border:1px solid #d9e2dd;border-radius:10px;background:#fff;color:#45564e}@media(max-width:520px){.priorityInput{width:100%}}
 .dashboardSearch{position:relative;margin:18px 0}.dashboardSearch>input{width:100%;padding:13px 15px;border:1px solid #dfe7e2;border-radius:14px;background:#fff;font-size:14px}.searchResults{position:absolute;z-index:5;left:0;right:0;top:52px;background:#fff;border:1px solid #e2e9e5;border-radius:14px;padding:8px;box-shadow:0 12px 28px rgba(30,60,45,.10)}.searchResults button{width:100%;display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:10px;text-align:left;border-radius:10px}.searchResults button:hover{background:#f3f7f5}.searchResults svg{width:20px;height:20px;fill:none;stroke:currentColor}.searchResults span{display:flex;flex-direction:column}.searchResults small{color:#78877f}.searchResults p{padding:10px;color:#78877f}
 .toast{position:fixed;z-index:50;top:18px;left:50%;transform:translateX(-50%);background:#244d3b;color:#fff;padding:11px 16px;border-radius:999px;font-size:13px;font-weight:700;box-shadow:0 8px 24px rgba(20,50,35,.18);max-width:calc(100% - 32px);text-align:center}button:disabled{opacity:.58;cursor:not-allowed}
+.overviewHousePhoto{position:relative;width:210px;height:190px;display:block;cursor:pointer;overflow:hidden;border-radius:24px;flex:0 0 auto}
+.overviewHousePhoto>input{display:none}
+.overviewHousePhoto.hasPhoto{background:#dcece3;box-shadow:inset 0 0 0 1px rgba(36,77,59,.08)}
+.overviewHousePhoto.hasPhoto img{width:100%;height:100%;display:block;object-fit:cover}
+.overviewHousePhoto .photoOverlay{position:absolute;left:50%;bottom:9px;transform:translateX(-50%);white-space:nowrap;background:rgba(255,255,255,.9);color:#236b4a;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:700;opacity:.92}
+.overviewHousePhoto.hasPhoto:after{content:"Skift billede";position:absolute;right:9px;bottom:9px;background:rgba(255,255,255,.9);color:#236b4a;padding:6px 9px;border-radius:999px;font-size:10px;font-weight:700}
+.overviewHousePhoto .sun,.overviewHousePhoto .roof,.overviewHousePhoto .houseBody,.overviewHousePhoto .tree{position:absolute}
+.overviewHousePhoto .sun{width:52px;height:52px;border-radius:50%;background:#fff0b8;right:15px;top:24px}
+.overviewHousePhoto .roof{width:0;height:0;border-left:72px solid transparent;border-right:72px solid transparent;border-bottom:0;border-top:0;left:35px;top:84px}
+.overviewHousePhoto .roof:after{content:"";position:absolute;width:100px;height:70px;background:#4e9666;transform:rotate(45deg);left:-50px;top:-16px}
+.overviewHousePhoto .houseBody{width:128px;height:94px;background:#fffdf4;right:5px;bottom:18px}
+.overviewHousePhoto .houseBody i{position:absolute;width:20px;height:22px;border:4px solid #92c4a2;right:26px;top:12px}
+.overviewHousePhoto .houseBody b{position:absolute;width:28px;height:58px;background:#4e9666;left:48px;bottom:0}
+.overviewHousePhoto .tree{left:3px;bottom:23px;font-size:62px;line-height:1;color:#4e9666}
+@media(max-width:520px){.overviewHousePhoto{width:42%;min-width:145px;height:175px}}
