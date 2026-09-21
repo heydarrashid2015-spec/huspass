@@ -60,3 +60,5 @@
 .futureSummary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.futureSummary article{display:flex;flex-direction:column;gap:6px;padding:15px;background:#f8fbf9;border:1px solid #e2ebe6;border-radius:16px}.futureSummary span{font-size:11px;color:#718078}.futureSummary b{font-size:19px;color:#24543f}@media(max-width:420px){.futureSummary{grid-template-columns:1fr}}
 
 .emptyState .emptyAction{margin-top:13px;padding:10px 14px;border:0;border-radius:12px;background:#287d52;color:#fff;font-weight:800}.budgetTasks article .taskEdit{flex:0 0 auto}
+
+.selectedFileRow{display:flex;align-items:center;gap:8px;min-width:0;padding:8px 10px;background:#fff;border:1px solid #e2ebe6;border-radius:11px}.selectedFileRow .selectedFile{flex:1;min-width:0}.selectedFileRow button{border:0;background:#f7eeee;color:#934a4a;border-radius:9px;padding:7px 9px;font-weight:700}.propertyActions button:disabled,.plusPreview:disabled{cursor:not-allowed;opacity:.62}.editPanel button:disabled{opacity:.55}
