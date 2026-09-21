@@ -10,8 +10,8 @@ const sections=[
  ["clock","Boligens historik","Samlet historik for boligens ændringer"]
 ];
 export default function Home(){const [view,setView]=useState("Overblik");return <main>
-<header><div><small>MIT HJEM</small><h1>HusPass</h1></div><button className="avatar">H</button></header>
-<section className="hero"><p>Godt at se dig 👋</p><h2>Alt om dit hjem,<br/>samlet ét sted.</h2><span>Hold styr på din bolig, vedligeholdelse, dokumenter og planer.</span></section>
+<header><div><h1>HusPass</h1><p className="tagline">Dit hjem. Altid samlet.</p></div><button className="avatar">HR</button></header>
+<section className="hero"><div><p>Godt at se dig igen 👋</p><h2>Alt om dit hjem,<br/>samlet ét sted.</h2><span>Få overblik, planlæg vedligehold og hold dine dokumenter samlet.</span></div><div className="houseArt"><div className="sun"></div><div className="roof"></div><div className="houseBody"><i></i><b></b></div><div className="tree">♧</div></div></section><section className="quick"><article><i><Icon name="check"/></i><b>2</b><span>Aktive opgaver</span></article><article><i><Icon name="coins"/></i><b>0 kr.</b><span>Udgifter denne måned</span></article><article><i><Icon name="doc"/></i><b>0</b><span>Dokumenter</span></article></section>
 <section className="homeHead"><small>DIN BOLIG</small><h3>Granlunden 81</h3><p>Alt det vigtige om dit hjem samlet i HusPass.</p></section>
 <section className="sectionList">{sections.map(([icon,title,desc])=><button className="sectionCard" key={title} onClick={()=>setView(title)}><i>{["home","tool","coins","doc","calendar","clock"].includes(icon)?<Icon name={icon}/>:icon}</i><div><b>{title}</b><span>{desc}</span></div><strong>›</strong></button>)}</section>
 <nav className="bottomNav">
