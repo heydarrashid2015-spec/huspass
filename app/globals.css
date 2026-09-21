@@ -9,3 +9,4 @@
 .dateInput{max-width:155px}@media(max-width:520px){.dateInput{max-width:none}}
 .docAdd select,.docAdd>input{padding:10px;border:1px solid #d9e2dd;border-radius:10px;background:#fff;min-width:120px}.docAdd>input[type=date]{max-width:155px}.docAdd>input[type=number]{max-width:130px}@media(max-width:520px){.docAdd select,.docAdd>input[type=date],.docAdd>input[type=number]{max-width:none;width:100%}}
 .warrantyField{display:flex;align-items:center;gap:7px;font-size:12px;color:#66766f}.warrantyField input{padding:9px;border:1px solid #d9e2dd;border-radius:10px;background:#fff}@media(max-width:520px){.warrantyField{width:100%;justify-content:space-between}}
+.priorityInput{padding:10px;border:1px solid #d9e2dd;border-radius:10px;background:#fff;color:#45564e}@media(max-width:520px){.priorityInput{width:100%}}
