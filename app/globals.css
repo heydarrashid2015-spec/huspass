@@ -62,3 +62,29 @@
 .emptyState .emptyAction{margin-top:13px;padding:10px 14px;border:0;border-radius:12px;background:#287d52;color:#fff;font-weight:800}.budgetTasks article .taskEdit{flex:0 0 auto}
 
 .selectedFileRow{display:flex;align-items:center;gap:8px;min-width:0;padding:8px 10px;background:#fff;border:1px solid #e2ebe6;border-radius:11px}.selectedFileRow .selectedFile{flex:1;min-width:0}.selectedFileRow button{border:0;background:#f7eeee;color:#934a4a;border-radius:9px;padding:7px 9px;font-weight:700}.propertyActions button:disabled,.plusPreview:disabled{cursor:not-allowed;opacity:.62}.editPanel button:disabled{opacity:.55}
+
+
+/* Responsive tablet and desktop layout */
+@media(min-width:700px){
+  main:not(.authPage){max-width:960px;margin:24px auto;min-height:calc(100vh - 48px);border-radius:28px;padding-bottom:32px;overflow:hidden}
+  header{padding-left:32px;padding-right:32px}
+  .hero{margin-left:32px;margin-right:32px;padding:30px;min-height:240px}
+  .quick,.sectionList,.propertyActions,.taskEditor{padding-left:32px;padding-right:32px}
+  .homeHead{padding-left:36px;padding-right:36px}
+  .quickActions,.dashboardSearch{margin-left:32px;margin-right:32px}
+  .propertyPhoto{margin-left:32px;margin-right:32px;height:360px}
+  .propertyInfo{padding-left:34px;padding-right:34px}
+  .infoGrid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .infoGrid .addressField{grid-column:span 2}
+  .bottomNav{width:min(960px,calc(100% - 48px));bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -5px 24px rgba(25,65,47,.08)}
+  .taskMeta,.docMeta{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .taskEditor article{padding:16px 18px}
+}
+@media(min-width:1100px){
+  main:not(.authPage){max-width:1120px}
+  .bottomNav{width:min(1120px,calc(100% - 64px))}
+  .hero>div:first-child{max-width:620px}
+  .overviewHousePhoto{height:260px}
+  .quick{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .quickActions>div{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
