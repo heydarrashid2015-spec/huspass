@@ -5,7 +5,7 @@ export const metadata={
   title:{default:"HusPass",template:"%s · HusPass"},
   description:"Hold styr på boligoplysninger, vedligeholdelse, udgifter og dokumenter ét sted.",
   applicationName:"HusPass",
-  robots:{index:false,follow:false,nocache:true,googleBot:{index:false,follow:false,noimageindex:true}},
+  robots:{index:true,follow:true},
   openGraph:{
     title:"HusPass",
     description:"Dit hjem. Altid samlet.",
