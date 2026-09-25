@@ -8,7 +8,7 @@ export const metadata={
   applicationName:"HusPass",
   icons:{icon:[{url:"/huspass-icon.svg",type:"image/svg+xml"}],apple:"/huspass-icon.svg"},
   manifest:"/manifest.webmanifest",
-  appleWebApp:{capable:true,title:"HusPass",statusBarStyle:"default"},
+  appleWebApp:{capable:true,title:"HusPass",statusBarStyle:"black-translucent"},
   formatDetection:{telephone:false},
   robots:{index:true,follow:true},
   openGraph:{
