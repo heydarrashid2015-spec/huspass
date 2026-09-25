@@ -3,8 +3,8 @@ import PwaRegister from "./pwa-register";
 
 export const metadata={
   metadataBase:new URL("https://huspass.dk"),
-  title:{default:"HusPass",template:"%s · HusPass"},
-  description:"Hold styr på boligoplysninger, vedligeholdelse, udgifter og dokumenter ét sted.",
+  title:{default:"HusPass – Boligapp til boligejere i Danmark",template:"%s · HusPass"},
+  description:"HusPass er en dansk boligapp, der samler boligoplysninger, vedligeholdelse, udgifter og dokumenter ét sted.",
   applicationName:"HusPass",
   icons:{icon:[{url:"/huspass-icon.svg",type:"image/svg+xml"}],apple:"/huspass-icon.svg"},
   manifest:"/manifest.webmanifest",
@@ -12,8 +12,8 @@ export const metadata={
   formatDetection:{telephone:false},
   robots:{index:true,follow:true},
   openGraph:{
-    title:"HusPass",
-    description:"Dit hjem. Altid samlet.",
+    title:"HusPass – Boligapp til boligejere i Danmark",
+    description:"Dansk boligapp til boligoplysninger, vedligeholdelse, udgifter og dokumenter.",
     type:"website",
     locale:"da_DK",
     siteName:"HusPass"
