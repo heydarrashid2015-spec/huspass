@@ -3,30 +3,16 @@
   "short_name": "HusPass",
   "description": "Dit hjem. Altid samlet.",
   "lang": "da",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#f7faf8",
   "theme_color": "#f7faf8",
-  "categories": [
-    "productivity",
-    "utilities"
-  ],
+  "prefer_related_applications": false,
+  "categories": ["productivity", "utilities"],
   "icons": [
-    {
-      "src": "/huspass-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/huspass-maskable.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
-    }
-  ],
-  "id": "/",
-  "orientation": "portrait-primary",
-  "prefer_related_applications": false
+    {"src": "/icon","sizes": "512x512","type": "image/png","purpose": "any maskable"}
+  ]
 }
