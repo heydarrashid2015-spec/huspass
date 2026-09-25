@@ -8,5 +8,16 @@
   "display": "standalone",
   "background_color": "#f7faf8",
   "theme_color": "#f7faf8",
-  "categories": ["productivity", "utilities"]
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/huspass-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
