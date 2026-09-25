@@ -19,5 +19,8 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "id": "/",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false
 }
