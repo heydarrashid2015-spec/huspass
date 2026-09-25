@@ -5,6 +5,9 @@ export const metadata={
   title:{default:"HusPass",template:"%s · HusPass"},
   description:"Hold styr på boligoplysninger, vedligeholdelse, udgifter og dokumenter ét sted.",
   applicationName:"HusPass",
+  manifest:"/manifest.webmanifest",
+  appleWebApp:{capable:true,title:"HusPass",statusBarStyle:"default"},
+  formatDetection:{telephone:false},
   robots:{index:true,follow:true},
   openGraph:{
     title:"HusPass",
