@@ -139,3 +139,20 @@
 
 /* HusPass account choice sheet */
 .accountMenuBackdrop{position:fixed;inset:0;z-index:10020;background:rgba(12,30,24,.42);display:flex;align-items:center;justify-content:center;padding:22px}.accountMenu{width:min(100%,390px);background:#fff!important;border-radius:24px;padding:24px;display:grid;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.24);border:1px solid #e6ece9}.accountMenu>b{font-size:21px;color:#173d31}.accountMenu>p{margin:0 0 7px;color:#6b7772}.accountMenu button{appearance:none;-webkit-appearance:none;width:100%;min-height:52px;border-radius:14px;font-weight:800;font-size:15px;cursor:pointer}.accountHomeBtn{border:0;background:#236b4a;color:#fff}.accountLogoutBtn{border:1px solid #eadada;background:#fff;color:#9b3131}.accountCancelBtn{border:0;background:#f0f4f2;color:#40534b}@media(min-width:700px){.accountMenu{padding:28px}}
+
+
+/* Installed app / mobile safe areas */
+html{background:#f7faf8}
+body{min-height:100dvh}
+@media(display-mode:standalone){
+  body{overscroll-behavior-y:none}
+  main:not(.authPage){min-height:100dvh;padding-top:env(safe-area-inset-top);padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+  .authPage{min-height:100dvh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+  .bottomNav{padding-bottom:max(8px,env(safe-area-inset-bottom));height:auto;min-height:68px}
+  .imageViewer{padding-top:calc(18px + env(safe-area-inset-top));padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+}
+@supports(padding:max(0px)){
+  @media(max-width:699px){
+    .bottomNav{padding-left:max(0px,env(safe-area-inset-left));padding-right:max(0px,env(safe-area-inset-right))}
+  }
+}
