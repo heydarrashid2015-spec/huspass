@@ -1,4 +1,5 @@
 import "./globals.css";
+import PwaRegister from "./pwa-register";
 
 export const metadata={
   metadataBase:new URL("https://huspass.dk"),
@@ -27,5 +28,5 @@ export const viewport={
 };
 
 export default function RootLayout({children}){
-  return <html lang="da"><body>{children}</body></html>
+  return <html lang="da"><body><PwaRegister/>{children}</body></html>
 }
