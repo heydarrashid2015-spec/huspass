@@ -6,7 +6,7 @@ export const metadata={
   title:{default:"HusPass – Boligapp til boligejere i Danmark",template:"%s · HusPass"},
   description:"HusPass er en dansk boligapp, der samler boligoplysninger, vedligeholdelse, udgifter og dokumenter ét sted.",
   applicationName:"HusPass",
-  icons:{icon:[{url:"/huspass-icon.svg",type:"image/svg+xml"}],apple:"/huspass-icon.svg"},
+  icons:{icon:[{url:"/icon",type:"image/png",sizes:"512x512"}],apple:[{url:"/apple-icon",type:"image/png",sizes:"180x180"}]},
   manifest:"/manifest.webmanifest",
   appleWebApp:{capable:true,title:"HusPass",statusBarStyle:"black-translucent"},
   formatDetection:{telephone:false},
