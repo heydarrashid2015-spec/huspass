@@ -135,3 +135,7 @@
 .valuationGrid a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin-top:3px;border-radius:11px;background:#eef6f1;color:#236b4a;font-weight:800;text-decoration:none}
 .valuationNote>b{color:#24543f}
 @media(min-width:700px){.valuationGrid{grid-template-columns:1fr 1fr}}
+
+
+/* HusPass account choice sheet */
+.accountMenuBackdrop{position:fixed;inset:0;z-index:10020;background:rgba(12,30,24,.48);display:flex;align-items:flex-end;justify-content:center;padding:18px}.accountMenu{width:min(100%,430px);background:#fff;border-radius:24px;padding:22px;display:grid;gap:11px;box-shadow:0 20px 60px rgba(0,0,0,.22)}.accountMenu>b{font-size:21px;color:#173d31}.accountMenu>p{margin:0 0 5px;color:#6b7772}.accountMenu button{width:100%;min-height:50px;border-radius:14px;font-weight:800;font-size:15px;cursor:pointer}.accountHomeBtn{border:0;background:#236b4a;color:#fff}.accountLogoutBtn{border:1px solid #e5d4d4;background:#fff7f7;color:#9b3131}.accountCancelBtn{border:0;background:#f0f4f2;color:#40534b}@media(min-width:700px){.accountMenuBackdrop{align-items:center}.accountMenu{padding:26px}}
