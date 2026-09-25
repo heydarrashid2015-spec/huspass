@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata={
-  metadataBase:new URL("https://huspass-36ey.vercel.app"),
+  metadataBase:new URL("https://huspass.dk"),
   title:{default:"HusPass",template:"%s · HusPass"},
   description:"Hold styr på boligoplysninger, vedligeholdelse, udgifter og dokumenter ét sted.",
   applicationName:"HusPass",
