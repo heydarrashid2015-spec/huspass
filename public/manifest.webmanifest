@@ -1,0 +1,12 @@
+{
+  "name": "HusPass",
+  "short_name": "HusPass",
+  "description": "Dit hjem. Altid samlet.",
+  "lang": "da",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7faf8",
+  "theme_color": "#f7faf8",
+  "categories": ["productivity", "utilities"]
+}
