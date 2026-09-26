@@ -126,6 +126,12 @@ jobs:
           printf '%s' "$privacy" | grep -q 'placering'
           printf '%s' "$privacy" | grep -q 'kontakter'
           printf '%s' "$privacy" | grep -q 'slette din konto'
+          terms=$(curl -L --silent --show-error https://www.huspass.dk/vilkaar)
+          printf '%s' "$terms" | grep -q 'HusPass'
+          printf '%s' "$terms" | grep -q 'betalt HusPass Plus'
+          download=$(curl -L --silent --show-error https://www.huspass.dk/download)
+          printf '%s' "$download" | grep -q 'Android-testversion'
+          printf '%s' "$download" | grep -q 'uden for Google Play'
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
