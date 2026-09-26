@@ -159,3 +159,11 @@ Before every public release:
 3. Confirm private storage and row-level access controls remain enabled.
 4. Confirm account deletion still removes the user's HusPass data as designed.
 5. Re-check production dependencies before completing Google Play Data Safety.
+
+
+## Security verification – 26 Sep 2026
+- Production database tables checked: homes, tasks, documents and support_messages all have Row Level Security enabled.
+- Current Supabase security advisor reports no database RLS vulnerability; the only security warning is leaked-password protection being disabled.
+- Leaked-password protection is not being enabled during the zero-cost preparation stage because the current project configuration does not provide it as a free setting. Re-check before public launch and do not claim it is enabled.
+- Performance advisor currently reports three unused indexes. They are informational findings only; do not remove them solely because a low-traffic pre-launch database has not used them yet.
+- No customer data was copied into store assets or this checklist during this verification.
