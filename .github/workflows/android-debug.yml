@@ -143,6 +143,15 @@ jobs:
           download=$(curl -L --silent --show-error https://www.huspass.dk/download)
           printf '%s' "$download" | grep -q 'Android-testversion'
           printf '%s' "$download" | grep -q 'uden for Google Play'
+      - name: Verify release metadata and no accidental test markers
+        run: |
+          grep -q 'metadataBase:new URL("https://huspass.dk")' app/layout.js
+          grep -q 'manifest:"/manifest.webmanifest"' app/layout.js
+          grep -q 'robots:{index:true,follow:true}' app/layout.js
+          if grep -R -n -E 'localhost|127\.0\.0\.1|example\.com|TODO|FIXME' capacitor.config.ts app/page.js app/layout.js public/manifest.webmanifest 2>/dev/null; then
+            echo "Development placeholder or unfinished marker found in release-critical files."
+            exit 1
+          fi
       - name: Verify PWA install metadata
         run: |
           python3 - <<'PY'
