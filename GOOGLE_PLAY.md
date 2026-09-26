@@ -62,6 +62,29 @@ HusPass requires login for private account features. Before review, provide Goog
 - [x] Android install/launch test completed successfully on a physical device with the approved launcher icon build
 - [ ] Full final release-candidate functional test on Android
 
+## Pre-Console readiness snapshot – 26 Sep 2026
+The zero-cost preparation stage is considered complete for items that do not require Play Console credentials or a permanent production signing identity.
+
+Completed before Play Console:
+- Production website deploys successfully after the patched Next.js upgrade.
+- Public privacy policy, terms and external account-deletion resource are prepared.
+- Android CI passes dependency audit, permission/privacy checks, manifest checks, debug APK build and unsigned release AAB build.
+- Shareable test APK and checksums are generated automatically.
+- Package ID and initial release identity are fixed at dk.huspass.app / 1.0.0 / versionCode 1.
+- Store copy, Data Safety worksheet, reviewer-access instructions and privacy-safe store-asset plan are prepared.
+- Current Android configuration does not intentionally request camera, microphone, location or contacts.
+- Store materials are explicitly restricted to fictional demo data.
+
+Intentionally deferred until Play Console / production-signing stage:
+- Create the Google Play developer account and app record.
+- Create/protect the permanent Android upload key and configure private CI secrets.
+- Produce the permanently signed release AAB.
+- Complete Play Console Data Safety, App access and Content rating forms against the final signed build.
+- Upload final 512×512 icon, 1024×500 feature graphic and final-device screenshots.
+- Run internal/closed Play testing and then request production publication.
+
+Do not create signing secrets, reviewer passwords or customer data in this public repository.
+
 ## Release notes – 1.0.0 (DA)
 Første version af HusPass til Android. Saml boligoplysninger, vedligeholdelsesopgaver, dokumenter og relevante udgifter ét sted med personlig adgang.
 
