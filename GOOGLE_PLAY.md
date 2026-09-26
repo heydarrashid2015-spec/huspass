@@ -242,3 +242,15 @@ Use these as a preparation checklist, then confirm them against the final signed
 - Terms: https://huspass.dk/vilkaar
 
 Do not mechanically answer Play Console yes/no fields from this draft if Google changes its Data Safety wording. Map each current Console question to the final release behavior and provider documentation at submission time.
+
+
+## Forward-compatible product rule
+HusPass 1.0.0 is a baseline, not a closed feature set. Keep the architecture and store declarations easy to extend in later releases without pre-enabling unused access.
+
+Future-capability rules:
+- New device permissions are added only in the release that actually needs them.
+- New modules (for example AI assistance, scanning/camera capture, notifications, household sharing or HusPass Plus) should be isolated so they can be enabled without rewriting the core home/task/document flows.
+- Database changes should prefer additive migrations and preserve existing user data.
+- New paid functionality must remain separate from the free baseline until pricing, billing and store terms are deliberately activated.
+- Privacy policy, Data Safety and permission checks must be revised per release when a new capability changes data handling.
+- VersionCode must increase for every Google Play update; versionName should follow the product release version.
