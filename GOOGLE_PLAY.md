@@ -209,3 +209,19 @@ When the Google Play developer account is activated, use this order to avoid unn
 
 ## Signing-key safety gate
 The repository already ignores *.jks, *.keystore, *.p12, *.pem, key.properties, keystore.properties and Play service-account files. The permanent Android upload key must never be committed to GitHub or pasted into public documentation. Its encrypted/base64 form and passwords belong only in protected GitHub Actions secrets when the owner reaches the signing stage.
+
+
+## Release-candidate acceptance criteria
+HusPass v1.0.0 may be marked ready for Play upload only when all of these are true:
+- Production website, privacy policy and terms return successfully over HTTPS.
+- Android build uses package dk.huspass.app and versionCode 1 / versionName 1.0.0.
+- No unexpected camera, microphone or location permission is present.
+- Production dependency audit has no high/critical finding that blocks release.
+- Login/logout and account deletion work on Android.
+- Property data, tasks, documents and home image remain isolated to the authenticated test account.
+- Fresh install and reopen work without blank page or unintended browser handoff.
+- Final screenshots contain fictional data only.
+- Permanent upload key exists privately and the release AAB is signed with it.
+- Play Console Data Safety, App Access and Content Rating are completed from the final build.
+
+Until the last two Play/signing items are completed, label the downloadable APK as a test build rather than an official Google Play release.
