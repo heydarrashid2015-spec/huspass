@@ -67,6 +67,7 @@ jobs:
           PY
       - name: Verify Android release identity
         run: |
+          grep -q '"version": "1.0.0"' package.json
           grep -q 'applicationId "dk.huspass.app"' android/app/build.gradle
           grep -q 'versionCode 1' android/app/build.gradle
           grep -q 'versionName "1.0.0"' android/app/build.gradle
