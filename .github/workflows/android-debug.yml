@@ -40,6 +40,16 @@ jobs:
           s=s.replace('versionName "1.0"', 'versionName "1.0.0"')
           p.write_text(s)
           PY
+      - name: Verify Android release identity
+        run: |
+          grep -q 'applicationId "dk.huspass.app"' android/app/build.gradle
+          grep -q 'versionCode 1' android/app/build.gradle
+          grep -q 'versionName "1.0.0"' android/app/build.gradle
+          grep -q 'https://www.huspass.dk' capacitor.config.ts
+          if grep -R -n -E 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|service_account|private_key_id' android capacitor.config.ts package.json 2>/dev/null; then
+            echo "Potential secret material detected in Android release inputs."
+            exit 1
+          fi
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
