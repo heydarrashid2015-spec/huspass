@@ -125,7 +125,7 @@ jobs:
           printf '%s' "$privacy" | grep -q 'mikrofon'
           printf '%s' "$privacy" | grep -q 'placering'
           printf '%s' "$privacy" | grep -q 'kontakter'
-          printf '%s' "$privacy" | grep -q 'Slet'
+          printf '%s' "$privacy" | grep -q 'slette din konto'
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
