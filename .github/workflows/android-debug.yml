@@ -118,6 +118,14 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+      - name: Verify generated Android manifest
+        run: |
+          manifest="android/app/src/main/AndroidManifest.xml"
+          grep -q 'android.permission.INTERNET' "$manifest"
+          if grep -E 'android.permission.(ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA|READ_CONTACTS|WRITE_CONTACTS)' "$manifest"; then
+            echo "Unexpected sensitive permission found in generated Android manifest."
+            exit 1
+          fi
       - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug
