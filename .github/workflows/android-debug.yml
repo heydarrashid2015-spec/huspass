@@ -153,13 +153,18 @@ jobs:
         run: ./gradlew bundleRelease
       - name: Verify release AAB is not accidentally signed before signing gate
         run: |
-          if [ -f android/app/build/outputs/bundle/release/app-release.aab ]; then
-            jarsigner -verify android/app/build/outputs/bundle/release/app-release.aab >/tmp/aab-signature.txt 2>&1 && {
-              echo "Release AAB is signed while the workflow is still in the unsigned preparation stage."
-              cat /tmp/aab-signature.txt
-              exit 1
-            } || true
+          AAB="android/app/build/outputs/bundle/release/app-release.aab"
+          test -f "$AAB"
+          set +e
+          OUTPUT="$(jarsigner -verify "$AAB" 2>&1)"
+          CODE=$?
+          set -e
+          echo "$OUTPUT"
+          if [ "$CODE" -eq 0 ] && ! echo "$OUTPUT" | grep -qi "jar is unsigned"; then
+            echo "Release AAB is signed while the workflow is still in the unsigned preparation stage."
+            exit 1
           fi
+          echo "Unsigned AAB confirmed for the pre-signing stage."
       - name: Verify Android release artifacts
         run: |
           test -s android/app/build/outputs/apk/debug/app-debug.apk
