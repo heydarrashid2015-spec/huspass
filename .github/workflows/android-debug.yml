@@ -50,6 +50,27 @@ jobs:
             echo "Potential secret material detected in Android release inputs."
             exit 1
           fi
+      - name: Check signing-secret readiness
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          present=0
+          [ -n "$KEYSTORE_B64" ] && present=$((present+1))
+          [ -n "$KEYSTORE_PASSWORD" ] && present=$((present+1))
+          [ -n "$KEY_ALIAS" ] && present=$((present+1))
+          [ -n "$KEY_PASSWORD" ] && present=$((present+1))
+          if [ "$present" -ne 0 ] && [ "$present" -ne 4 ]; then
+            echo "Android signing secrets are only partially configured."
+            exit 1
+          fi
+          if [ "$present" -eq 4 ]; then
+            echo "Android signing secrets are complete."
+          else
+            echo "Android signing secrets are not configured yet; unsigned AAB only."
+          fi
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
