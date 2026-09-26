@@ -39,6 +39,28 @@ Based on the current HusPass production design, the Play Console Data Safety dec
 ## Reviewer access preparation
 HusPass requires login for private account features. Before review, provide Google Play reviewers with valid app-access instructions through Play Console. Do not put reviewer credentials, passwords, API keys, or test-account secrets in this public repository.
 
+## Release checklist
+- [x] Stable Android package ID: dk.huspass.app
+- [x] Initial release version: 1.0.0 / versionCode 1
+- [x] HTTPS-only production host
+- [x] Debug APK build
+- [x] Release AAB build
+- [x] Public privacy-policy URL
+- [x] Public terms URL
+- [x] Account deletion available in HusPass
+- [x] Danish store-description draft
+- [ ] Permanent private Android upload key
+- [ ] Signed release AAB
+- [ ] Final Play Store icon and feature graphic
+- [ ] Final Android screenshots
+- [ ] Play Console Data Safety declaration
+- [ ] Play Console content rating
+- [ ] Private reviewer test access
+- [ ] Final release-candidate test on Android
+
+## Release notes – 1.0.0 (DA)
+Første version af HusPass til Android. Saml boligoplysninger, vedligeholdelsesopgaver, dokumenter og relevante udgifter ét sted med personlig adgang.
+
 ## Store assets still required before publication
 - Final high-resolution app icon
 - Feature graphic
