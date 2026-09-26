@@ -204,3 +204,17 @@ body{min-height:100dvh}
 .bottomNav button:active{transform:scale(.96)}
 .bottomNav button.active i{background:#e7f7ee}
 @media(max-width:380px){.bottomNav span{font-size:8px}.bottomNav svg{width:20px;height:20px}}
+
+/* Dashboard section hierarchy */
+.homeHead{margin-top:2px}
+.quickActions>small,.homeHead>small{color:#647a70}
+.dashboardSearch{padding:0 16px 14px}
+.searchInputWrap{background:#f7faf8;border:1px solid #e3ebe7;border-radius:16px;box-shadow:none}
+.sectionList{padding-top:4px}
+.sectionCard{transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.sectionCard:active{transform:scale(.985);border-color:#d8e5de}
+@media(max-width:520px){
+ .dashboardSearch{padding-bottom:12px}
+ .sectionList{gap:8px;padding-bottom:18px}
+ .sectionCard{padding:11px 13px}
+}
