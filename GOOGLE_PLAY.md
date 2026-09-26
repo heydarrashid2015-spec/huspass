@@ -119,7 +119,7 @@ Current production direction:
 - Store graphics must not imply features that the released app does not actually provide.
 - Validate the launcher icon on a physical Android device before freezing the v1.0.0 release candidate.
 
-The current generated web/PWA icon is a temporary HusPass “H” mark. Treat it as a placeholder until the final brand artwork is approved and applied consistently to Android and store assets.
+The HusPass house + checkmark concept has been approved as the visual direction. The final production artwork should preserve this concept while being recreated as clean standalone brand assets (not cropped from a promotional mockup) for Android, web/PWA, Play Store and future iOS use.
 
 ## Store assets still required before publication
 - Final high-resolution app icon
