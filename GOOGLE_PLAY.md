@@ -30,6 +30,7 @@ HusPass udvikles til boligejere i Danmark. Funktioner kan blive udvidet og forbe
 ## Privacy and support
 - Privacy policy: https://huspass.dk/privatliv
 - Terms: https://huspass.dk/vilkaar
+- Account deletion web resource: https://huspass.dk/slet-konto
 - Website: https://huspass.dk
 - Support email: heydar.rashid2015@gmail.com
 
@@ -48,6 +49,7 @@ HusPass requires login for private account features. Before review, provide Goog
 - [x] Public privacy-policy URL
 - [x] Public terms URL
 - [x] Account deletion available in HusPass
+- [x] Public account-deletion web resource prepared at https://huspass.dk/slet-konto
 - [x] Danish store-description draft
 - [ ] Permanent private Android upload key
 - [ ] Signed release AAB
@@ -70,6 +72,7 @@ Use this only as a preparation worksheet and verify it against the final product
 - Core private features require a HusPass account and login.
 - Google review must receive private test-access instructions through Play Console, never through the public repository.
 - Users can request/delete their HusPass account from the app.
+- External account-deletion request resource: https://huspass.dk/slet-konto
 
 ### Current data inventory to verify in Data Safety
 - Account identifier: email address.
