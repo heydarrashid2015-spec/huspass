@@ -3,8 +3,9 @@ const config = {
   appName: "HusPass",
   webDir: "out",
   server: {
-    url: "https://huspass.dk",
-    cleartext: false
+    url: "https://www.huspass.dk",
+    cleartext: false,
+    allowNavigation: ["huspass.dk", "www.huspass.dk"]
   }
 };
 
