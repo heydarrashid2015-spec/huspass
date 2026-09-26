@@ -51,7 +51,8 @@ HusPass requires login for private account features. Before review, provide Goog
 - [x] Danish store-description draft
 - [ ] Permanent private Android upload key
 - [ ] Signed release AAB
-- [ ] Final Play Store icon and feature graphic
+- [x] Final app/launcher icon integrated in Web/PWA/Android build
+- [ ] Final Play Store feature graphic
 - [ ] Final Android screenshots
 - [ ] Play Console Data Safety declaration
 - [ ] Play Console content rating
@@ -113,8 +114,10 @@ For the final Android/store identity, keep one consistent HusPass mark across la
 
 Current production direction:
 - Brand name: HusPass
-- Primary mark: simple, recognizable house/home-oriented HusPass symbol rather than generic Capacitor branding.
+- Approved primary mark: navy house, four-pane white window, integrated green checkmark and blue–teal–green surrounding form.
+- Approved palette: #0B2D4F primary navy, #008D7A teal, #5ED36F green, #4CC3E6 light blue, #E8F6EF light background.
 - Visual language: clean Danish home-management product; readable at small icon sizes.
+- The approved mark is now integrated in the web interface, PWA icons and Android launcher build.
 - Do not place customer data, addresses, personal names or screenshots inside the icon.
 - Store graphics must not imply features that the released app does not actually provide.
 - Validate the launcher icon on a physical Android device before freezing the v1.0.0 release candidate.
@@ -122,7 +125,7 @@ Current production direction:
 The HusPass house + checkmark concept has been approved as the visual direction. The final production artwork should preserve this concept while being recreated as clean standalone brand assets (not cropped from a promotional mockup) for Android, web/PWA, Play Store and future iOS use.
 
 ## Store assets still required before publication
-- Final high-resolution app icon
+- Final high-resolution app icon: integrated in the current build; verify visually on a physical Android device before store submission.
 - Feature graphic
 - Android phone screenshots from the final release candidate
 - Content-rating questionnaire in Play Console
