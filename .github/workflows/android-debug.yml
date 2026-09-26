@@ -12,6 +12,10 @@ on:
       - "app/apple-icon.js"
       - "app/pwa-192/route.js"
       - "app/pwa-512/route.js"
+      - "app/privatliv/page.js"
+      - "app/vilkaar/page.js"
+      - "app/download/page.js"
+      - "next.config.mjs"
 
 permissions:
   contents: write
