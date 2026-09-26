@@ -120,6 +120,12 @@ jobs:
             echo "$url -> $code"
             [ "$code" = "200" ] || exit 1
           done
+          privacy=$(curl -L --silent --show-error https://www.huspass.dk/privatliv)
+          printf '%s' "$privacy" | grep -q 'kamera'
+          printf '%s' "$privacy" | grep -q 'mikrofon'
+          printf '%s' "$privacy" | grep -q 'placering'
+          printf '%s' "$privacy" | grep -q 'kontakter'
+          printf '%s' "$privacy" | grep -q 'Slet'
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
