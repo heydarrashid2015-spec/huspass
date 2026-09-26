@@ -108,6 +108,19 @@ Run these checks on the final signed Android release candidate before Play submi
 
 Use only fictional test data. Never use a real customer's personal data for release testing or screenshots.
 
+## HusPass visual identity direction
+For the final Android/store identity, keep one consistent HusPass mark across launcher icon, Play Store icon, website and future iOS build.
+
+Current production direction:
+- Brand name: HusPass
+- Primary mark: simple, recognizable house/home-oriented HusPass symbol rather than generic Capacitor branding.
+- Visual language: clean Danish home-management product; readable at small icon sizes.
+- Do not place customer data, addresses, personal names or screenshots inside the icon.
+- Store graphics must not imply features that the released app does not actually provide.
+- Validate the launcher icon on a physical Android device before freezing the v1.0.0 release candidate.
+
+The current generated web/PWA icon is a temporary HusPass “H” mark. Treat it as a placeholder until the final brand artwork is approved and applied consistently to Android and store assets.
+
 ## Store assets still required before publication
 - Final high-resolution app icon
 - Feature graphic
