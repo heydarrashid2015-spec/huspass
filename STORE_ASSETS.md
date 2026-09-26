@@ -31,6 +31,11 @@ Create screenshots from the final Android release candidate using a dedicated fi
 
 Before export, inspect every screenshot for status-bar identifiers, notifications, email addresses, real addresses, filenames, documents, photos or expenses. Crop/redact anything not fictional.
 
+## v1.0.0 screenshot truthfulness gate
+For the free 1.0.0 store listing, do not show the proposed multi-photo gallery as an available feature. The gallery concept belongs to the future paid HusPass Plus scope. Screenshots must reflect only functionality present in the submitted build.
+
+Do not use the generated concept sheet as a Play Store screenshot because it contains illustrative UI rather than verified release UI. Generate final screenshots from the actual Android release candidate with fictional data.
+
 ## Store text
 Short description:
 > Din bolig, vedligeholdelse, dokumenter og udgifter samlet ét sted.
