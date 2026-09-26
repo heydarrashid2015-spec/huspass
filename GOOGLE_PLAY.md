@@ -80,6 +80,17 @@ Use this only as a preparation worksheet and verify it against the final product
 ### Final verification before answering Play Console
 Check the final release candidate, Supabase production configuration and every production SDK/provider. Google Play declarations must reflect actual collection, sharing, purpose, retention, deletion and security behavior at submission time.
 
+## Content-rating preparation
+HusPass is a home-management utility. The current product design does not intentionally include gambling, sexual content, violence, drugs, user-to-user social posting, or public user-generated content. Answer the official Play Console questionnaire from the final production build; do not copy assumptions from this file without verification.
+
+## Store listing asset specification
+Prepare final assets from the release candidate, not from private customer data:
+- App icon: final HusPass brand artwork, high resolution, no personal/customer information.
+- Feature graphic: HusPass branding and product value only.
+- Phone screenshots: use a dedicated test account with fictional property data.
+- Never capture a real user's address, documents, email, expenses, images, or support messages in store screenshots.
+- Review every screenshot before upload for notification text, status-bar identifiers, or other accidental personal information.
+
 ## Store assets still required before publication
 - Final high-resolution app icon
 - Feature graphic
