@@ -174,3 +174,9 @@ body{min-height:100dvh}
 .homeHero .homeHeroChange{position:absolute;z-index:4;right:12px;bottom:14px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.94);color:#102f68;border-radius:12px;padding:8px 9px;font-size:10px;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.14);cursor:pointer}
 .homeHero .homeHeroChange input{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
 @media(max-width:520px){.homeHero{height:230px;min-height:230px;padding:0;gap:0}.homeHero .homeHeroText{left:18px;right:76px;bottom:18px}.homeHero .homeHeroText h2{font-size:28px}.homeHero .homeHeroText span{font-size:13px}.homeHero .homeHeroChange{right:10px;bottom:12px;padding:7px 8px}.homeHero .homeHeroChange span{font-size:9px}}
+
+/* Hero photo correction: always fill the entire welcome card */
+.homeHero .homeHeroMedia,.homeHero .homeHeroMedia .houseImageView{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important}
+.homeHero.hasPhoto .homeHeroMedia img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center!important}
+.homeHero .homeHeroChange{top:12px!important;right:12px!important;bottom:auto!important;left:auto!important}
+@media(max-width:520px){.homeHero .homeHeroChange{top:10px!important;right:10px!important;bottom:auto!important}}
