@@ -280,3 +280,14 @@ Future-capability rules:
 - New paid functionality must remain separate from the free baseline until pricing, billing and store terms are deliberately activated.
 - Privacy policy, Data Safety and permission checks must be revised per release when a new capability changes data handling.
 - VersionCode must increase for every Google Play update; versionName should follow the product release version.
+
+## Future HusPass Plus feature – photo gallery
+The owner approved a structured home-photo gallery as a future paid HusPass Plus feature. It is not part of the free v1.0.0 release and must not be advertised as available until implemented and activated.
+
+Planned scope:
+- Multiple private photos per home.
+- Gallery filters/categories such as Alle, Udvendig and Indvendig, with room/component categories extendable later.
+- Photos remain isolated to the authenticated home owner and use private storage/time-limited access.
+- No camera permission is required for the initial gallery if photos are selected through the system file/photo picker; reassess permissions and Google Play Data Safety before adding direct camera capture.
+- Architecture must allow future notes, dates and maintenance links without destructive database changes.
+
