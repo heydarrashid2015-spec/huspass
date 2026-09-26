@@ -33,6 +33,12 @@ HusPass udvikles til boligejere i Danmark. Funktioner kan blive udvidet og forbe
 - Website: https://huspass.dk
 - Support email: heydar.rashid2015@gmail.com
 
+## Google Play data-safety preparation
+Based on the current HusPass production design, the Play Console Data Safety declaration must be completed from the final release behavior, not guessed from this document. Current user-facing data categories include account email plus user-entered home information, tasks, expenses, images, documents, and support messages. Authentication, database and private file storage are provided through HusPass backend services. Account deletion is available in HusPass. Re-check all production SDKs and data flows immediately before submitting the declaration.
+
+## Reviewer access preparation
+HusPass requires login for private account features. Before review, provide Google Play reviewers with valid app-access instructions through Play Console. Do not put reviewer credentials, passwords, API keys, or test-account secrets in this public repository.
+
 ## Store assets still required before publication
 - Final high-resolution app icon
 - Feature graphic
