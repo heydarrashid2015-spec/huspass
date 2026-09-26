@@ -197,3 +197,10 @@ body{min-height:100dvh}
   .homeHead h3{font-size:24px;line-height:1.08}
   .quickActions{margin-top:18px}
 }
+
+/* Bottom navigation polish */
+.bottomNav{box-shadow:0 -8px 24px rgba(16,47,104,.035);backdrop-filter:blur(12px)}
+.bottomNav button{transition:color .16s ease,transform .16s ease}
+.bottomNav button:active{transform:scale(.96)}
+.bottomNav button.active i{background:#e7f7ee}
+@media(max-width:380px){.bottomNav span{font-size:8px}.bottomNav svg{width:20px;height:20px}}
