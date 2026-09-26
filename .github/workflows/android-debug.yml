@@ -102,6 +102,13 @@ jobs:
             echo "Unexpected privacy-sensitive Android permission detected."
             exit 1
           fi
+      - name: Verify required public release pages
+        run: |
+          for url in https://www.huspass.dk/ https://www.huspass.dk/privatliv https://www.huspass.dk/vilkaar https://www.huspass.dk/download; do
+            code=$(curl -L --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || exit 1
+          done
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
