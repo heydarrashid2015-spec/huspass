@@ -110,6 +110,533 @@ jobs:
             echo "Tracked environment, signing, or service-account file detected."
             exit 1
           fi
+      - name: Verify repository privacy hygiene
+        run: |
+          tracked="$(git ls-files)"
+          if printf '%s\n' "$tracked" | grep -E '(^|/)(\.env($|\.)|.*\.(jks|keystore|p12|pem)$|key\.properties$|keystore\.properties$|google-services\.json$|service-account.*\.json$|play-service-account.*\.json$)'; then
+            echo "Sensitive configuration or signing material is tracked."
+            exit 1
+          fi
+          grep -q '^\.env\*        run: npm run build
+      - name: Audit production dependency tree
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify privacy-sensitive Android configuration
+        run: |
+          grep -q 'cleartext: false' capacitor.config.ts
+          grep -q 'allowNavigation: \["huspass.dk", "www.huspass.dk"\]' capacitor.config.ts
+          if grep -R -n -E 'ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA' android/app/src/main/AndroidManifest.xml 2>/dev/null; then
+            echo "Unexpected privacy-sensitive Android permission detected."
+            exit 1
+          fi
+      - name: Verify required public release pages
+        run: |
+          for url in https://www.huspass.dk/ https://www.huspass.dk/privatliv https://www.huspass.dk/vilkaar https://www.huspass.dk/slet-konto https://www.huspass.dk/download; do
+            code=$(curl -L --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || exit 1
+          done
+          privacy=$(curl -L --silent --show-error https://www.huspass.dk/privatliv)
+          printf '%s' "$privacy" | grep -q 'kamera'
+          printf '%s' "$privacy" | grep -q 'mikrofon'
+          printf '%s' "$privacy" | grep -q 'placering'
+          printf '%s' "$privacy" | grep -q 'kontakter'
+          printf '%s' "$privacy" | grep -q 'slette din konto'
+          deletion=$(curl -L --silent --show-error https://www.huspass.dk/slet-konto)
+          printf '%s' "$deletion" | grep -q 'Slet konto'
+          printf '%s' "$deletion" | grep -q 'Mere'
+          printf '%s' "$deletion" | grep -q 'dokumenter'
+          terms=$(curl -L --silent --show-error https://www.huspass.dk/vilkaar)
+          printf '%s' "$terms" | grep -q 'HusPass'
+          printf '%s' "$terms" | grep -q 'betalt HusPass Plus'
+          download=$(curl -L --silent --show-error https://www.huspass.dk/download)
+          printf '%s' "$download" | grep -q 'Android-testversion'
+          printf '%s' "$download" | grep -q 'uden for Google Play'
+      - name: Verify release metadata and no accidental test markers
+        run: |
+          grep -q 'metadataBase:new URL("https://huspass.dk")' app/layout.js
+          grep -q 'manifest:"/manifest.webmanifest"' app/layout.js
+          grep -q 'robots:{index:true,follow:true}' app/layout.js
+          if grep -R -n -E 'localhost|127\.0\.0\.1|example\.com|TODO|FIXME' capacitor.config.ts app/page.js app/layout.js public/manifest.webmanifest 2>/dev/null; then
+            echo "Development placeholder or unfinished marker found in release-critical files."
+            exit 1
+          fi
+      - name: Verify PWA install metadata
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path("public/manifest.webmanifest").read_text())
+          assert m["name"]=="HusPass"
+          assert m["short_name"]=="HusPass"
+          assert m["start_url"]=="/"
+          assert m["scope"]=="/"
+          assert m["display"]=="standalone"
+          sizes={i.get("sizes") for i in m.get("icons",[])}
+          assert "192x192" in sizes and "512x512" in sizes
+          PY
+          for url in https://www.huspass.dk/manifest.webmanifest https://www.huspass.dk/pwa-192 https://www.huspass.dk/pwa-512; do
+            code=$(curl -L --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || exit 1
+          done
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Verify generated Android manifest
+        run: |
+          manifest="android/app/src/main/AndroidManifest.xml"
+          grep -q 'android.permission.INTERNET' "$manifest"
+          if grep -E 'android.permission.(ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA|READ_CONTACTS|WRITE_CONTACTS)' "$manifest"; then
+            echo "Unexpected sensitive permission found in generated Android manifest."
+            exit 1
+          fi
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - name: Build unsigned release AAB
+        working-directory: android
+        run: ./gradlew bundleRelease
+      - name: Verify release AAB is not accidentally signed before signing gate
+        run: |
+          AAB="android/app/build/outputs/bundle/release/app-release.aab"
+          test -f "$AAB"
+          set +e
+          OUTPUT="$(jarsigner -verify "$AAB" 2>&1)"
+          CODE=$?
+          set -e
+          echo "$OUTPUT"
+          if [ "$CODE" -eq 0 ] && ! echo "$OUTPUT" | grep -qi "jar is unsigned"; then
+            echo "Release AAB is signed while the workflow is still in the unsigned preparation stage."
+            exit 1
+          fi
+          echo "Unsigned AAB confirmed for the pre-signing stage."
+      - name: Verify Android release artifacts
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          test -s android/app/build/outputs/bundle/release/app-release.aab
+          apk_size=$(stat -c%s android/app/build/outputs/apk/debug/app-debug.apk)
+          aab_size=$(stat -c%s android/app/build/outputs/bundle/release/app-release.aab)
+          echo "APK bytes: $apk_size"
+          echo "AAB bytes: $aab_size"
+          [ "$apk_size" -gt 100000 ] || exit 1
+          [ "$aab_size" -gt 100000 ] || exit 1
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/bundle/release/app-release.aab
+      - name: Write Android artifact checksums
+        run: |
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > HusPass-Android-v1.0.0-SHA256.txt
+          sha256sum android/app/build/outputs/bundle/release/app-release.aab >> HusPass-Android-v1.0.0-SHA256.txt
+      - name: Publish shareable Android test APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk HusPass-Android-test.apk
+          gh release view android-test >/dev/null 2>&1 || gh release create android-test --title "HusPass Android test" --notes "Testing build of HusPass for Android. This is a prerelease build distributed outside Google Play." --prerelease
+          gh release upload android-test HusPass-Android-test.apk HusPass-Android-v1.0.0-SHA256.txt --clobber
+      - name: Upload test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: HusPass-Android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Upload Play-ready unsigned AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: HusPass-Android-release-v1.0.0-unsigned-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+ .gitignore
+          grep -q '^\*\.jks        run: npm run build
+      - name: Audit production dependency tree
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify privacy-sensitive Android configuration
+        run: |
+          grep -q 'cleartext: false' capacitor.config.ts
+          grep -q 'allowNavigation: \["huspass.dk", "www.huspass.dk"\]' capacitor.config.ts
+          if grep -R -n -E 'ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA' android/app/src/main/AndroidManifest.xml 2>/dev/null; then
+            echo "Unexpected privacy-sensitive Android permission detected."
+            exit 1
+          fi
+      - name: Verify required public release pages
+        run: |
+          for url in https://www.huspass.dk/ https://www.huspass.dk/privatliv https://www.huspass.dk/vilkaar https://www.huspass.dk/slet-konto https://www.huspass.dk/download; do
+            code=$(curl -L --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || exit 1
+          done
+          privacy=$(curl -L --silent --show-error https://www.huspass.dk/privatliv)
+          printf '%s' "$privacy" | grep -q 'kamera'
+          printf '%s' "$privacy" | grep -q 'mikrofon'
+          printf '%s' "$privacy" | grep -q 'placering'
+          printf '%s' "$privacy" | grep -q 'kontakter'
+          printf '%s' "$privacy" | grep -q 'slette din konto'
+          deletion=$(curl -L --silent --show-error https://www.huspass.dk/slet-konto)
+          printf '%s' "$deletion" | grep -q 'Slet konto'
+          printf '%s' "$deletion" | grep -q 'Mere'
+          printf '%s' "$deletion" | grep -q 'dokumenter'
+          terms=$(curl -L --silent --show-error https://www.huspass.dk/vilkaar)
+          printf '%s' "$terms" | grep -q 'HusPass'
+          printf '%s' "$terms" | grep -q 'betalt HusPass Plus'
+          download=$(curl -L --silent --show-error https://www.huspass.dk/download)
+          printf '%s' "$download" | grep -q 'Android-testversion'
+          printf '%s' "$download" | grep -q 'uden for Google Play'
+      - name: Verify release metadata and no accidental test markers
+        run: |
+          grep -q 'metadataBase:new URL("https://huspass.dk")' app/layout.js
+          grep -q 'manifest:"/manifest.webmanifest"' app/layout.js
+          grep -q 'robots:{index:true,follow:true}' app/layout.js
+          if grep -R -n -E 'localhost|127\.0\.0\.1|example\.com|TODO|FIXME' capacitor.config.ts app/page.js app/layout.js public/manifest.webmanifest 2>/dev/null; then
+            echo "Development placeholder or unfinished marker found in release-critical files."
+            exit 1
+          fi
+      - name: Verify PWA install metadata
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path("public/manifest.webmanifest").read_text())
+          assert m["name"]=="HusPass"
+          assert m["short_name"]=="HusPass"
+          assert m["start_url"]=="/"
+          assert m["scope"]=="/"
+          assert m["display"]=="standalone"
+          sizes={i.get("sizes") for i in m.get("icons",[])}
+          assert "192x192" in sizes and "512x512" in sizes
+          PY
+          for url in https://www.huspass.dk/manifest.webmanifest https://www.huspass.dk/pwa-192 https://www.huspass.dk/pwa-512; do
+            code=$(curl -L --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || exit 1
+          done
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Verify generated Android manifest
+        run: |
+          manifest="android/app/src/main/AndroidManifest.xml"
+          grep -q 'android.permission.INTERNET' "$manifest"
+          if grep -E 'android.permission.(ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA|READ_CONTACTS|WRITE_CONTACTS)' "$manifest"; then
+            echo "Unexpected sensitive permission found in generated Android manifest."
+            exit 1
+          fi
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - name: Build unsigned release AAB
+        working-directory: android
+        run: ./gradlew bundleRelease
+      - name: Verify release AAB is not accidentally signed before signing gate
+        run: |
+          AAB="android/app/build/outputs/bundle/release/app-release.aab"
+          test -f "$AAB"
+          set +e
+          OUTPUT="$(jarsigner -verify "$AAB" 2>&1)"
+          CODE=$?
+          set -e
+          echo "$OUTPUT"
+          if [ "$CODE" -eq 0 ] && ! echo "$OUTPUT" | grep -qi "jar is unsigned"; then
+            echo "Release AAB is signed while the workflow is still in the unsigned preparation stage."
+            exit 1
+          fi
+          echo "Unsigned AAB confirmed for the pre-signing stage."
+      - name: Verify Android release artifacts
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          test -s android/app/build/outputs/bundle/release/app-release.aab
+          apk_size=$(stat -c%s android/app/build/outputs/apk/debug/app-debug.apk)
+          aab_size=$(stat -c%s android/app/build/outputs/bundle/release/app-release.aab)
+          echo "APK bytes: $apk_size"
+          echo "AAB bytes: $aab_size"
+          [ "$apk_size" -gt 100000 ] || exit 1
+          [ "$aab_size" -gt 100000 ] || exit 1
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/bundle/release/app-release.aab
+      - name: Write Android artifact checksums
+        run: |
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > HusPass-Android-v1.0.0-SHA256.txt
+          sha256sum android/app/build/outputs/bundle/release/app-release.aab >> HusPass-Android-v1.0.0-SHA256.txt
+      - name: Publish shareable Android test APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk HusPass-Android-test.apk
+          gh release view android-test >/dev/null 2>&1 || gh release create android-test --title "HusPass Android test" --notes "Testing build of HusPass for Android. This is a prerelease build distributed outside Google Play." --prerelease
+          gh release upload android-test HusPass-Android-test.apk HusPass-Android-v1.0.0-SHA256.txt --clobber
+      - name: Upload test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: HusPass-Android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Upload Play-ready unsigned AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: HusPass-Android-release-v1.0.0-unsigned-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+ .gitignore
+          grep -q '^\*\.keystore        run: npm run build
+      - name: Audit production dependency tree
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify privacy-sensitive Android configuration
+        run: |
+          grep -q 'cleartext: false' capacitor.config.ts
+          grep -q 'allowNavigation: \["huspass.dk", "www.huspass.dk"\]' capacitor.config.ts
+          if grep -R -n -E 'ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA' android/app/src/main/AndroidManifest.xml 2>/dev/null; then
+            echo "Unexpected privacy-sensitive Android permission detected."
+            exit 1
+          fi
+      - name: Verify required public release pages
+        run: |
+          for url in https://www.huspass.dk/ https://www.huspass.dk/privatliv https://www.huspass.dk/vilkaar https://www.huspass.dk/slet-konto https://www.huspass.dk/download; do
+            code=$(curl -L --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || exit 1
+          done
+          privacy=$(curl -L --silent --show-error https://www.huspass.dk/privatliv)
+          printf '%s' "$privacy" | grep -q 'kamera'
+          printf '%s' "$privacy" | grep -q 'mikrofon'
+          printf '%s' "$privacy" | grep -q 'placering'
+          printf '%s' "$privacy" | grep -q 'kontakter'
+          printf '%s' "$privacy" | grep -q 'slette din konto'
+          deletion=$(curl -L --silent --show-error https://www.huspass.dk/slet-konto)
+          printf '%s' "$deletion" | grep -q 'Slet konto'
+          printf '%s' "$deletion" | grep -q 'Mere'
+          printf '%s' "$deletion" | grep -q 'dokumenter'
+          terms=$(curl -L --silent --show-error https://www.huspass.dk/vilkaar)
+          printf '%s' "$terms" | grep -q 'HusPass'
+          printf '%s' "$terms" | grep -q 'betalt HusPass Plus'
+          download=$(curl -L --silent --show-error https://www.huspass.dk/download)
+          printf '%s' "$download" | grep -q 'Android-testversion'
+          printf '%s' "$download" | grep -q 'uden for Google Play'
+      - name: Verify release metadata and no accidental test markers
+        run: |
+          grep -q 'metadataBase:new URL("https://huspass.dk")' app/layout.js
+          grep -q 'manifest:"/manifest.webmanifest"' app/layout.js
+          grep -q 'robots:{index:true,follow:true}' app/layout.js
+          if grep -R -n -E 'localhost|127\.0\.0\.1|example\.com|TODO|FIXME' capacitor.config.ts app/page.js app/layout.js public/manifest.webmanifest 2>/dev/null; then
+            echo "Development placeholder or unfinished marker found in release-critical files."
+            exit 1
+          fi
+      - name: Verify PWA install metadata
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path("public/manifest.webmanifest").read_text())
+          assert m["name"]=="HusPass"
+          assert m["short_name"]=="HusPass"
+          assert m["start_url"]=="/"
+          assert m["scope"]=="/"
+          assert m["display"]=="standalone"
+          sizes={i.get("sizes") for i in m.get("icons",[])}
+          assert "192x192" in sizes and "512x512" in sizes
+          PY
+          for url in https://www.huspass.dk/manifest.webmanifest https://www.huspass.dk/pwa-192 https://www.huspass.dk/pwa-512; do
+            code=$(curl -L --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || exit 1
+          done
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Verify generated Android manifest
+        run: |
+          manifest="android/app/src/main/AndroidManifest.xml"
+          grep -q 'android.permission.INTERNET' "$manifest"
+          if grep -E 'android.permission.(ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA|READ_CONTACTS|WRITE_CONTACTS)' "$manifest"; then
+            echo "Unexpected sensitive permission found in generated Android manifest."
+            exit 1
+          fi
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - name: Build unsigned release AAB
+        working-directory: android
+        run: ./gradlew bundleRelease
+      - name: Verify release AAB is not accidentally signed before signing gate
+        run: |
+          AAB="android/app/build/outputs/bundle/release/app-release.aab"
+          test -f "$AAB"
+          set +e
+          OUTPUT="$(jarsigner -verify "$AAB" 2>&1)"
+          CODE=$?
+          set -e
+          echo "$OUTPUT"
+          if [ "$CODE" -eq 0 ] && ! echo "$OUTPUT" | grep -qi "jar is unsigned"; then
+            echo "Release AAB is signed while the workflow is still in the unsigned preparation stage."
+            exit 1
+          fi
+          echo "Unsigned AAB confirmed for the pre-signing stage."
+      - name: Verify Android release artifacts
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          test -s android/app/build/outputs/bundle/release/app-release.aab
+          apk_size=$(stat -c%s android/app/build/outputs/apk/debug/app-debug.apk)
+          aab_size=$(stat -c%s android/app/build/outputs/bundle/release/app-release.aab)
+          echo "APK bytes: $apk_size"
+          echo "AAB bytes: $aab_size"
+          [ "$apk_size" -gt 100000 ] || exit 1
+          [ "$aab_size" -gt 100000 ] || exit 1
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/bundle/release/app-release.aab
+      - name: Write Android artifact checksums
+        run: |
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > HusPass-Android-v1.0.0-SHA256.txt
+          sha256sum android/app/build/outputs/bundle/release/app-release.aab >> HusPass-Android-v1.0.0-SHA256.txt
+      - name: Publish shareable Android test APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk HusPass-Android-test.apk
+          gh release view android-test >/dev/null 2>&1 || gh release create android-test --title "HusPass Android test" --notes "Testing build of HusPass for Android. This is a prerelease build distributed outside Google Play." --prerelease
+          gh release upload android-test HusPass-Android-test.apk HusPass-Android-v1.0.0-SHA256.txt --clobber
+      - name: Upload test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: HusPass-Android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Upload Play-ready unsigned AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: HusPass-Android-release-v1.0.0-unsigned-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+ .gitignore
+          grep -q '^service-account\*\.json        run: npm run build
+      - name: Audit production dependency tree
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify privacy-sensitive Android configuration
+        run: |
+          grep -q 'cleartext: false' capacitor.config.ts
+          grep -q 'allowNavigation: \["huspass.dk", "www.huspass.dk"\]' capacitor.config.ts
+          if grep -R -n -E 'ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA' android/app/src/main/AndroidManifest.xml 2>/dev/null; then
+            echo "Unexpected privacy-sensitive Android permission detected."
+            exit 1
+          fi
+      - name: Verify required public release pages
+        run: |
+          for url in https://www.huspass.dk/ https://www.huspass.dk/privatliv https://www.huspass.dk/vilkaar https://www.huspass.dk/slet-konto https://www.huspass.dk/download; do
+            code=$(curl -L --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || exit 1
+          done
+          privacy=$(curl -L --silent --show-error https://www.huspass.dk/privatliv)
+          printf '%s' "$privacy" | grep -q 'kamera'
+          printf '%s' "$privacy" | grep -q 'mikrofon'
+          printf '%s' "$privacy" | grep -q 'placering'
+          printf '%s' "$privacy" | grep -q 'kontakter'
+          printf '%s' "$privacy" | grep -q 'slette din konto'
+          deletion=$(curl -L --silent --show-error https://www.huspass.dk/slet-konto)
+          printf '%s' "$deletion" | grep -q 'Slet konto'
+          printf '%s' "$deletion" | grep -q 'Mere'
+          printf '%s' "$deletion" | grep -q 'dokumenter'
+          terms=$(curl -L --silent --show-error https://www.huspass.dk/vilkaar)
+          printf '%s' "$terms" | grep -q 'HusPass'
+          printf '%s' "$terms" | grep -q 'betalt HusPass Plus'
+          download=$(curl -L --silent --show-error https://www.huspass.dk/download)
+          printf '%s' "$download" | grep -q 'Android-testversion'
+          printf '%s' "$download" | grep -q 'uden for Google Play'
+      - name: Verify release metadata and no accidental test markers
+        run: |
+          grep -q 'metadataBase:new URL("https://huspass.dk")' app/layout.js
+          grep -q 'manifest:"/manifest.webmanifest"' app/layout.js
+          grep -q 'robots:{index:true,follow:true}' app/layout.js
+          if grep -R -n -E 'localhost|127\.0\.0\.1|example\.com|TODO|FIXME' capacitor.config.ts app/page.js app/layout.js public/manifest.webmanifest 2>/dev/null; then
+            echo "Development placeholder or unfinished marker found in release-critical files."
+            exit 1
+          fi
+      - name: Verify PWA install metadata
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path("public/manifest.webmanifest").read_text())
+          assert m["name"]=="HusPass"
+          assert m["short_name"]=="HusPass"
+          assert m["start_url"]=="/"
+          assert m["scope"]=="/"
+          assert m["display"]=="standalone"
+          sizes={i.get("sizes") for i in m.get("icons",[])}
+          assert "192x192" in sizes and "512x512" in sizes
+          PY
+          for url in https://www.huspass.dk/manifest.webmanifest https://www.huspass.dk/pwa-192 https://www.huspass.dk/pwa-512; do
+            code=$(curl -L --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || exit 1
+          done
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Verify generated Android manifest
+        run: |
+          manifest="android/app/src/main/AndroidManifest.xml"
+          grep -q 'android.permission.INTERNET' "$manifest"
+          if grep -E 'android.permission.(ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA|READ_CONTACTS|WRITE_CONTACTS)' "$manifest"; then
+            echo "Unexpected sensitive permission found in generated Android manifest."
+            exit 1
+          fi
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - name: Build unsigned release AAB
+        working-directory: android
+        run: ./gradlew bundleRelease
+      - name: Verify release AAB is not accidentally signed before signing gate
+        run: |
+          AAB="android/app/build/outputs/bundle/release/app-release.aab"
+          test -f "$AAB"
+          set +e
+          OUTPUT="$(jarsigner -verify "$AAB" 2>&1)"
+          CODE=$?
+          set -e
+          echo "$OUTPUT"
+          if [ "$CODE" -eq 0 ] && ! echo "$OUTPUT" | grep -qi "jar is unsigned"; then
+            echo "Release AAB is signed while the workflow is still in the unsigned preparation stage."
+            exit 1
+          fi
+          echo "Unsigned AAB confirmed for the pre-signing stage."
+      - name: Verify Android release artifacts
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          test -s android/app/build/outputs/bundle/release/app-release.aab
+          apk_size=$(stat -c%s android/app/build/outputs/apk/debug/app-debug.apk)
+          aab_size=$(stat -c%s android/app/build/outputs/bundle/release/app-release.aab)
+          echo "APK bytes: $apk_size"
+          echo "AAB bytes: $aab_size"
+          [ "$apk_size" -gt 100000 ] || exit 1
+          [ "$aab_size" -gt 100000 ] || exit 1
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/bundle/release/app-release.aab
+      - name: Write Android artifact checksums
+        run: |
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > HusPass-Android-v1.0.0-SHA256.txt
+          sha256sum android/app/build/outputs/bundle/release/app-release.aab >> HusPass-Android-v1.0.0-SHA256.txt
+      - name: Publish shareable Android test APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk HusPass-Android-test.apk
+          gh release view android-test >/dev/null 2>&1 || gh release create android-test --title "HusPass Android test" --notes "Testing build of HusPass for Android. This is a prerelease build distributed outside Google Play." --prerelease
+          gh release upload android-test HusPass-Android-test.apk HusPass-Android-v1.0.0-SHA256.txt --clobber
+      - name: Upload test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: HusPass-Android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Upload Play-ready unsigned AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: HusPass-Android-release-v1.0.0-unsigned-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+ .gitignore
       - name: Verify production web build
         run: npm run build
       - name: Audit production dependency tree
