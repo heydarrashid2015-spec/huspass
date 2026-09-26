@@ -159,3 +159,18 @@ body{min-height:100dvh}
 
 /* HusPass approved brand */
 .huspassBrand{display:flex;align-items:center;justify-content:center;gap:10px}.huspassMark{width:58px;height:58px;display:inline-flex;flex:0 0 auto}.huspassMark svg{width:100%;height:100%;display:block}.huspassWord{font-size:29px;letter-spacing:-1.2px;line-height:1}.huspassWord b{color:#082d4f}.huspassWord strong{color:#008d7a}.authBox>.huspassBrand{margin:0 auto 8px}.authBox>.huspassBrand .huspassMark{width:68px;height:68px}.authBox>.huspassBrand .huspassWord{font-size:31px}.headerBrand>.huspassBrand{justify-content:flex-start}.headerBrand .huspassMark{width:48px;height:48px}.headerBrand .huspassWord{font-size:27px}.headerBrand .tagline{margin-left:58px;margin-top:-10px}@media(max-width:360px){.headerBrand .huspassWord{font-size:24px}.headerBrand .huspassMark{width:44px;height:44px}.headerBrand .tagline{margin-left:54px}}
+
+/* Home hero: photo-first layout with readable copy and compact image control */
+.homeHero{height:260px;min-height:260px;margin:8px 16px 18px;padding:0;border-radius:24px;display:block;position:relative;overflow:hidden;background:linear-gradient(135deg,#dff4ed,#eef8f5)}
+.homeHero .homeHeroMedia{position:absolute;inset:0;width:100%;height:100%}
+.homeHero .homeHeroMedia .houseImageView{width:100%;height:100%;padding:0;border:0;background:transparent;display:block}
+.homeHero .homeHeroMedia img{width:100%;height:100%;object-fit:cover;display:block}
+.homeHero .overviewPhotoPlaceholder{width:100%;height:100%;padding-bottom:34px}
+.homeHero .homeHeroShade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(4,25,32,.02) 28%,rgba(4,25,32,.78) 100%);pointer-events:none}
+.homeHero .homeHeroText{position:absolute;z-index:2;left:22px;right:82px;bottom:22px;width:auto;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.28)}
+.homeHero .homeHeroText p{margin:0 0 5px;color:rgba(255,255,255,.9);font-size:12px}
+.homeHero .homeHeroText h2{margin:0 0 4px;color:#fff;font-size:30px;line-height:1.05}
+.homeHero .homeHeroText span{color:#fff;font-size:14px;line-height:1.35}
+.homeHero .homeHeroChange{position:absolute;z-index:4;right:12px;bottom:14px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.94);color:#102f68;border-radius:12px;padding:8px 9px;font-size:10px;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.14);cursor:pointer}
+.homeHero .homeHeroChange input{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+@media(max-width:520px){.homeHero{height:230px;min-height:230px;padding:0;gap:0}.homeHero .homeHeroText{left:18px;right:76px;bottom:18px}.homeHero .homeHeroText h2{font-size:28px}.homeHero .homeHeroText span{font-size:13px}.homeHero .homeHeroChange{right:10px;bottom:12px;padding:7px 8px}.homeHero .homeHeroChange span{font-size:9px}}
