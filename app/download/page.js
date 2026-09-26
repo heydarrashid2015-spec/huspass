@@ -1,0 +1,4 @@
+export const metadata={title:"Download HusPass"};
+const wrap={maxWidth:720,margin:"0 auto",padding:"56px 22px 90px",fontFamily:"system-ui,sans-serif",lineHeight:1.6,color:"#17211c",textAlign:"center"};
+const button={display:"inline-block",marginTop:20,padding:"14px 22px",borderRadius:12,background:"#102f68",color:"#fff",textDecoration:"none",fontWeight:700};
+export default function Download(){return <main style={wrap}><img src="/icon" width="112" height="112" alt="HusPass"/><h1>HusPass til Android</h1><p>Den direkte Android-download bliver gjort klar til privat test. Indtil APK-filen er lagt på HusPass' offentlige downloadlager, viser vi ikke et falsk eller ustabilt downloadlink.</p><p>HusPass bliver senere tilgængelig via Google Play.</p><a style={button} href="/">Åbn HusPass</a><p style={{marginTop:28,fontSize:14,color:"#647067"}}>Downloadside: huspass.dk/download</p></main>}
