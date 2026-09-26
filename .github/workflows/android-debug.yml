@@ -110,6 +110,8 @@ jobs:
             echo "Tracked environment, signing, or service-account file detected."
             exit 1
           fi
+      - name: Verify production web build
+        run: npm run build
       - name: Audit production dependency tree
         run: npm audit --omit=dev --audit-level=high
       - name: Verify privacy-sensitive Android configuration
