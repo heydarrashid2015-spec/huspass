@@ -122,7 +122,7 @@ jobs:
           fi
       - name: Verify required public release pages
         run: |
-          for url in https://www.huspass.dk/ https://www.huspass.dk/privatliv https://www.huspass.dk/vilkaar https://www.huspass.dk/download; do
+          for url in https://www.huspass.dk/ https://www.huspass.dk/privatliv https://www.huspass.dk/vilkaar https://www.huspass.dk/slet-konto https://www.huspass.dk/download; do
             code=$(curl -L --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")
             echo "$url -> $code"
             [ "$code" = "200" ] || exit 1
@@ -133,6 +133,10 @@ jobs:
           printf '%s' "$privacy" | grep -q 'placering'
           printf '%s' "$privacy" | grep -q 'kontakter'
           printf '%s' "$privacy" | grep -q 'slette din konto'
+          deletion=$(curl -L --silent --show-error https://www.huspass.dk/slet-konto)
+          printf '%s' "$deletion" | grep -q 'Slet konto'
+          printf '%s' "$deletion" | grep -q 'Mere'
+          printf '%s' "$deletion" | grep -q 'dokumenter'
           terms=$(curl -L --silent --show-error https://www.huspass.dk/vilkaar)
           printf '%s' "$terms" | grep -q 'HusPass'
           printf '%s' "$terms" | grep -q 'betalt HusPass Plus'
