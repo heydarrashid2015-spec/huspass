@@ -193,3 +193,19 @@ Google Play publication itself is intentionally paused until the owner chooses t
 **Category:** House & Home
 
 The text above is prepared for direct entry in Play Console. Do not add claims about features that are not enabled in the release candidate.
+
+
+## Play Console setup order (owner-action stage)
+When the Google Play developer account is activated, use this order to avoid unnecessary backtracking:
+1. Create the app as **HusPass**, default language **Danish**, app/game = **App**, free app.
+2. Complete App access using a dedicated fictional reviewer account; never place its credentials in this repository.
+3. Enter Ads declaration based on the release candidate (current code intentionally contains no advertising SDK).
+4. Complete Data Safety from the verified production data inventory in this document.
+5. Complete Content rating from the actual app behavior.
+6. Add privacy-policy URL and store contact details.
+7. Upload approved icon, 1024×500 feature graphic, and Android screenshots made only with fictional data.
+8. Generate and upload the signed AAB only after the permanent upload key is protected as repository secrets.
+9. Use an internal/closed test track first; verify install, login, private data isolation, documents, image change, logout and account deletion before production submission.
+
+## Signing-key safety gate
+The repository already ignores *.jks, *.keystore, *.p12, *.pem, key.properties, keystore.properties and Play service-account files. The permanent Android upload key must never be committed to GitHub or pasted into public documentation. Its encrypted/base64 form and passwords belong only in protected GitHub Actions secrets when the owner reaches the signing stage.
