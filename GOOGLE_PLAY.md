@@ -91,6 +91,23 @@ Prepare final assets from the release candidate, not from private customer data:
 - Never capture a real user's address, documents, email, expenses, images, or support messages in store screenshots.
 - Review every screenshot before upload for notification text, status-bar identifiers, or other accidental personal information.
 
+## Pre-release test plan
+Run these checks on the final signed Android release candidate before Play submission:
+- Fresh install: install on a device that has never had HusPass installed.
+- Launch: app opens directly inside HusPass with no blank screen and no unexpected browser redirect.
+- Authentication: sign up, email confirmation, login, logout and password recovery.
+- Persistence: close/reopen the app and confirm the authenticated session and private data behave correctly.
+- Home data: create/edit property information and verify it is isolated to the signed-in account.
+- Maintenance: create, edit and delete a task.
+- Documents: upload, open and delete an allowed test file.
+- Images: upload/change a fictional home image and verify private access.
+- Account deletion: verify the test account and its HusPass data are removed as designed.
+- External links: only intentional external destinations may leave the app.
+- Network recovery: verify a useful state after temporary loss and restoration of internet access.
+- Upgrade: once a signed v1.0.0 baseline exists, future builds must preserve the same package ID and signing identity.
+
+Use only fictional test data. Never use a real customer's personal data for release testing or screenshots.
+
 ## Store assets still required before publication
 - Final high-resolution app icon
 - Feature graphic
