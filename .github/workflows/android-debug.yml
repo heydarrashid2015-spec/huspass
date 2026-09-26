@@ -8,6 +8,10 @@ on:
       - ".github/workflows/android-debug.yml"
       - "capacitor.config.ts"
       - "package.json"
+      - "app/icon.js"
+      - "app/apple-icon.js"
+      - "app/pwa-192/route.js"
+      - "app/pwa-512/route.js"
 
 permissions:
   contents: read
@@ -26,10 +30,27 @@ jobs:
         run: npm install
       - name: Prepare Capacitor web directory
         run: mkdir -p out && printf '<!doctype html><html><body></body></html>' > out/index.html
+      - name: Generate approved HusPass launcher artwork
+        run: |
+          cat > /tmp/huspass-icon.svg <<'SVG'
+          <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#18bfe5"/><stop offset=".55" stop-color="#00a99d"/><stop offset="1" stop-color="#83e52e"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="15" fill="#082d4f"/><path d="M8 33C8 18 20 7 35 7c9 0 16 3 21 9l-8 9c-4-5-8-7-13-7-8 0-15 7-15 15 0 8 5 14 13 16v9C18 57 8 47 8 33Z" fill="url(#g)"/><path d="M16 35 32 18l16 17v14H16Z" fill="white"/><path d="M23 35 32 26l9 9v13H23Z" fill="#082d4f"/><g fill="white"><rect x="28" y="34" width="3.5" height="3.5" rx=".6"/><rect x="33.5" y="34" width="3.5" height="3.5" rx=".6"/><rect x="28" y="39.5" width="3.5" height="3.5" rx=".6"/><rect x="33.5" y="39.5" width="3.5" height="3.5" rx=".6"/></g><path d="m38 48 5 5 11-13" fill="none" stroke="#7ee52f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          SVG
+          npx --yes sharp-cli -i /tmp/huspass-icon.svg -o /tmp/huspass-icon.png resize 512 512
       - name: Add Android project
         run: npx cap add android
       - name: Sync Capacitor
         run: npx cap sync android
+      - name: Install HusPass Android launcher icons
+        run: |
+          for spec in "mipmap-mdpi 48" "mipmap-hdpi 72" "mipmap-xhdpi 96" "mipmap-xxhdpi 144" "mipmap-xxxhdpi 192"; do
+            set -- $spec
+            dir="android/app/src/main/res/$1"
+            size="$2"
+            mkdir -p "$dir"
+            npx --yes sharp-cli -i /tmp/huspass-icon.png -o "$dir/ic_launcher.png" resize "$size" "$size"
+            cp "$dir/ic_launcher.png" "$dir/ic_launcher_round.png"
+            cp "$dir/ic_launcher.png" "$dir/ic_launcher_foreground.png"
+          done
       - name: Set Android release identity
         run: |
           python3 - <<'PY'
