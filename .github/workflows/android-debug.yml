@@ -162,13 +162,17 @@ jobs:
           [ "$apk_size" -gt 100000 ] || exit 1
           [ "$aab_size" -gt 100000 ] || exit 1
           sha256sum android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/bundle/release/app-release.aab
+      - name: Write Android artifact checksums
+        run: |
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > HusPass-Android-v1.0.0-SHA256.txt
+          sha256sum android/app/build/outputs/bundle/release/app-release.aab >> HusPass-Android-v1.0.0-SHA256.txt
       - name: Publish shareable Android test APK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk HusPass-Android-test.apk
           gh release view android-test >/dev/null 2>&1 || gh release create android-test --title "HusPass Android test" --notes "Testing build of HusPass for Android. This is a prerelease build distributed outside Google Play." --prerelease
-          gh release upload android-test HusPass-Android-test.apk --clobber
+          gh release upload android-test HusPass-Android-test.apk HusPass-Android-v1.0.0-SHA256.txt --clobber
       - name: Upload test APK
         uses: actions/upload-artifact@v4
         with:
