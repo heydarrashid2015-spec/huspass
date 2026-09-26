@@ -291,3 +291,28 @@ Planned scope:
 - No camera permission is required for the initial gallery if photos are selected through the system file/photo picker; reassess permissions and Google Play Data Safety before adding direct camera capture.
 - Architecture must allow future notes, dates and maintenance links without destructive database changes.
 
+
+## Play Console form worksheet – ready to copy when the account is created
+
+### App access
+- Restricted functionality: Yes — private HusPass features require authentication.
+- Reviewer route: launch HusPass, choose login, then use the dedicated fictional reviewer account supplied privately in Play Console.
+- Never publish reviewer credentials in GitHub, screenshots or store copy.
+
+### Ads
+- Current release design: no advertising SDK is intentionally included.
+- Re-check the final signed AAB dependency tree immediately before answering the Play Console declaration.
+
+### Target audience / content
+- HusPass is a household/home-management utility, not a child-directed product.
+- No public social feed or user-to-user content is intentionally included in v1.0.0.
+- Complete Google's official target-audience and content-rating questionnaires from the final submitted build.
+
+### Account deletion
+- In-app route: Mere → Slet konto.
+- External deletion resource: https://huspass.dk/slet-konto
+- Identity must be verified before acting on an external deletion request.
+
+### Reviewer privacy rule
+The reviewer account must contain fictional property information, fictional documents/images and no real customer or owner personal data beyond the dedicated reviewer login itself.
+
