@@ -30,8 +30,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install dependencies
-        run: npm install
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
       - name: Prepare Capacitor web directory
         run: mkdir -p out && printf '<!doctype html><html><body></body></html>' > out/index.html
       - name: Generate approved HusPass launcher artwork
