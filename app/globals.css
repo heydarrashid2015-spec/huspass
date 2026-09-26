@@ -226,3 +226,5 @@ body{min-height:100dvh}
 .propertyActions>button i svg{width:21px;height:21px;fill:none;stroke:currentColor}
 .propertyActions>button div{min-width:0}.propertyActions>button b,.propertyActions>button span{display:block}.propertyActions>button b{font-size:14px}.propertyActions>button span{margin-top:4px;font-size:11px;line-height:1.35;color:#78877f}.propertyActions>button strong{color:#7f8d87}
 .propertyActions>button:not(:disabled):active{transform:scale(.985)}
+
+.offlineBanner{position:sticky;top:0;z-index:80;margin:0 auto 12px;max-width:760px;padding:10px 14px;border-radius:12px;background:#fff7e6;border:1px solid #f0c36d;color:#6b4b00;font-size:13px;font-weight:700;text-align:center;box-shadow:0 4px 14px rgba(16,47,104,.08)}
