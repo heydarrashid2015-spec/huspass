@@ -61,6 +61,25 @@ HusPass requires login for private account features. Before review, provide Goog
 ## Release notes – 1.0.0 (DA)
 Første version af HusPass til Android. Saml boligoplysninger, vedligeholdelsesopgaver, dokumenter og relevante udgifter ét sted med personlig adgang.
 
+## Play Console declaration worksheet
+Use this only as a preparation worksheet and verify it against the final production build before submission.
+
+### Account and access
+- Core private features require a HusPass account and login.
+- Google review must receive private test-access instructions through Play Console, never through the public repository.
+- Users can request/delete their HusPass account from the app.
+
+### Current data inventory to verify in Data Safety
+- Account identifier: email address.
+- User-provided home information: address and property details.
+- User-provided app content: maintenance tasks, expenses, documents, images and support messages.
+- Files are intended to remain private to the authenticated owner.
+- No advertising SDK is intentionally included in the current codebase.
+- No location permission is intentionally requested by the current mobile configuration.
+
+### Final verification before answering Play Console
+Check the final release candidate, Supabase production configuration and every production SDK/provider. Google Play declarations must reflect actual collection, sharing, purpose, retention, deletion and security behavior at submission time.
+
 ## Store assets still required before publication
 - Final high-resolution app icon
 - Feature graphic
