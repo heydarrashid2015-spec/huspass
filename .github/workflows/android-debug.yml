@@ -11,7 +11,7 @@ on:
       - "app/page.js"
       - "app/globals.css"
       - "public/sw.js"
-      - "app/manifest.js"
+      - "public/manifest.webmanifest"
       - "app/layout.js"
       - "app/icon.js"
       - "app/apple-icon.js"
