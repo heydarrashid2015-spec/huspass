@@ -117,7 +117,12 @@ jobs:
             echo "Sensitive configuration or signing material is tracked."
             exit 1
           fi
-          grep -q '^\.env\*        run: npm run build
+          grep -Fqx '.env*' .gitignore
+          grep -Fqx '*.jks' .gitignore
+          grep -Fqx '*.keystore' .gitignore
+          grep -Fqx 'service-account*.json' .gitignore
+      - name: Verify production web build
+        run: npm run build
       - name: Audit production dependency tree
         run: npm audit --omit=dev --audit-level=high
       - name: Verify privacy-sensitive Android configuration
