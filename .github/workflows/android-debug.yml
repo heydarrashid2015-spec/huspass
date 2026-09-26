@@ -92,6 +92,16 @@ jobs:
           else
             echo "Android signing secrets are not configured yet; unsigned AAB only."
           fi
+      - name: Audit production dependency tree
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify privacy-sensitive Android configuration
+        run: |
+          grep -q 'cleartext: false' capacitor.config.ts
+          grep -q 'allowNavigation: \["huspass.dk", "www.huspass.dk"\]' capacitor.config.ts
+          if grep -R -n -E 'ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA' android/app/src/main/AndroidManifest.xml 2>/dev/null; then
+            echo "Unexpected privacy-sensitive Android permission detected."
+            exit 1
+          fi
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
