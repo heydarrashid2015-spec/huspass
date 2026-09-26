@@ -229,3 +229,16 @@ Until the last two Play/signing items are completed, label the downloadable APK 
 
 ## Android permission baseline – v1.0.0
 For the initial HusPass 1.0.0 release, do not request camera, microphone, precise/coarse location, or contacts permissions. Current image/document flows should use user-initiated file selection rather than broad device access. If a future feature genuinely needs a new sensitive permission, add it only with a feature-specific reason, user-visible request at the point of use, privacy-policy/Data Safety review, and a new release test.
+
+
+## Data Safety answers – v1.0.0 baseline
+Use these as a preparation checklist, then confirm them against the final signed build before submission:
+- Sensitive device permissions: camera = not requested; microphone = not requested; location = not requested; contacts = not requested.
+- Account data: email address is used for authentication/account management.
+- User content: property information, tasks, expenses, images, documents and support messages are stored only when the user chooses to provide them for HusPass functionality.
+- Advertising: no advertising SDK is intentionally included in v1.0.0.
+- Account deletion: available from inside HusPass; associated HusPass data deletion is initiated by that action, subject to any legally required retention described in the privacy policy.
+- Privacy policy: https://huspass.dk/privatliv
+- Terms: https://huspass.dk/vilkaar
+
+Do not mechanically answer Play Console yes/no fields from this draft if Google changes its Data Safety wording. Map each current Console question to the final release behavior and provider documentation at submission time.
