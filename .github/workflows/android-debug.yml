@@ -98,10 +98,92 @@ jobs:
           else
             echo "Android signing secrets are not configured yet; unsigned AAB only."
           fi
-      - name: Verify no environment files are tracked
+      - name: Verify no environment or signing files are tracked
         run: |
-          if git ls-files | grep -E '(^|/)\.env($|\.)'; then
-            echo "Tracked environment file detected."
+          if git ls-files | grep -E '(^|/)\.env($|\.)|\.(jks|keystore|p12|pem)$|(^|/)(key|keystore)\.properties$|(^|/)google-services\.json$|(^|/)(play-)?service-account.*\.json      - name: Audit production dependency tree
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify privacy-sensitive Android configuration
+        run: |
+          grep -q 'cleartext: false' capacitor.config.ts
+          grep -q 'allowNavigation: \["huspass.dk", "www.huspass.dk"\]' capacitor.config.ts
+          if grep -R -n -E 'ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA' android/app/src/main/AndroidManifest.xml 2>/dev/null; then
+            echo "Unexpected privacy-sensitive Android permission detected."
+            exit 1
+          fi
+      - name: Verify required public release pages
+        run: |
+          for url in https://www.huspass.dk/ https://www.huspass.dk/privatliv https://www.huspass.dk/vilkaar https://www.huspass.dk/download; do
+            code=$(curl -L --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || exit 1
+          done
+          privacy=$(curl -L --silent --show-error https://www.huspass.dk/privatliv)
+          printf '%s' "$privacy" | grep -q 'kamera'
+          printf '%s' "$privacy" | grep -q 'mikrofon'
+          printf '%s' "$privacy" | grep -q 'placering'
+          printf '%s' "$privacy" | grep -q 'kontakter'
+          printf '%s' "$privacy" | grep -q 'slette din konto'
+          terms=$(curl -L --silent --show-error https://www.huspass.dk/vilkaar)
+          printf '%s' "$terms" | grep -q 'HusPass'
+          printf '%s' "$terms" | grep -q 'betalt HusPass Plus'
+          download=$(curl -L --silent --show-error https://www.huspass.dk/download)
+          printf '%s' "$download" | grep -q 'Android-testversion'
+          printf '%s' "$download" | grep -q 'uden for Google Play'
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Verify generated Android manifest
+        run: |
+          manifest="android/app/src/main/AndroidManifest.xml"
+          grep -q 'android.permission.INTERNET' "$manifest"
+          if grep -E 'android.permission.(ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA|READ_CONTACTS|WRITE_CONTACTS)' "$manifest"; then
+            echo "Unexpected sensitive permission found in generated Android manifest."
+            exit 1
+          fi
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - name: Build unsigned release AAB
+        working-directory: android
+        run: ./gradlew bundleRelease
+      - name: Verify Android release artifacts
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          test -s android/app/build/outputs/bundle/release/app-release.aab
+          apk_size=$(stat -c%s android/app/build/outputs/apk/debug/app-debug.apk)
+          aab_size=$(stat -c%s android/app/build/outputs/bundle/release/app-release.aab)
+          echo "APK bytes: $apk_size"
+          echo "AAB bytes: $aab_size"
+          [ "$apk_size" -gt 100000 ] || exit 1
+          [ "$aab_size" -gt 100000 ] || exit 1
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/bundle/release/app-release.aab
+      - name: Write Android artifact checksums
+        run: |
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk > HusPass-Android-v1.0.0-SHA256.txt
+          sha256sum android/app/build/outputs/bundle/release/app-release.aab >> HusPass-Android-v1.0.0-SHA256.txt
+      - name: Publish shareable Android test APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk HusPass-Android-test.apk
+          gh release view android-test >/dev/null 2>&1 || gh release create android-test --title "HusPass Android test" --notes "Testing build of HusPass for Android. This is a prerelease build distributed outside Google Play." --prerelease
+          gh release upload android-test HusPass-Android-test.apk HusPass-Android-v1.0.0-SHA256.txt --clobber
+      - name: Upload test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: HusPass-Android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Upload Play-ready unsigned AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: HusPass-Android-release-v1.0.0-unsigned-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+; then
+            echo "Tracked environment, signing, or service-account file detected."
             exit 1
           fi
       - name: Audit production dependency tree
