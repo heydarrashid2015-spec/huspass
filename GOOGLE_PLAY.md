@@ -167,3 +167,17 @@ Before every public release:
 - Leaked-password protection is not being enabled during the zero-cost preparation stage because the current project configuration does not provide it as a free setting. Re-check before public launch and do not claim it is enabled.
 - Performance advisor currently reports three unused indexes. They are informational findings only; do not remove them solely because a low-traffic pre-launch database has not used them yet.
 - No customer data was copied into store assets or this checklist during this verification.
+
+
+## Zero-cost readiness checkpoint – 26 Sep 2026
+Completed without activating a paid service:
+- Public Android test download is available from huspass.dk/download.
+- Current web UI deployment is healthy on Vercel.
+- Android package identity remains dk.huspass.app, version 1.0.0 / versionCode 1.
+- CI verifies release identity and fails if Android signing secrets are only partially configured.
+- CI produces a debug test APK plus an unsigned release AAB.
+- Permanent Play signing/upload credentials are intentionally not created or committed yet.
+- Store screenshots and feature graphic must use fictional data only.
+
+### Next gate requiring owner action/payment
+Google Play publication itself is intentionally paused until the owner chooses to create/activate the Google Play developer account and its required fee. Before any Play upload, create a permanent private upload key, store it only as protected repository secrets, build a signed release AAB, and run the full release-candidate test plan above.
