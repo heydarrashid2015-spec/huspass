@@ -151,6 +151,17 @@ jobs:
       - name: Build unsigned release AAB
         working-directory: android
         run: ./gradlew bundleRelease
+      - name: Verify Android release artifacts
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          test -s android/app/build/outputs/bundle/release/app-release.aab
+          apk_size=$(stat -c%s android/app/build/outputs/apk/debug/app-debug.apk)
+          aab_size=$(stat -c%s android/app/build/outputs/bundle/release/app-release.aab)
+          echo "APK bytes: $apk_size"
+          echo "AAB bytes: $aab_size"
+          [ "$apk_size" -gt 100000 ] || exit 1
+          [ "$aab_size" -gt 100000 ] || exit 1
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/bundle/release/app-release.aab
       - name: Publish shareable Android test APK
         env:
           GH_TOKEN: ${{ github.token }}
