@@ -44,3 +44,14 @@ A Mac with Xcode is required.
 4. Run `npm run cap:ios`.
 
 App Store and Google Play paid publication are intentionally not activated. No paid store service is required for the current preparation stage.
+
+
+## Signing-key safety gate
+Repository scan confirmed that no Android keystore, private-key, key-properties, Google service-account, or Google Services credential file is currently tracked in the public repository.
+
+Before creating the permanent upload key:
+1. Generate it only in a private environment.
+2. Keep at least one encrypted/offline backup controlled by the app owner.
+3. Store CI values only as private GitHub Actions secrets.
+4. Never paste the keystore, passwords, service-account JSON, or private keys into source files, issues, logs, screenshots, or public documentation.
+5. Build the first signed release only after the secret names and signing workflow have been verified.
