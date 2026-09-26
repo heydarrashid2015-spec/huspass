@@ -97,6 +97,12 @@ jobs:
           else
             echo "Android signing secrets are not configured yet; unsigned AAB only."
           fi
+      - name: Verify no environment files are tracked
+        run: |
+          if git ls-files | grep -E '(^|/)\.env($|\.)'; then
+            echo "Tracked environment file detected."
+            exit 1
+          fi
       - name: Audit production dependency tree
         run: npm audit --omit=dev --audit-level=high
       - name: Verify privacy-sensitive Android configuration
