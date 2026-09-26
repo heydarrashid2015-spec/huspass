@@ -30,6 +30,16 @@ jobs:
         run: npx cap add android
       - name: Sync Capacitor
         run: npx cap sync android
+      - name: Set Android release identity
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("android/app/build.gradle")
+          s=p.read_text()
+          s=s.replace("versionCode 1", "versionCode 1")
+          s=s.replace('versionName "1.0"', 'versionName "1.0.0"')
+          p.write_text(s)
+          PY
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -50,6 +60,6 @@ jobs:
       - name: Upload Play-ready unsigned AAB
         uses: actions/upload-artifact@v4
         with:
-          name: HusPass-Android-release-unsigned-aab
+          name: HusPass-Android-release-v1.0.0-unsigned-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
