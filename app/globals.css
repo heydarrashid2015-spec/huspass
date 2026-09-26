@@ -185,3 +185,15 @@ body{min-height:100dvh}
 .homeHero.hasPhoto .homeHeroShade{background:linear-gradient(180deg,rgba(4,25,32,.05) 0%,rgba(4,25,32,.08) 42%,rgba(4,25,32,.82) 100%)}
 .homeHero .homeHeroText{pointer-events:none}
 .homeHero .homeHeroChange{min-width:64px;justify-content:center;border:1px solid rgba(16,47,104,.08);backdrop-filter:blur(8px)}
+
+/* Compact mobile dashboard spacing */
+@media(max-width:520px){
+  .homeHero{margin-bottom:14px}
+  .quick{gap:8px;padding:0 16px 16px}
+  .quick article{min-width:0;padding:12px 10px;border-radius:16px}
+  .quick b{font-size:17px}
+  .quick span{font-size:10px;overflow-wrap:anywhere}
+  .homeHead{padding-top:3px}
+  .homeHead h3{font-size:24px;line-height:1.08}
+  .quickActions{margin-top:18px}
+}
