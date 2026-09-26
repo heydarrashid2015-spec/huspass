@@ -225,3 +225,7 @@ HusPass v1.0.0 may be marked ready for Play upload only when all of these are tr
 - Play Console Data Safety, App Access and Content Rating are completed from the final build.
 
 Until the last two Play/signing items are completed, label the downloadable APK as a test build rather than an official Google Play release.
+
+
+## Android permission baseline – v1.0.0
+For the initial HusPass 1.0.0 release, do not request camera, microphone, precise/coarse location, or contacts permissions. Current image/document flows should use user-initiated file selection rather than broad device access. If a future feature genuinely needs a new sensitive permission, add it only with a feature-specific reason, user-visible request at the point of use, privacy-policy/Data Safety review, and a new release test.
