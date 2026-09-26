@@ -115,18 +115,18 @@ For the final Android/store identity, keep one consistent HusPass mark across la
 
 Current production direction:
 - Brand name: HusPass
-- Approved primary mark: navy house, four-pane white window, integrated green checkmark and blue–teal–green surrounding form.
-- Approved palette: #0B2D4F primary navy, #008D7A teal, #5ED36F green, #4CC3E6 light blue, #E8F6EF light background.
+- Approved primary mark: white rounded-square field, navy house with four-pane white window, cyan/blue sweep and green leaf/checkmark.
+- Approved palette: #102F68 navy, #0876C9 blue, #20BFE7 cyan, #008D62 green and white background.
 - Visual language: clean Danish home-management product; readable at small icon sizes.
 - The approved mark is now integrated in the web interface, PWA icons and Android launcher build.
 - Do not place customer data, addresses, personal names or screenshots inside the icon.
 - Store graphics must not imply features that the released app does not actually provide.
-- Validate the launcher icon on a physical Android device before freezing the v1.0.0 release candidate.
+- Launcher icon has been installed successfully on a physical Android device; re-check once more on the final signed v1.0.0 release candidate.
 
 The HusPass house + checkmark concept has been approved as the visual direction. The final production artwork should preserve this concept while being recreated as clean standalone brand assets (not cropped from a promotional mockup) for Android, web/PWA, Play Store and future iOS use.
 
 ## Store assets still required before publication
-- Final high-resolution app icon: integrated in the current build; verify visually on a physical Android device before store submission.
+- Final high-resolution app icon: integrated across Android, web/PWA and Apple icon routes; physical Android installation succeeded.
 - Feature graphic
 - Android phone screenshots from the final release candidate
 - Content-rating questionnaire in Play Console
