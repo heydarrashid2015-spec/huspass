@@ -143,6 +143,25 @@ jobs:
           download=$(curl -L --silent --show-error https://www.huspass.dk/download)
           printf '%s' "$download" | grep -q 'Android-testversion'
           printf '%s' "$download" | grep -q 'uden for Google Play'
+      - name: Verify PWA install metadata
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path("public/manifest.webmanifest").read_text())
+          assert m["name"]=="HusPass"
+          assert m["short_name"]=="HusPass"
+          assert m["start_url"]=="/"
+          assert m["scope"]=="/"
+          assert m["display"]=="standalone"
+          sizes={i.get("sizes") for i in m.get("icons",[])}
+          assert "192x192" in sizes and "512x512" in sizes
+          PY
+          for url in https://www.huspass.dk/manifest.webmanifest https://www.huspass.dk/pwa-192 https://www.huspass.dk/pwa-512; do
+            code=$(curl -L --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || exit 1
+          done
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
