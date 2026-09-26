@@ -180,3 +180,8 @@ body{min-height:100dvh}
 .homeHero.hasPhoto .homeHeroMedia img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center!important}
 .homeHero .homeHeroChange{top:12px!important;right:12px!important;bottom:auto!important;left:auto!important}
 @media(max-width:520px){.homeHero .homeHeroChange{top:10px!important;right:10px!important;bottom:auto!important}}
+
+/* Mobile welcome-card readability */
+.homeHero.hasPhoto .homeHeroShade{background:linear-gradient(180deg,rgba(4,25,32,.05) 0%,rgba(4,25,32,.08) 42%,rgba(4,25,32,.82) 100%)}
+.homeHero .homeHeroText{pointer-events:none}
+.homeHero .homeHeroChange{min-width:64px;justify-content:center;border:1px solid rgba(16,47,104,.08);backdrop-filter:blur(8px)}
