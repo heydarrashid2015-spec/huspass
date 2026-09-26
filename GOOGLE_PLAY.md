@@ -57,7 +57,8 @@ HusPass requires login for private account features. Before review, provide Goog
 - [ ] Play Console Data Safety declaration
 - [ ] Play Console content rating
 - [ ] Private reviewer test access
-- [ ] Final release-candidate test on Android
+- [x] Android install/launch test completed successfully on a physical device with the approved launcher icon build
+- [ ] Full final release-candidate functional test on Android
 
 ## Release notes – 1.0.0 (DA)
 Første version af HusPass til Android. Saml boligoplysninger, vedligeholdelsesopgaver, dokumenter og relevante udgifter ét sted med personlig adgang.
@@ -133,3 +134,28 @@ The HusPass house + checkmark concept has been approved as the visual direction.
 - App-access instructions for Google review if login is required
 
 Do not claim publication readiness until the signed release bundle and Play Console declarations have been reviewed.
+
+
+## Prepared Data Safety answers (draft for Play Console)
+These answers are based on the current HusPass production code and must be re-checked immediately before submission.
+
+- Data is transmitted over HTTPS.
+- Account email is used for authentication and account management.
+- Home/property information, tasks, expense-related entries, documents and images are user-provided app content used to provide HusPass functionality.
+- Support messages are provided by the user for support handling.
+- Private files are stored in private storage and accessed through authenticated/time-limited access flows.
+- HusPass currently has no advertising SDK in the application dependencies.
+- The Android configuration does not intentionally request location, camera or microphone access for current HusPass functionality.
+- Users can initiate account deletion from inside HusPass.
+- Do not mark data as sold. Any Play Console question about third-party processing/sharing must be answered from the final production provider configuration and Google's current definitions at submission time.
+
+## Reviewer instructions draft (DA)
+HusPass kræver login for adgang til private boligdata. Google Play-revieweren skal bruge en særskilt testkonto med fiktive oplysninger. Testkontoens loginoplysninger må kun indsættes i Play Console under App access og må aldrig gemmes i dette repository. Efter login kan revieweren teste boligoplysninger, vedligeholdelsesopgaver, dokumenter og kontofunktioner.
+
+## Privacy release gate
+Before every public release:
+1. Use only fictional/test data for screenshots and reviewer access.
+2. Confirm no secrets, customer addresses, emails, documents or images are present in repository/store assets.
+3. Confirm private storage and row-level access controls remain enabled.
+4. Confirm account deletion still removes the user's HusPass data as designed.
+5. Re-check production dependencies before completing Google Play Data Safety.
