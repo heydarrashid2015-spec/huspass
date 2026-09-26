@@ -24,6 +24,8 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Prepare Capacitor web directory
+        run: mkdir -p out && printf '<!doctype html><html><body></body></html>' > out/index.html
       - name: Add Android project
         run: npx cap add android
       - name: Sync Capacitor
