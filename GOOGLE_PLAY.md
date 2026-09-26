@@ -52,8 +52,8 @@ HusPass requires login for private account features. Before review, provide Goog
 - [ ] Permanent private Android upload key
 - [ ] Signed release AAB
 - [x] Final app/launcher icon integrated in Web/PWA/Android build
-- [ ] Final Play Store feature graphic
-- [ ] Final Android screenshots
+- [ ] Final Play Store feature graphic (1024×500; create from approved HusPass branding only, no customer data)
+- [ ] Final Android screenshots (use fictional test account/data only)
 - [ ] Play Console Data Safety declaration
 - [ ] Play Console content rating
 - [ ] Private reviewer test access
@@ -181,3 +181,15 @@ Completed without activating a paid service:
 
 ### Next gate requiring owner action/payment
 Google Play publication itself is intentionally paused until the owner chooses to create/activate the Google Play developer account and its required fee. Before any Play upload, create a permanent private upload key, store it only as protected repository secrets, build a signed release AAB, and run the full release-candidate test plan above.
+
+
+## Store-listing copy ready for paste (DA)
+**Appnavn:** HusPass
+
+**Kort beskrivelse:** Din bolig, vedligeholdelse, dokumenter og udgifter samlet ét sted.
+
+**Release note 1.0.0:** Første Android-version af HusPass. Få samlet overblik over boligoplysninger, vedligeholdelsesopgaver, dokumenter og relevante udgifter med personlig adgang.
+
+**Category:** House & Home
+
+The text above is prepared for direct entry in Play Console. Do not add claims about features that are not enabled in the release candidate.
