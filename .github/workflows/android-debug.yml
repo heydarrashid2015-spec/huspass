@@ -8,6 +8,8 @@ on:
       - ".github/workflows/android-debug.yml"
       - "capacitor.config.ts"
       - "package.json"
+      - "app/page.js"
+      - "app/globals.css"
       - "app/icon.js"
       - "app/apple-icon.js"
       - "app/pwa-192/route.js"
