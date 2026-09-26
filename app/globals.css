@@ -156,3 +156,6 @@ body{min-height:100dvh}
     .bottomNav{padding-left:max(0px,env(safe-area-inset-left));padding-right:max(0px,env(safe-area-inset-right))}
   }
 }
+
+/* HusPass approved brand */
+.huspassBrand{display:flex;align-items:center;justify-content:center;gap:10px}.huspassMark{width:58px;height:58px;display:inline-flex;flex:0 0 auto}.huspassMark svg{width:100%;height:100%;display:block}.huspassWord{font-size:29px;letter-spacing:-1.2px;line-height:1}.huspassWord b{color:#082d4f}.huspassWord strong{color:#008d7a}.authBox>.huspassBrand{margin:0 auto 8px}.authBox>.huspassBrand .huspassMark{width:68px;height:68px}.authBox>.huspassBrand .huspassWord{font-size:31px}.headerBrand>.huspassBrand{justify-content:flex-start}.headerBrand .huspassMark{width:48px;height:48px}.headerBrand .huspassWord{font-size:27px}.headerBrand .tagline{margin-left:58px;margin-top:-10px}@media(max-width:360px){.headerBrand .huspassWord{font-size:24px}.headerBrand .huspassMark{width:44px;height:44px}.headerBrand .tagline{margin-left:54px}}
