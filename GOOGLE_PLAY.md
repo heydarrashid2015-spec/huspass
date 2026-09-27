@@ -1,6 +1,6 @@
 # HusPass – Google Play listing draft
 
-Status: preparation only. No paid Google Play account or publication has been activated.
+Status: Google Play developer account registration and fee completed. Google identity/address verification is pending; Android-device verification and app creation remain blocked until the developer account becomes available in the Play Console mobile app.
 
 ## App identity
 - App name: HusPass
@@ -51,6 +51,10 @@ HusPass requires login for private account features. Before review, provide Goog
 - [x] Account deletion available in HusPass
 - [x] Public account-deletion web resource prepared at https://huspass.dk/slet-konto
 - [x] Danish store-description draft
+- [x] Google Play developer account registration and fee completed
+- [ ] Google identity/address verification approved
+- [ ] Android-device verification completed
+- [ ] HusPass app record created in Play Console
 - [ ] Permanent private Android upload key
 - [ ] Signed release AAB
 - [x] Final app/launcher icon integrated in Web/PWA/Android build
@@ -205,8 +209,8 @@ Completed without activating a paid service:
 - Permanent Play signing/upload credentials are intentionally not created or committed yet.
 - Store screenshots and feature graphic must use fictional data only.
 
-### Next gate requiring owner action/payment
-Google Play publication itself is intentionally paused until the owner chooses to create/activate the Google Play developer account and its required fee. Before any Play upload, create a permanent private upload key, store it only as protected repository secrets, build a signed release AAB, and run the full release-candidate test plan above.
+### Current Play account gate – 27 Sep 2026
+The Google Play developer registration fee has been paid and the identity/address document has been submitted to Google. Google currently reports that identity verification is in progress. The required Android-device verification is also pending because the new developer account is not yet visible in the Play Console mobile app. Do not create or pay for another developer account. Once Google approves the account, complete Android-device verification, create the HusPass app record, then create/protect the permanent upload key and produce the signed release AAB.
 
 
 ## Store-listing copy ready for paste (DA)
