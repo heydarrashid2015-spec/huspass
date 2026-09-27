@@ -316,3 +316,17 @@ Planned scope:
 ### Reviewer privacy rule
 The reviewer account must contain fictional property information, fictional documents/images and no real customer or owner personal data beyond the dedicated reviewer login itself.
 
+
+
+## Pre-Console technical freeze – v1.0.0
+The pre-Play technical release candidate is frozen after successful GitHub Actions run #53.
+
+Verified at the freeze point:
+- Production web build passes.
+- Android debug APK builds successfully.
+- Android release AAB builds successfully in the intentionally unsigned pre-signing stage.
+- Package/version baseline remains dk.huspass.app, versionCode 1, versionName 1.0.0.
+- Dependency, Android privacy/permission, manifest, public legal-page and artifact checks pass.
+- Core UI changes trigger the Android release gate.
+
+Do not add non-blocking v1 features before Play submission. Remaining work is intentionally limited to owner/Play-stage items: create Play Console, protect the permanent upload key, produce the signed AAB, enter current Console declarations, provide private fictional reviewer access, create final store graphics/screenshots from the actual release candidate with fictional data, and complete Play testing/submission.
