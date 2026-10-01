@@ -71,6 +71,12 @@ jobs:
           s=s.replace("versionCode 1", "versionCode 1")
           s=s.replace('versionName "1.0"', 'versionName "1.0.0"')
           p.write_text(s)
+
+          v=Path("android/variables.gradle")
+          if v.exists():
+              t=v.read_text()
+              t=t.replace("minSdkVersion = 23", "minSdkVersion = 24")
+              v.write_text(t)
           PY
       - name: Verify Android release identity
         run: |
@@ -78,6 +84,7 @@ jobs:
           grep -q 'applicationId "dk.huspass.app"' android/app/build.gradle
           grep -q 'versionCode 1' android/app/build.gradle
           grep -q 'versionName "1.0.0"' android/app/build.gradle
+          grep -q 'minSdkVersion = 24' android/variables.gradle
           grep -q 'https://www.huspass.dk' capacitor.config.ts
           if grep -R -n -E 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|service_account|private_key_id' android capacitor.config.ts package.json 2>/dev/null; then
             echo "Potential secret material detected in Android release inputs."
