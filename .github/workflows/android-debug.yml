@@ -68,9 +68,15 @@ jobs:
           from pathlib import Path
           p=Path("android/app/build.gradle")
           s=p.read_text()
-          s=s.replace("versionCode 1", "versionCode 3")
-          s=s.replace('versionName "1.0"', 'versionName "1.0.2"')
+          s=s.replace("versionCode 1", "versionCode 4")
+          s=s.replace('versionName "1.0"', 'versionName "1.0.3"')
           p.write_text(s)
+
+          root=Path("android/build.gradle")
+          r=root.read_text()
+          import re
+          r=re.sub(r"com\\.android\\.tools\\.build:gradle:[0-9.]+", "com.android.tools.build:gradle:8.9.1", r)
+          root.write_text(r)
 
           v=Path("android/variables.gradle")
           if v.exists():
@@ -84,11 +90,12 @@ jobs:
         run: |
           grep -q '"version": "1.0.0"' package.json
           grep -q 'applicationId "dk.huspass.app"' android/app/build.gradle
-          grep -q 'versionCode 3' android/app/build.gradle
-          grep -q 'versionName "1.0.2"' android/app/build.gradle
+          grep -q 'versionCode 4' android/app/build.gradle
+          grep -q 'versionName "1.0.3"' android/app/build.gradle
           grep -q 'minSdkVersion = 24' android/variables.gradle
           grep -q 'compileSdkVersion = 36' android/variables.gradle
           grep -q 'targetSdkVersion = 36' android/variables.gradle
+          grep -q 'com.android.tools.build:gradle:8.9.1' android/build.gradle
           grep -q 'https://www.huspass.dk' capacitor.config.ts
           if grep -R -n -E 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|service_account|private_key_id' android capacitor.config.ts package.json 2>/dev/null; then
             echo "Potential secret material detected in Android release inputs."
@@ -251,7 +258,7 @@ jobs:
         run: |
           test -s android/app/build/outputs/bundle/release/app-release.aab
           jarsigner -verify android/app/build/outputs/bundle/release/app-release.aab
-          cp android/app/build/outputs/bundle/release/app-release.aab HusPass-Android-v1.0.2-signed.aab
+          cp android/app/build/outputs/bundle/release/app-release.aab HusPass-Android-v1.0.3-signed.aab
           rm -f "$RUNNER_TEMP/huspass-upload-key.jks" "$RUNNER_TEMP/huspass-signing.properties"
 
       - name: Verify Android release artifacts
@@ -285,6 +292,6 @@ jobs:
       - name: Upload Play-ready signed AAB
         uses: actions/upload-artifact@v4
         with:
-          name: HusPass-Android-release-v1.0.2-signed-aab
-          path: HusPass-Android-v1.0.2-signed.aab
+          name: HusPass-Android-release-v1.0.3-signed-aab
+          path: HusPass-Android-v1.0.3-signed.aab
           if-no-files-found: error
