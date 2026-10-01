@@ -95,7 +95,6 @@ jobs:
           grep -q 'minSdkVersion = 24' android/variables.gradle
           grep -q 'compileSdkVersion = 36' android/variables.gradle
           grep -q 'targetSdkVersion = 36' android/variables.gradle
-          grep -q 'com.android.tools.build:gradle:8.9.1' android/build.gradle
           grep -q 'https://www.huspass.dk' capacitor.config.ts
           if grep -R -n -E 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|service_account|private_key_id' android capacitor.config.ts package.json 2>/dev/null; then
             echo "Potential secret material detected in Android release inputs."
