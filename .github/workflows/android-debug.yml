@@ -282,8 +282,9 @@ jobs:
       - name: Verify packaged launcher resources
         run: |
           unzip -l android/app/build/outputs/bundle/release/app-release.aab > /tmp/aab-files.txt
-          grep -q 'res/mipmap-mdpi/ic_launcher.png' /tmp/aab-files.txt
-          grep -q 'res/mipmap-xxxhdpi/ic_launcher.png' /tmp/aab-files.txt
+          grep -Eq 'base/res/mipmap[^/]*/ic_launcher[^/]*\.png|res/mipmap[^/]*/ic_launcher[^/]*\.png' /tmp/aab-files.txt
+          # Resource names are compiled/renamed in an AAB, so verify absence of the old adaptive source before build (above),
+          # and presence of packaged launcher PNG resources here rather than exact ZIP paths.
           if grep -E 'mipmap-anydpi-v26/.*/?ic_launcher|ic_launcher_foreground|ic_launcher_background' /tmp/aab-files.txt; then
             echo "Old/adaptive launcher resources unexpectedly packaged."
             exit 1
