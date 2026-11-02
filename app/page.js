@@ -6,7 +6,7 @@ const PROD_SUPABASE_KEY="sb_publishable_DKoZCEePERooCwKysgH5Cw_JVOqrqsO";
 const SUPABASE_URL=process.env.NEXT_PUBLIC_SUPABASE_URL||PROD_SUPABASE_URL;
 const SUPABASE_KEY=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||PROD_SUPABASE_KEY;
 const TURNSTILE_REQUESTED=process.env.NEXT_PUBLIC_TURNSTILE_ENABLED==="true";
-if(TURNSTILE_REQUESTED&&(!process.env.NEXT_PUBLIC_SUPABASE_URL||!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||SUPABASE_URL===PROD_SUPABASE_URL))throw new Error("Turnstile preview requires an isolated Supabase project.");
+if(TURNSTILE_REQUESTED&&(!process.env.NEXT_PUBLIC_SUPABASE_URL||!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||SUPABASE_URL===PROD_SUPABASE_URL||!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY))throw new Error("Turnstile preview requires isolated Supabase credentials and a site key.");
 const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
 const TURNSTILE_SITE_KEY=process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY||"";
 // Disabled by default; never enable production before Supabase configuration and end-to-end tests.
