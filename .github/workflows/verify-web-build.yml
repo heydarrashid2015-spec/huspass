@@ -25,3 +25,11 @@ jobs:
         run: node --test tests/turnstile-static.test.cjs
       - name: Build web app
         run: npm run build
+
+      - name: Build with Turnstile enabled against nonproduction placeholder
+        env:
+          NEXT_PUBLIC_TURNSTILE_ENABLED: 'true'
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA'
+          NEXT_PUBLIC_SUPABASE_URL: 'https://example-test-project.supabase.co'
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_test_only_placeholder'
+        run: npm run build
