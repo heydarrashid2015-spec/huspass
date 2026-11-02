@@ -21,3 +21,17 @@ If users cannot authenticate, disable Supabase Auth CAPTCHA immediately using th
 
 ## Open issue: recovery callback
 The password recovery request currently directs its callback to the production hostname. Before preview testing, change it to use the initiating origin, and ensure that origin is included in the isolated Supabase project's allowed redirect URLs. Test both preview and production callback paths. Do not point preview authentication at the live customer database.
+
+## Verification matrix (pending manual end-to-end validation)
+| Scenario | Expected result |
+| --- | --- |
+| Existing account, correct password and valid challenge | Sign-in succeeds |
+| Existing account, incorrect password | Generic error; challenge resets for retry |
+| Signup, valid challenge | Confirmation email sent; no unexpected sign-in |
+| Confirmation link opened in another browser/device | User can explicitly sign in afterward; do not rely on automatic polling |
+| Password reset request with valid challenge | Email callback returns to the originating, allowlisted origin |
+| Expired or failed challenge | Form submission blocked until challenge is retried |
+| Resend confirmation | Requires a fresh challenge; repeat attempts respect provider rate limits |
+| Android WebView | Widget loads, challenge completes, navigation and return to app work |
+
+**Important:** Passing GitHub Actions verifies buildability only. This matrix is not yet executed. Do not mark any scenario as passed without evidence from an isolated Supabase Auth test environment.
