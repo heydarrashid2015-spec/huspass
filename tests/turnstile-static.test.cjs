@@ -12,7 +12,8 @@ test("auth flows pass captcha tokens to Supabase", () => {
   for (const method of ["signUp", "signInWithPassword", "resetPasswordForEmail", "resend"]) {
     assert.ok(source.includes("supabase.auth." + method + "("), method + " missing");
   }
-  assert.ok((source.match(/TURNSTILE_ENABLED\?\{captchaToken\}/g) || []).length >= 4);
+  assert.ok((source.match(/TURNSTILE_ENABLED\?\{captchaToken\}/g) || []).length >= 3);
+  assert.match(source, /signInWithPassword\(\{email:cleanEmail,password,\.\.\.\(TURNSTILE_ENABLED\?\{options:\{captchaToken\}\}/);
 });
 
 test("password recovery returns to initiating origin", () => {
