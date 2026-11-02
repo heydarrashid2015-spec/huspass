@@ -3,11 +3,12 @@ name: Android test and Play bundle
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, security/turnstile-auth-prep]
     paths:
       - ".github/workflows/android-debug.yml"
       - "capacitor.config.ts"
       - "package.json"
+      - "tests/**"
       - "app/page.js"
       - "app/globals.css"
       - "public/sw.js"
@@ -146,6 +147,8 @@ jobs:
             echo "Tracked environment, signing, or service-account file detected."
             exit 1
           fi
+      - name: Verify static release and authentication invariants
+        run: node --test tests/*.test.cjs
       - name: Verify production web build
         run: npm run build
       - name: Audit production dependency tree
@@ -312,6 +315,7 @@ jobs:
             sha256sum android/app/build/outputs/bundle/release/app-release.aab >> HusPass-Android-v1.0.0-SHA256.txt
           fi
       - name: Publish shareable Android test APK
+        if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
