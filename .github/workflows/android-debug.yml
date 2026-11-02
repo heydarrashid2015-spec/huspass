@@ -117,6 +117,7 @@ jobs:
             exit 1
           fi
       - name: Check signing-secret readiness
+        id: signing
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -134,8 +135,10 @@ jobs:
           fi
           if [ "$present" -eq 4 ]; then
             echo "Android signing secrets are complete."
+            echo "ready=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Android signing secrets are not configured yet; unsigned AAB only."
+            echo "Android signing secrets are not configured; signed release steps will be skipped."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Verify no environment or signing files are tracked
         run: |
@@ -223,6 +226,7 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
       - name: Configure Gradle release signing
+        if: steps.signing.outputs.ready == 'true'
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -266,13 +270,16 @@ jobs:
           PY
 
       - name: Build signed release AAB
+        if: steps.signing.outputs.ready == 'true'
         working-directory: android
         run: ./gradlew bundleRelease
 
       - name: Verify built bundle uses AGP 8.9.1
+        if: steps.signing.outputs.ready == 'true'
         run: |
           unzip -p android/app/build/outputs/bundle/release/app-release.aab BUNDLE-METADATA/com.android.tools.build.gradle/app-metadata.properties | grep -q "androidGradlePluginVersion=8.9.1"
       - name: Verify signed release AAB
+        if: steps.signing.outputs.ready == 'true'
         run: |
           test -s android/app/build/outputs/bundle/release/app-release.aab
           jarsigner -verify android/app/build/outputs/bundle/release/app-release.aab
@@ -280,6 +287,7 @@ jobs:
           rm -f "$RUNNER_TEMP/huspass-upload-key.jks" "$RUNNER_TEMP/huspass-signing.properties"
 
       - name: Verify packaged launcher resources
+        if: steps.signing.outputs.ready == 'true'
         run: |
           unzip -l android/app/build/outputs/bundle/release/app-release.aab > /tmp/aab-files.txt
           grep -Eq 'base/res/mipmap[^/]*/ic_launcher[^/]*\.png|res/mipmap[^/]*/ic_launcher[^/]*\.png' /tmp/aab-files.txt
@@ -293,18 +301,16 @@ jobs:
       - name: Verify Android release artifacts
         run: |
           test -s android/app/build/outputs/apk/debug/app-debug.apk
-          test -s android/app/build/outputs/bundle/release/app-release.aab
           apk_size=$(stat -c%s android/app/build/outputs/apk/debug/app-debug.apk)
-          aab_size=$(stat -c%s android/app/build/outputs/bundle/release/app-release.aab)
           echo "APK bytes: $apk_size"
-          echo "AAB bytes: $aab_size"
           [ "$apk_size" -gt 100000 ] || exit 1
-          [ "$aab_size" -gt 100000 ] || exit 1
-          sha256sum android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/bundle/release/app-release.aab
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk
       - name: Write Android artifact checksums
         run: |
           sha256sum android/app/build/outputs/apk/debug/app-debug.apk > HusPass-Android-v1.0.0-SHA256.txt
-          sha256sum android/app/build/outputs/bundle/release/app-release.aab >> HusPass-Android-v1.0.0-SHA256.txt
+          if [ "${{ steps.signing.outputs.ready }}" = "true" ]; then
+            sha256sum android/app/build/outputs/bundle/release/app-release.aab >> HusPass-Android-v1.0.0-SHA256.txt
+          fi
       - name: Publish shareable Android test APK
         env:
           GH_TOKEN: ${{ github.token }}
@@ -319,6 +325,7 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
       - name: Upload Play-ready signed AAB
+        if: steps.signing.outputs.ready == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: HusPass-Android-release-v1.0.9-signed-aab
