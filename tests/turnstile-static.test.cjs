@@ -39,3 +39,7 @@ test("password recovery view survives a subsequent sign-in event", () => {
 test("initial session lookup does not override recovery mode", () => {
   assert.match(source, /const sessionUser=data\.session\?\.user\|\|null;setUser\(sessionUser\);if\(recoveryModeRef\.current\)\{setView\("Auth"\);setAuthReady\(true\);return\}/);
 });
+
+test("failed Turnstile script can be retried on challenge reset", () => {
+  assert.match(source, /if\(script\?\.dataset\.turnstileLoadFailed==="true"\)\{script\.remove\(\);script=null\}/);
+});
