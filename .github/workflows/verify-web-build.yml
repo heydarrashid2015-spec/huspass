@@ -1,5 +1,8 @@
 name: Verify HusPass web build
 on:
+  push:
+    branches:
+      - security/turnstile-auth-prep
   pull_request:
     paths:
       - 'app/**'
