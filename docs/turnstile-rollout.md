@@ -18,3 +18,6 @@ Status: **not enabled in production**. Do not merge until validated.
 
 ## Rollback
 If users cannot authenticate, disable Supabase Auth CAPTCHA immediately using the dashboard; roll back frontend feature flag/deployment separately. Never expose secret keys in tickets or screenshots.
+
+## Open issue: recovery callback
+The password recovery request currently directs its callback to the production hostname. Before preview testing, change it to use the initiating origin, and ensure that origin is included in the isolated Supabase project's allowed redirect URLs. Test both preview and production callback paths. Do not point preview authentication at the live customer database.
