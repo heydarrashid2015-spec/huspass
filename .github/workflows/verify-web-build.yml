@@ -23,6 +23,21 @@ jobs:
         run: npm install --no-package-lock --no-audit --no-fund
       - name: Verify authentication wiring
         run: node --test tests/turnstile-static.test.cjs
+      - name: Verify Turnstile cannot build against production Supabase
+        env:
+          NEXT_PUBLIC_TURNSTILE_ENABLED: 'true'
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA'
+        run: |
+          if npm run build > /tmp/turnstile-production-guard.log 2>&1; then
+            echo 'ERROR: Turnstile build unexpectedly succeeded without isolated backend'
+            exit 1
+          fi
+          if ! grep -q 'Turnstile preview requires isolated Supabase credentials' /tmp/turnstile-production-guard.log; then
+            cat /tmp/turnstile-production-guard.log
+            echo 'ERROR: build failed for an unrelated reason'
+            exit 1
+          fi
+          echo 'Verified: production backend guard rejects Turnstile activation'
       - name: Build web app
         run: npm run build
 
