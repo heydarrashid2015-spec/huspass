@@ -35,3 +35,7 @@ test("password recovery view survives a subsequent sign-in event", () => {
   assert.match(source, /if\(event==="SIGNED_IN"&&session\?\.user\)\{if\(recoveryModeRef\.current\)return/);
   assert.match(source, /recoveryModeRef\.current=false;setRecoveryMode\(false\);setNewPassword/);
 });
+
+test("initial session lookup does not override recovery mode", () => {
+  assert.match(source, /const sessionUser=data\.session\?\.user\|\|null;setUser\(sessionUser\);if\(recoveryModeRef\.current\)\{setView\("Auth"\);setAuthReady\(true\);return\}/);
+});
