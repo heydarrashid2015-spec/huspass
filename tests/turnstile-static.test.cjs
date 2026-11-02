@@ -27,4 +27,5 @@ test("confirmation polling avoids password sign-in when CAPTCHA is enabled", () 
 test("Turnstile preview rejects production Supabase backend", () => {
   assert.match(source, /TURNSTILE_REQUESTED&&\(!process\.env\.NEXT_PUBLIC_SUPABASE_URL/);
   assert.match(source, /SUPABASE_URL===PROD_SUPABASE_URL/);
+  assert.match(source, /!process\.env\.NEXT_PUBLIC_TURNSTILE_SITE_KEY/);
 });
