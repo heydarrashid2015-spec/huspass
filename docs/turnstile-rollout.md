@@ -19,8 +19,8 @@ Status: **not enabled in production**. Do not merge until validated.
 ## Rollback
 If users cannot authenticate, disable Supabase Auth CAPTCHA immediately using the dashboard; roll back frontend feature flag/deployment separately. Never expose secret keys in tickets or screenshots.
 
-## Open issue: recovery callback
-The password recovery request currently directs its callback to the production hostname. Before preview testing, change it to use the initiating origin, and ensure that origin is included in the isolated Supabase project's allowed redirect URLs. Test both preview and production callback paths. Do not point preview authentication at the live customer database.
+## Recovery callback and session handling
+The password recovery request now uses `window.location.origin`, not a fixed production hostname. The originating URL must be included in the Supabase redirect allowlist. Static regression tests protect the recovery screen from subsequent `SIGNED_IN` events and initial session lookup, but actual email-link and Android WebView navigation still require manual testing. Do not point preview authentication at the live customer database.
 
 ## Verification matrix (pending manual end-to-end validation)
 | Scenario | Expected result |
@@ -39,6 +39,9 @@ The password recovery request currently directs its callback to the production h
 ## Release blockers and evidence
 - Automated static checks and Next.js build pass on the feature branch, but they do **not** verify CAPTCHA enforcement.
 - A valid Turnstile widget response is only an input to Supabase; backend enforcement must be verified separately with CAPTCHA enabled on an isolated Auth project.
-- The current frontend still initializes the production Supabase URL and publishable key. A preview deployment must **not** be used to exercise account creation, recovery, or login against real customers. Introduce explicit test Supabase configuration and verify it before any end-to-end test.
+- The frontend retains production Supabase defaults only when Turnstile is disabled. When Turnstile is enabled, the build guard requires explicit isolated Supabase URL and publishable key and rejects the known production Supabase URL. CI checks the rejection path. A preview deployment must **not** be used to exercise account creation, recovery, or login against real customers.
 - The current Android build is not a verified Turnstile-compatible build. Test actual WebView behavior, redirects, challenge errors and recovery on a nonproduction app build.
 - Verify Cloudflare allowed hostnames and Supabase redirect allowlist for the chosen preview URL. Avoid putting any secret in public build flags.
+
+## Single-project decision (2026-11-02)
+The owner chose to keep only the existing HusPass Supabase project and avoid new charges. Accordingly, do **not** create a second project, enable production Auth CAPTCHA, merge this branch, or claim full E2E coverage. Static tests and builds can continue safely. A true server-side CAPTCHA enforcement test remains blocked without an isolated Auth backend or an explicitly approved maintenance/testing window with a rollback plan; no production authentication experiments are authorized by this decision.
