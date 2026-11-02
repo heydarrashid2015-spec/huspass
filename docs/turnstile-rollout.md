@@ -4,7 +4,7 @@ Status: **not enabled in production**. Do not merge until validated.
 
 ## Configuration
 - `NEXT_PUBLIC_TURNSTILE_ENABLED` defaults to disabled; set `true` only for a dedicated test deployment initially.
-- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is public. Use a Cloudflare testing site key for local/preview tests or a widget whose allowed hostname matches the test URL.
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is public and must be set explicitly; if absent, the challenge stays disabled. Use a Cloudflare testing site key for local/preview tests or a widget whose allowed hostname matches the test URL.
 - **Never** put the Cloudflare secret key in `NEXT_PUBLIC_*` variables or GitHub source. Enter it only in Supabase Auth CAPTCHA settings when ready.
 - The Supabase Auth CAPTCHA toggle must stay off in production until the frontend is deployed and confirmed compatible. Enabling it prematurely may block logins.
 
