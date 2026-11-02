@@ -35,3 +35,10 @@ The password recovery request currently directs its callback to the production h
 | Android WebView | Widget loads, challenge completes, navigation and return to app work |
 
 **Important:** Passing GitHub Actions verifies buildability only. This matrix is not yet executed. Do not mark any scenario as passed without evidence from an isolated Supabase Auth test environment.
+
+## Release blockers and evidence
+- Automated static checks and Next.js build pass on the feature branch, but they do **not** verify CAPTCHA enforcement.
+- A valid Turnstile widget response is only an input to Supabase; backend enforcement must be verified separately with CAPTCHA enabled on an isolated Auth project.
+- The current frontend still initializes the production Supabase URL and publishable key. A preview deployment must **not** be used to exercise account creation, recovery, or login against real customers. Introduce explicit test Supabase configuration and verify it before any end-to-end test.
+- The current Android build is not a verified Turnstile-compatible build. Test actual WebView behavior, redirects, challenge errors and recovery on a nonproduction app build.
+- Verify Cloudflare allowed hostnames and Supabase redirect allowlist for the chosen preview URL. Avoid putting any secret in public build flags.
