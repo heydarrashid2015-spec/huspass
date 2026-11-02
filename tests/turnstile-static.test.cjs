@@ -29,3 +29,9 @@ test("Turnstile preview rejects production Supabase backend", () => {
   assert.match(source, /SUPABASE_URL===PROD_SUPABASE_URL/);
   assert.match(source, /!process\.env\.NEXT_PUBLIC_TURNSTILE_SITE_KEY/);
 });
+
+test("password recovery view survives a subsequent sign-in event", () => {
+  assert.match(source, /if\(event==="PASSWORD_RECOVERY"\)\{recoveryModeRef\.current=true/);
+  assert.match(source, /if\(event==="SIGNED_IN"&&session\?\.user\)\{if\(recoveryModeRef\.current\)return/);
+  assert.match(source, /recoveryModeRef\.current=false;setRecoveryMode\(false\);setNewPassword/);
+});
