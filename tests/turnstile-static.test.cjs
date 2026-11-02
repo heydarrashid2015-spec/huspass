@@ -23,3 +23,8 @@ test("password recovery returns to initiating origin", () => {
 test("confirmation polling avoids password sign-in when CAPTCHA is enabled", () => {
   assert.match(source, /if\(TURNSTILE_ENABLED\)return;const \{data,error\}=await supabase\.auth\.signInWithPassword/);
 });
+
+test("Turnstile preview rejects production Supabase backend", () => {
+  assert.match(source, /TURNSTILE_REQUESTED&&\(!process\.env\.NEXT_PUBLIC_SUPABASE_URL/);
+  assert.match(source, /SUPABASE_URL===PROD_SUPABASE_URL/);
+});
