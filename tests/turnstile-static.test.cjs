@@ -43,3 +43,8 @@ test("initial session lookup does not override recovery mode", () => {
 test("failed Turnstile script can be retried on challenge reset", () => {
   assert.match(source, /if\(script\?\.dataset\.turnstileLoadFailed==="true"\)\{script\.remove\(\);script=null\}/);
 });
+
+test("frontend does not expose server-side Supabase or Turnstile secrets", () => {
+  assert.doesNotMatch(source, /process\.env\.(?:NEXT_PUBLIC_)?(?:SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY|TURNSTILE_SECRET_KEY)/);
+  assert.doesNotMatch(source, /(?:service_role|secret_key)\s*[:=]\s*["\x27][^"\x27]+/i);
+});
