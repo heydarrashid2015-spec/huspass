@@ -24,3 +24,17 @@ test("private environment and signing files remain ignored", () => {
     assert.ok(gitignore.split(/\r?\n/).includes(entry), entry + " not ignored");
   }
 });
+
+test("Android checksum filename matches the signed release and is uploaded", () => {
+  const workflow = read(".github/workflows/android-debug.yml");
+  assert.match(workflow, /HusPass-Android-v1\.0\.9-signed\.aab/);
+  assert.match(workflow, /HusPass-Android-v1\.0\.9-SHA256\.txt/);
+  assert.doesNotMatch(workflow, /HusPass-Android-v1\.0\.0-SHA256\.txt/);
+  assert.match(workflow, /name: Upload Android artifact checksums/);
+  assert.match(workflow, /name: Upload Play-ready signed AAB/);
+});
+
+test("feature branch cannot publish a public Android test release", () => {
+  const workflow = read(".github/workflows/android-debug.yml");
+  assert.match(workflow, /name: Publish shareable Android test APK\s+if: github\.ref == 'refs\/heads\/main'/);
+});
