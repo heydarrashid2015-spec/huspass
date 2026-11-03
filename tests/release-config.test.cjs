@@ -60,3 +60,10 @@ test("both logout entry points clear user-specific cached images", () => {
     assert.match(beforeReset, /await clearPrivateLocalData\(user\?\.id\);/);
   }
 });
+
+test("remote sign-out or expired session purges private image cache", () => {
+  const page = read("app/page.js");
+  assert.match(page, /lastAuthenticatedUserIdRef=useRef\(null\)/);
+  assert.match(page, /else if\(event==="SIGNED_OUT"\)\{const previousUserId=lastAuthenticatedUserIdRef\.current;/);
+  assert.match(page, /if\(previousUserId\)void clearPrivateLocalData\(previousUserId\)/);
+});
