@@ -38,3 +38,14 @@ test("feature branch cannot publish a public Android test release", () => {
   const workflow = read(".github/workflows/android-debug.yml");
   assert.match(workflow, /name: Publish shareable Android test APK\s+if: github\.ref == 'refs\/heads\/main'/);
 });
+
+test("PWA service worker never caches account pages or API responses", () => {
+  const worker = read("public/sw.js");
+  assert.match(worker, /req\.method!==["']GET["']/);
+  assert.match(worker, /url\.origin!==self\.location\.origin/);
+  assert.match(worker, /if\(!isPublicAsset\)return/);
+  assert.doesNotMatch(worker, /cache\.put\(req,\s*res\)/);
+  for (const path of ["/auth", "/api", "/konto", "/overblik"]) {
+    assert.ok(!worker.match(/const SHELL=\[([^\]]*)\]/)?.[1].includes(path), path + " must not be pre-cached");
+  }
+});
