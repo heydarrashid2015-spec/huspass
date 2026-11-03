@@ -1,11 +1,6 @@
 name: Generate reproducible dependency lockfile
 on:
   workflow_dispatch:
-  push:
-    branches: [security/turnstile-auth-prep]
-    paths:
-      - ".github/workflows/generate-lockfile.yml"
-      - "package.json"
 permissions:
   contents: write
 jobs:
