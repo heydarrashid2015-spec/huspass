@@ -49,3 +49,14 @@ test("PWA service worker never caches account pages or API responses", () => {
     assert.ok(!worker.match(/const SHELL=\[([^\]]*)\]/)?.[1].includes(path), path + " must not be pre-cached");
   }
 });
+
+test("both logout entry points clear user-specific cached images", () => {
+  const page = read("app/page.js");
+  const logoutError = 'if(error)return notify("Du kunne ikke logges ud. Prøv igen.");';
+  const handlers = page.split(logoutError).slice(1);
+  assert.equal(handlers.length, 2, "expected two logout entry points");
+  for (const handler of handlers) {
+    const beforeReset = handler.split("setUser(null)")[0];
+    assert.match(beforeReset, /await clearPrivateLocalData\(user\?\.id\);/);
+  }
+});
