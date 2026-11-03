@@ -67,3 +67,10 @@ test("remote sign-out or expired session purges private image cache", () => {
   assert.match(page, /else if\(event==="SIGNED_OUT"\)\{const previousUserId=lastAuthenticatedUserIdRef\.current;/);
   assert.match(page, /if\(previousUserId\)void clearPrivateLocalData\(previousUserId\)/);
 });
+
+test("cached image loading cannot restore private image after sign-out", () => {
+  const page = read("app/page.js");
+  assert.match(page, /lastAuthenticatedUserIdRef\.current!==sessionUser\.id/);
+  assert.match(page, /URL\.revokeObjectURL\(blobUrl\);return/);
+  assert.match(page, /if\(houseImage\.startsWith\("blob:"\)\)URL\.revokeObjectURL\(houseImage\)/);
+});
