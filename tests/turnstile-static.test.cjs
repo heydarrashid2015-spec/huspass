@@ -44,6 +44,11 @@ test("direct account switching clears prior account state", () => {
   assert.ok(source.includes("setTasks([]);setDocs([]);setEditingTask(null);setQuery"));
 });
 
+test("document signed links are bound to the active account", () => {
+  assert.ok(source.includes("d.user_id!==requestingUserId"));
+  assert.ok(source.includes("if(lastAuthenticatedUserIdRef.current!==requestingUserId)return"));
+});
+
 test("initial session lookup does not override recovery mode", () => {
   assert.match(source, /const sessionUser=data\.session\?\.user\|\|null;if\(sessionUser\)lastAuthenticatedUserIdRef\.current=sessionUser\.id;setUser\(sessionUser\);if\(recoveryModeRef\.current\)\{setView\("Auth"\);setAuthReady\(true\);return\}/);
 });
