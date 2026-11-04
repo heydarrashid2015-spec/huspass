@@ -38,6 +38,12 @@ test("password recovery view survives a subsequent sign-in event", () => {
   assert.match(source, /recoveryModeRef\.current=false;setRecoveryMode\(false\);setNewPassword/);
 });
 
+test("direct account switching clears prior account state", () => {
+  assert.ok(source.includes("previousUserId&&previousUserId!==session.user.id"));
+  assert.ok(source.includes("void clearPrivateLocalData(previousUserId);loadedUserRef.current=null;setHouseImage"));
+  assert.ok(source.includes("setTasks([]);setDocs([]);setEditingTask(null);setQuery"));
+});
+
 test("initial session lookup does not override recovery mode", () => {
   assert.match(source, /const sessionUser=data\.session\?\.user\|\|null;if\(sessionUser\)lastAuthenticatedUserIdRef\.current=sessionUser\.id;setUser\(sessionUser\);if\(recoveryModeRef\.current\)\{setView\("Auth"\);setAuthReady\(true\);return\}/);
 });
