@@ -59,6 +59,10 @@ test("image upload rechecks account before signing and linking", () => {
   assert.ok(source.includes("if(lastAuthenticatedUserIdRef.current!==session.user.id){setImageBusy(false);e.target.value=\"\";return}const {error:saveError}"));
 });
 
+test("deferred home loading checks active account and component lifetime", () => {
+  assert.ok(source.includes("setTimeout(()=>{if(mounted&&lastAuthenticatedUserIdRef.current===session.user.id)loadUserHome(session.user.id)},0)"));
+});
+
 test("initial session lookup does not override recovery mode", () => {
   assert.match(source, /const sessionUser=data\.session\?\.user\|\|null;if\(sessionUser\)lastAuthenticatedUserIdRef\.current=sessionUser\.id;setUser\(sessionUser\);if\(recoveryModeRef\.current\)\{setView\("Auth"\);setAuthReady\(true\);return\}/);
 });
