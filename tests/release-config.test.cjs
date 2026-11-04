@@ -74,3 +74,11 @@ test("cached image loading cannot restore private image after sign-out", () => {
   assert.match(page, /URL\.revokeObjectURL\(blobUrl\);return/);
   assert.match(page, /if\(houseImage\.startsWith\("blob:"\)\)URL\.revokeObjectURL\(houseImage\)/);
 });
+
+test("stale account requests cannot restore previous user's home tasks or documents", () => {
+  const page = read("app/page.js");
+  assert.match(page, /if\(lastAuthenticatedUserIdRef\.current!==uid\)return;if\(error\)return notify\("Boligoplysninger/);
+  assert.match(page, /if\(lastAuthenticatedUserIdRef\.current!==uid\)return;imageUrl=signed\?\.signedUrl/);
+  assert.match(page, /if\(lastAuthenticatedUserIdRef\.current!==uid\)return;if\(error\)return notify\("Dokumenter/);
+  assert.match(page, /if\(lastAuthenticatedUserIdRef\.current!==uid\)return;if\(error\)return notify\("Opgaver/);
+});
