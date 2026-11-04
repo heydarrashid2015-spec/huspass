@@ -1,0 +1,56 @@
+name: Verify HusPass web build
+on:
+  push:
+    branches:
+      - security/turnstile-auth-prep
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/verify-web-build.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: web-verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Verify authentication wiring
+        run: node --test tests/*.test.cjs
+      - name: Verify Turnstile cannot build against production Supabase
+        env:
+          NEXT_PUBLIC_TURNSTILE_ENABLED: 'true'
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA'
+        run: |
+          if npm run build > /tmp/turnstile-production-guard.log 2>&1; then
+            echo 'ERROR: Turnstile build unexpectedly succeeded without isolated backend'
+            exit 1
+          fi
+          if ! grep -q 'Turnstile preview requires isolated Supabase credentials' /tmp/turnstile-production-guard.log; then
+            cat /tmp/turnstile-production-guard.log
+            echo 'ERROR: build failed for an unrelated reason'
+            exit 1
+          fi
+          echo 'Verified: production backend guard rejects Turnstile activation'
+      - name: Build web app
+        run: npm run build
+
+      - name: Build with Turnstile enabled against nonproduction placeholder
+        env:
+          NEXT_PUBLIC_TURNSTILE_ENABLED: 'true'
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA'
+          NEXT_PUBLIC_SUPABASE_URL: 'https://example-test-project.supabase.co'
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_test_only_placeholder'
+        run: npm run build
