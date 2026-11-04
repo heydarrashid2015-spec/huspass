@@ -242,3 +242,5 @@ body{min-height:100dvh}
 .taskFinanceSummary b{color:#184b3b;font-size:clamp(17px,4vw,23px);line-height:1.2;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .taskFinanceSummary>button{grid-column:1/-1;border:1px solid #d8e7de;background:white;border-radius:12px;min-height:44px;padding:10px 12px;text-align:left;color:#23634b;font-weight:700;cursor:pointer}
 @media(max-width:360px){.taskOverview{gap:6px}.taskOverview>div{padding:11px 8px}.taskOverview b{font-size:22px}.taskOverview span{font-size:11px}.taskFinanceSummary{gap:9px;padding:13px}}
+
+.taskFinanceHint{grid-column:1/-1;margin:0;color:#62796d;font-size:12px;line-height:1.55}
