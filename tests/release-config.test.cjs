@@ -82,3 +82,10 @@ test("stale account requests cannot restore previous user's home tasks or docume
   assert.match(page, /if\(lastAuthenticatedUserIdRef\.current!==uid\)return;if\(error\)return notify\("Dokumenter/);
   assert.match(page, /if\(lastAuthenticatedUserIdRef\.current!==uid\)return;if\(error\)return notify\("Opgaver/);
 });
+
+test("late initial session result cannot overwrite newer auth events", () => {
+  const page = read("app/page.js");
+  assert.match(page, /let mounted=true;let authEventSeen=false;/);
+  assert.match(page, /supabase\.auth\.getSession\(\)\.then\(\(\{data\}\)=>\{if\(!mounted\|\|authEventSeen\)return;/);
+  assert.match(page, /if\(event==="SIGNED_IN"\|\|event==="SIGNED_OUT"\|\|event==="PASSWORD_RECOVERY"\)authEventSeen=true;/);
+});
