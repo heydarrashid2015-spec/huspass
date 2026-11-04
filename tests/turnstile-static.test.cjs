@@ -54,6 +54,11 @@ test("image upload avoids restoring local cache after account change", () => {
   assert.ok(source.includes("await saveImageBlob(session.user.id,f);if(lastAuthenticatedUserIdRef.current!==session.user.id){await clearPrivateLocalData(session.user.id)"));
 });
 
+test("image upload rechecks account before signing and linking", () => {
+  assert.ok(source.includes("if(lastAuthenticatedUserIdRef.current!==session.user.id){setImageBusy(false);e.target.value=\"\";return}const {data:signed,error:signedError}"));
+  assert.ok(source.includes("if(lastAuthenticatedUserIdRef.current!==session.user.id){setImageBusy(false);e.target.value=\"\";return}const {error:saveError}"));
+});
+
 test("initial session lookup does not override recovery mode", () => {
   assert.match(source, /const sessionUser=data\.session\?\.user\|\|null;if\(sessionUser\)lastAuthenticatedUserIdRef\.current=sessionUser\.id;setUser\(sessionUser\);if\(recoveryModeRef\.current\)\{setView\("Auth"\);setAuthReady\(true\);return\}/);
 });
