@@ -63,6 +63,12 @@ test("deferred home loading checks active account and component lifetime", () =>
   assert.ok(source.includes("setTimeout(()=>{if(mounted&&lastAuthenticatedUserIdRef.current===session.user.id)loadUserHome(session.user.id)},0)"));
 });
 
+test("home and task writes ignore responses after account change", () => {
+  assert.ok(source.includes("if(lastAuthenticatedUserIdRef.current!==payload.user_id)return;setSaving(false)"));
+  assert.ok(source.includes("if(lastAuthenticatedUserIdRef.current!==user.id)return;if(error){setBusy(false);return notify"));
+  assert.ok(source.includes("if(lastAuthenticatedUserIdRef.current!==user.id)return;setBusy(false);if(error)return notify"));
+});
+
 test("initial session lookup does not override recovery mode", () => {
   assert.match(source, /const sessionUser=data\.session\?\.user\|\|null;if\(sessionUser\)lastAuthenticatedUserIdRef\.current=sessionUser\.id;setUser\(sessionUser\);if\(recoveryModeRef\.current\)\{setView\("Auth"\);setAuthReady\(true\);return\}/);
 });
