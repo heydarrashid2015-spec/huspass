@@ -69,6 +69,11 @@ test("home and task writes ignore responses after account change", () => {
   assert.ok(source.includes("if(lastAuthenticatedUserIdRef.current!==user.id)return;setBusy(false);if(error)return notify"));
 });
 
+test("task status and deletion ignore responses from previous account", () => {
+  assert.ok(source.includes("if(lastAuthenticatedUserIdRef.current!==user.id)return;setBusy(false);if(error)return notify(\"Opgavens status kunne ikke ændres.\""));
+  assert.ok(source.includes("if(lastAuthenticatedUserIdRef.current!==user.id)return;setBusy(false);if(error)return notify(\"Opgaven kunne ikke slettes\""));
+});
+
 test("initial session lookup does not override recovery mode", () => {
   assert.match(source, /const sessionUser=data\.session\?\.user\|\|null;if\(sessionUser\)lastAuthenticatedUserIdRef\.current=sessionUser\.id;setUser\(sessionUser\);if\(recoveryModeRef\.current\)\{setView\("Auth"\);setAuthReady\(true\);return\}/);
 });
