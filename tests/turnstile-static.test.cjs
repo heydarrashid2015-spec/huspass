@@ -49,6 +49,11 @@ test("document signed links are bound to the active account", () => {
   assert.ok(source.includes("if(lastAuthenticatedUserIdRef.current!==requestingUserId)return"));
 });
 
+test("image upload avoids restoring local cache after account change", () => {
+  assert.ok(source.includes("session.user.id!==user.id||lastAuthenticatedUserIdRef.current!==user.id"));
+  assert.ok(source.includes("await saveImageBlob(session.user.id,f);if(lastAuthenticatedUserIdRef.current!==session.user.id){await clearPrivateLocalData(session.user.id)"));
+});
+
 test("initial session lookup does not override recovery mode", () => {
   assert.match(source, /const sessionUser=data\.session\?\.user\|\|null;if\(sessionUser\)lastAuthenticatedUserIdRef\.current=sessionUser\.id;setUser\(sessionUser\);if\(recoveryModeRef\.current\)\{setView\("Auth"\);setAuthReady\(true\);return\}/);
 });
