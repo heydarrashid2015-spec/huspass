@@ -25,10 +25,10 @@ jobs:
           java-version: '21'
       - name: Check required signing credentials
         env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
-          KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
-          STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           for name in KEYSTORE_BASE64 KEY_ALIAS STORE_PASSWORD KEY_PASSWORD; do
             if [ -z "${!name}" ]; then
@@ -46,10 +46,10 @@ jobs:
           node scripts/configure-android-app-links.mjs
       - name: Restore upload keystore and configure release
         env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
-          HUSPASS_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
-          HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
-          HUSPASS_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          HUSPASS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          HUSPASS_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           HUSPASS_VERSION_CODE: ${{ inputs.version_code }}
           HUSPASS_SIGN_RELEASE: 'true'
         run: |
@@ -71,14 +71,14 @@ jobs:
             exit 1
           fi
         env:
-          HUSPASS_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
-          HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          HUSPASS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       - name: Build signed release AAB
         working-directory: android
         env:
-          HUSPASS_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
-          HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
-          HUSPASS_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+          HUSPASS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          HUSPASS_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: ./gradlew bundleRelease
       - name: Verify bundle signature
         run: |
