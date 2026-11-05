@@ -20,14 +20,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
       - uses: android-actions/setup-android@v3
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
       - name: Generate Capacitor Android project
         run: |
           mkdir -p out
