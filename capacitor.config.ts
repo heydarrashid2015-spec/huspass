@@ -5,7 +5,7 @@ const config = {
   plugins: {
     StatusBar: {
       backgroundColor: "#008F5A",
-      style: "DARK",
+      style: "LIGHT",
       overlaysWebView: false
     }
   },
