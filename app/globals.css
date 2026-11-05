@@ -285,3 +285,5 @@ body{min-height:100dvh}
 .aiComparisonDetails{margin-top:16px;padding:14px;border:1px solid #d8e7df;border-radius:14px}.aiComparisonDetails h3{margin:0 0 8px}.aiComparisonDetails p{font-size:13px;line-height:1.5}.aiVatCompareRow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-top:1px solid #e5ece7;padding:10px 0;font-size:14px}.aiVatCompareRow strong{font-variant-numeric:tabular-nums}
 
 .aiScopeComparison{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px;margin-top:12px}.aiScopeOffer{min-width:0;padding:14px;border:1px solid #dfe8e2;border-radius:12px;background:#fff}.aiScopeOffer>strong{display:block;margin-bottom:10px;overflow-wrap:anywhere}.aiScopeOffer dl{margin:0}.aiScopeOffer dt{font-size:12px;color:#506459;font-weight:700;margin-top:10px}.aiScopeOffer dd{font-size:13px;line-height:1.5;margin:2px 0 0;overflow-wrap:anywhere;white-space:pre-wrap}
+
+.aiOfferQuestions{padding-left:20px;margin:8px 0 0}.aiOfferQuestions li{margin:7px 0;font-size:13px;line-height:1.5}
