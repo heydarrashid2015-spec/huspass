@@ -14,6 +14,11 @@ if (!/minSdkVersion\s*=\s*\d+/.test(variables)) {
   throw new Error("Generated Android minSdkVersion not found in variables.gradle");
 }
 variables = variables.replace(/minSdkVersion\s*=\s*\d+/, "minSdkVersion = 24");
+for (const sdk of ["compileSdkVersion", "targetSdkVersion"]) {
+  const pattern = new RegExp(`${sdk}\\s*=\\s*\\d+`);
+  if (!pattern.test(variables)) throw new Error(`Generated Android ${sdk} not found in variables.gradle`);
+  variables = variables.replace(pattern, `${sdk} = 36`);
+}
 writeFileSync(variablesPath, variables);
 
 let gradle = readFileSync(path, "utf8");
