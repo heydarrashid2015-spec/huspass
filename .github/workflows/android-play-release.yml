@@ -80,9 +80,30 @@ jobs:
           HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           HUSPASS_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: ./gradlew bundleRelease
-      - name: Verify bundle signature
+      - name: Verify bundle signature and original upload certificate
+        env:
+          HUSPASS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          jarsigner -verify -strict -certs android/app/build/outputs/bundle/release/app-release.aab
+          set -euo pipefail
+          BUNDLE=android/app/build/outputs/bundle/release/app-release.aab
+          jarsigner -verify -verbose -certs "$BUNDLE" > "$RUNNER_TEMP/jarsigner-verification.log" 2>&1 || {
+            cat "$RUNNER_TEMP/jarsigner-verification.log"
+            echo "::error::AAB signature verification failed"
+            exit 1
+          }
+          grep -q 'jar verified' "$RUNNER_TEMP/jarsigner-verification.log" || {
+            cat "$RUNNER_TEMP/jarsigner-verification.log"
+            echo "::error::AAB did not pass signature verification"
+            exit 1
+          }
+          keytool -printcert -jarfile "$BUNDLE" > "$RUNNER_TEMP/aab-certificate.txt"
+          EXPECTED='3E:B7:34:47:6E:15:96:D7:17:F9:97:43:DC:47:AE:32:8A:87:06:35:1D:C0:45:ED:48:30:41:B3:97:FE:E4:7D'
+          grep -Fq "$EXPECTED" "$RUNNER_TEMP/aab-certificate.txt" || {
+            echo "::error::Signed AAB certificate does not match original HusPass upload certificate"
+            exit 1
+          }
+          echo 'AAB signature verified and upload certificate matched'
       - uses: actions/upload-artifact@v4
         with:
           name: huspass-android-signed-release-aab
