@@ -5,6 +5,17 @@ const version = Number(process.env.HUSPASS_VERSION_CODE);
 if (!Number.isSafeInteger(version) || version < 11 || version > 2100000000) {
   throw new Error("HUSPASS_VERSION_CODE must be an integer from 11 to 2100000000; check the current Play Console versionCode before choosing it");
 }
+
+// Google Play automatic protection requires Android minSdkVersion >= 24.
+// Capacitor generates this setting in android/variables.gradle.
+const variablesPath = "android/variables.gradle";
+let variables = readFileSync(variablesPath, "utf8");
+if (!/minSdkVersion\s*=\s*\d+/.test(variables)) {
+  throw new Error("Generated Android minSdkVersion not found in variables.gradle");
+}
+variables = variables.replace(/minSdkVersion\s*=\s*\d+/, "minSdkVersion = 24");
+writeFileSync(variablesPath, variables);
+
 let gradle = readFileSync(path, "utf8");
 if (!/versionCode\s+\d+/.test(gradle)) throw new Error("Generated Android versionCode not found");
 gradle = gradle.replace(/versionCode\s+\d+/, `versionCode ${version}`);
