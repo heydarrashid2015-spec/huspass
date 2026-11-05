@@ -40,6 +40,7 @@ jobs:
         run: |
           node scripts/configure-android-release.mjs
           grep -q 'versionCode 2000000000' android/app/build.gradle
+          grep -Eq 'minSdkVersion[[:space:]]*=[[:space:]]*24' android/variables.gradle
       - name: Verify Android manifest
         run: |
           grep -q 'android:autoVerify="true"' android/app/src/main/AndroidManifest.xml
