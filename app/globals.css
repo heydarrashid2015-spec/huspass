@@ -291,3 +291,5 @@ body{min-height:100dvh}
 .aiQuickSteps{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}.aiQuickSteps span{background:#e9f5ec;border:1px solid #d3e7d8;border-radius:20px;padding:7px 11px;font-size:12px;font-weight:700;color:#22573b}
 
 .aiMainAction{text-align:center}.aiMainAction h2{font-size:clamp(20px,4vw,28px)}.aiPrimaryAction{width:100%;max-width:440px;margin:12px auto;padding:15px 20px;border:0;border-radius:14px;background:#176b45;color:#fff;font-size:16px;font-weight:750;cursor:pointer}.aiPrimaryAction:hover{background:#115635}.aiOptionalTools{padding:12px!important}.aiToggleDetails{width:100%;padding:12px;background:transparent;border:1px solid #dce8df;border-radius:10px;font-weight:700;color:#24533a;cursor:pointer}
+
+.aiSearchDescription{display:flex;flex-direction:column;gap:9px;margin:16px 0}.aiSearchDescription span{font-weight:700;color:#16432e}.aiSearchDescription textarea{width:100%;min-height:112px;padding:13px;border:1px solid #cbded1;border-radius:12px;resize:vertical;font:inherit;line-height:1.5;box-sizing:border-box}.aiSearchDescription textarea:focus-visible{outline:3px solid #90d5ac;outline-offset:2px}
