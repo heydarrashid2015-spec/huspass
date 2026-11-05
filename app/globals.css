@@ -279,3 +279,5 @@ body{min-height:100dvh}
 .aiOfferComparison{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}.aiOfferComparison>div{border:1px solid #d9e8df;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:9px;min-width:0;overflow-wrap:anywhere;background:#f8fbf9}.aiOfferComparison small{color:#52695b}.aiOfferComparison strong{font-size:clamp(18px,2vw,25px);color:#124e30}.aiOfferComparison span{font-size:12px}@media(max-width:720px){.aiOfferComparison{grid-template-columns:1fr}}
 
 .aiOfferForm select{width:100%;min-width:0;border:1px solid #cbdcd1;border-radius:9px;padding:10px;background:#fff;color:#173e2a}
+
+.aiCompareWarning{border:1px solid #e9c57e;border-radius:12px;background:#fff8e8;color:#664516!important;padding:14px;line-height:1.6}.aiVerifyLinks{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}.aiVerifyLinks a{display:inline-flex;align-items:center;min-height:44px;border-radius:12px;background:#087747;color:#fff!important;text-decoration:none;padding:10px 14px;font-size:13px;font-weight:750}.aiVerifyLinks a:focus-visible{outline:3px solid #75cba3;outline-offset:3px}
