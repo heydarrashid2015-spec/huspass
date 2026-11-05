@@ -37,11 +37,16 @@ jobs:
         run: |
           grep -q 'android:autoVerify="true"' android/app/src/main/AndroidManifest.xml
           grep -q 'android:host="www.huspass.dk"' android/app/src/main/AndroidManifest.xml
-      - name: Build unsigned-for-Play debug test APK
+      - name: Build debug APK and unsigned release AAB
         working-directory: android
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug bundleRelease
       - uses: actions/upload-artifact@v4
         with:
           name: huspass-android-debug-app-links
           path: android/app/build/outputs/apk/debug/*.apk
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: huspass-android-unsigned-release-aab
+          path: android/app/build/outputs/bundle/release/*.aab
           retention-days: 7
