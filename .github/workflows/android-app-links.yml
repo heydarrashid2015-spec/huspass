@@ -25,6 +25,8 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+      - name: Install Android SDK platform 36
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: Generate Capacitor Android project
@@ -41,6 +43,8 @@ jobs:
           node scripts/configure-android-release.mjs
           grep -q 'versionCode 2000000000' android/app/build.gradle
           grep -Eq 'minSdkVersion[[:space:]]*=[[:space:]]*24' android/variables.gradle
+          grep -Eq 'compileSdkVersion[[:space:]]*=[[:space:]]*36' android/variables.gradle
+          grep -Eq 'targetSdkVersion[[:space:]]*=[[:space:]]*36' android/variables.gradle
       - name: Verify Android manifest
         run: |
           grep -q 'android:autoVerify="true"' android/app/src/main/AndroidManifest.xml
