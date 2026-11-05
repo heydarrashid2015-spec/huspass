@@ -293,3 +293,6 @@ body{min-height:100dvh}
 .aiMainAction{text-align:center}.aiMainAction h2{font-size:clamp(20px,4vw,28px)}.aiPrimaryAction{width:100%;max-width:440px;margin:12px auto;padding:15px 20px;border:0;border-radius:14px;background:#176b45;color:#fff;font-size:16px;font-weight:750;cursor:pointer}.aiPrimaryAction:hover{background:#115635}.aiOptionalTools{padding:12px!important}.aiToggleDetails{width:100%;padding:12px;background:transparent;border:1px solid #dce8df;border-radius:10px;font-weight:700;color:#24533a;cursor:pointer}
 
 .aiSearchDescription{display:flex;flex-direction:column;gap:9px;margin:16px 0}.aiSearchDescription span{font-weight:700;color:#16432e}.aiSearchDescription textarea{width:100%;min-height:112px;padding:13px;border:1px solid #cbded1;border-radius:12px;resize:vertical;font:inherit;line-height:1.5;box-sizing:border-box}.aiSearchDescription textarea:focus-visible{outline:3px solid #90d5ac;outline-offset:2px}
+
+/* Android / installed web app: visible green system status-bar backdrop. */
+@media (max-width:699px){html{background:#008f5a}body{background:#008f5a}main{background:#fff}main:not(.authPage){padding-top:max(env(safe-area-inset-top),24px)}@supports (padding-top:env(safe-area-inset-top)){main:not(.authPage){padding-top:env(safe-area-inset-top)}}}
