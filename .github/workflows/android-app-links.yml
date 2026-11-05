@@ -9,6 +9,7 @@ on:
       - 'package-lock.json'
       - '.github/workflows/android-app-links.yml'
       - 'scripts/configure-android-app-links.mjs'
+      - 'scripts/configure-android-release.mjs'
 
 jobs:
   android-debug:
@@ -33,6 +34,12 @@ jobs:
           npx cap add android
       - name: Configure verified HTTPS app links
         run: node scripts/configure-android-app-links.mjs
+      - name: Validate release version configuration
+        env:
+          HUSPASS_VERSION_CODE: '2000000000'
+        run: |
+          node scripts/configure-android-release.mjs
+          grep -q 'versionCode 2000000000' android/app/build.gradle
       - name: Verify Android manifest
         run: |
           grep -q 'android:autoVerify="true"' android/app/src/main/AndroidManifest.xml
