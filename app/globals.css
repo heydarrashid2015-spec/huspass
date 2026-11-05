@@ -289,3 +289,5 @@ body{min-height:100dvh}
 .aiOfferQuestions{padding-left:20px;margin:8px 0 0}.aiOfferQuestions li{margin:7px 0;font-size:13px;line-height:1.5}
 
 .aiQuickSteps{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}.aiQuickSteps span{background:#e9f5ec;border:1px solid #d3e7d8;border-radius:20px;padding:7px 11px;font-size:12px;font-weight:700;color:#22573b}
+
+.aiMainAction{text-align:center}.aiMainAction h2{font-size:clamp(20px,4vw,28px)}.aiPrimaryAction{width:100%;max-width:440px;margin:12px auto;padding:15px 20px;border:0;border-radius:14px;background:#176b45;color:#fff;font-size:16px;font-weight:750;cursor:pointer}.aiPrimaryAction:hover{background:#115635}.aiOptionalTools{padding:12px!important}.aiToggleDetails{width:100%;padding:12px;background:transparent;border:1px solid #dce8df;border-radius:10px;font-weight:700;color:#24533a;cursor:pointer}
