@@ -24,7 +24,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - uses: android-actions/setup-android@v3
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: Generate Capacitor Android project
