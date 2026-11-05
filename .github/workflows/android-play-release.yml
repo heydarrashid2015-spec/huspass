@@ -25,10 +25,10 @@ jobs:
           java-version: '21'
       - name: Check required signing credentials
         env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
-          KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
-          STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           for name in KEYSTORE_BASE64 KEY_ALIAS STORE_PASSWORD KEY_PASSWORD; do
             if [ -z "${!name}" ]; then
@@ -46,10 +46,10 @@ jobs:
           node scripts/configure-android-app-links.mjs
       - name: Restore upload keystore and configure release
         env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
-          HUSPASS_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
-          HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
-          HUSPASS_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          HUSPASS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          HUSPASS_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           HUSPASS_VERSION_CODE: ${{ inputs.version_code }}
           HUSPASS_SIGN_RELEASE: 'true'
         run: |
@@ -62,12 +62,23 @@ jobs:
           grep -q 'android:autoVerify="true"' android/app/src/main/AndroidManifest.xml
           grep -q 'android:host="www.huspass.dk"' android/app/src/main/AndroidManifest.xml
           grep -q 'signingConfig signingConfigs.huspassRelease' android/app/build.gradle
+      - name: Verify original HusPass upload certificate
+        run: |
+          ACTUAL=$(keytool -list -v -keystore "$HUSPASS_KEYSTORE_PATH" -alias "$HUSPASS_KEY_ALIAS" -storepass "$HUSPASS_STORE_PASSWORD" 2>/dev/null | grep 'SHA256:' | head -1 | sed 's/.*SHA256: //')
+          EXPECTED='3E:B7:34:47:6E:15:96:D7:17:F9:97:43:DC:47:AE:32:8A:87:06:35:1D:C0:45:ED:48:30:41:B3:97:FE:E4:7D'
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo '::error::Upload certificate differs from original HusPass v1.0.9 signed AAB'
+            exit 1
+          fi
+        env:
+          HUSPASS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       - name: Build signed release AAB
         working-directory: android
         env:
-          HUSPASS_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
-          HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
-          HUSPASS_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+          HUSPASS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          HUSPASS_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          HUSPASS_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: ./gradlew bundleRelease
       - name: Verify bundle signature
         run: |

@@ -2,8 +2,8 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 const path = "android/app/build.gradle";
 const version = Number(process.env.HUSPASS_VERSION_CODE);
-if (!Number.isSafeInteger(version) || version < 2 || version > 2100000000) {
-  throw new Error("HUSPASS_VERSION_CODE must be an integer from 2 to 2100000000; check the current Play Console versionCode before choosing it");
+if (!Number.isSafeInteger(version) || version < 11 || version > 2100000000) {
+  throw new Error("HUSPASS_VERSION_CODE must be an integer from 11 to 2100000000; check the current Play Console versionCode before choosing it");
 }
 let gradle = readFileSync(path, "utf8");
 if (!/versionCode\s+\d+/.test(gradle)) throw new Error("Generated Android versionCode not found");
