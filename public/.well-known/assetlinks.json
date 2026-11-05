@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "dk.huspass.app",
+      "sha256_cert_fingerprints": [
+        "16:4C:F8:28:05:3A:BB:CD:77:FB:8C:2A:0E:93:9F:25:AB:25:52:F9:1B:AF:CB:83:06:F0:20:71:C2:F1:7B:49"
+      ]
+    }
+  }
+]
