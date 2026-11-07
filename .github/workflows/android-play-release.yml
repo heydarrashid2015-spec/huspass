@@ -44,6 +44,7 @@ jobs:
           printf '<!doctype html><title>HusPass</title>' > out/index.html
           npx cap add android
           node scripts/configure-android-app-links.mjs
+          node scripts/configure-android-keyboard.mjs
       - name: Restore upload keystore and configure release
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -60,6 +61,7 @@ jobs:
       - name: Verify signed release configuration
         run: |
           grep -q 'android:autoVerify="true"' android/app/src/main/AndroidManifest.xml
+          grep -q 'android:windowSoftInputMode="adjustResize"' android/app/src/main/AndroidManifest.xml
           grep -q 'android:host="www.huspass.dk"' android/app/src/main/AndroidManifest.xml
           grep -q 'signingConfig signingConfigs.huspassRelease' android/app/build.gradle
       - name: Verify original HusPass upload certificate
