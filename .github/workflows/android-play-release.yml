@@ -44,6 +44,36 @@ jobs:
           printf '<!doctype html><title>HusPass</title>' > out/index.html
           npx cap add android
           node scripts/configure-android-app-links.mjs
+      - name: Install approved HusPass launcher icons
+        run: |
+          npx --yes sharp-cli -i public/huspass-icon.svg -o /tmp/huspass-icon.png resize 512 512
+          find android/app/src/main/res -type f \( -name 'ic_launcher*' -o -name 'ic_launcher_round*' \) -delete
+          for spec in "mipmap-mdpi 48" "mipmap-hdpi 72" "mipmap-xhdpi 96" "mipmap-xxhdpi 144" "mipmap-xxxhdpi 192"; do
+            set -- $spec
+            dir="android/app/src/main/res/$1"
+            mkdir -p "$dir"
+            npx --yes sharp-cli -i /tmp/huspass-icon.png -o "$dir/ic_launcher.png" resize "$2" "$2"
+            cp "$dir/ic_launcher.png" "$dir/ic_launcher_round.png"
+          done
+          if find android/app/src/main/res -path '*mipmap-anydpi-v26*' -type f -name 'ic_launcher*.xml' | grep -q .; then
+            echo "::error::Unexpected default adaptive launcher remains"
+            exit 1
+          fi
+      - name: Upgrade generated Android Gradle plugin for API 36
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for q in Path("android").rglob("*"):
+              if q.is_file() and q.suffix in {".gradle", ".kts"}:
+                  try:
+                      s=q.read_text()
+                  except UnicodeDecodeError:
+                      continue
+                  s=s.replace("com.android.tools.build:gradle:8.7.2", "com.android.tools.build:gradle:8.9.1")
+                  s=s.replace('id "com.android.application" version "8.7.2"', 'id "com.android.application" version "8.9.1"')
+                  s=s.replace('id("com.android.application") version "8.7.2"', 'id("com.android.application") version "8.9.1"')
+                  q.write_text(s)
+          PY
       - name: Restore upload keystore and configure release
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
