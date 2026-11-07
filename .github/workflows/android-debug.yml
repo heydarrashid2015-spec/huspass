@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/android-debug.yml"
       - "capacitor.config.ts"
+      - "scripts/configure-android-keyboard.mjs"
       - "package.json"
       - "app/page.js"
       - "app/globals.css"
@@ -48,6 +49,8 @@ jobs:
         run: npx cap add android
       - name: Sync Capacitor
         run: npx cap sync android
+      - name: Configure Android keyboard viewport resizing
+        run: node scripts/configure-android-keyboard.mjs
       - name: Install HusPass Android launcher icons
         run: |
           # Capacitor scaffolds adaptive-icon XML/resources that override density PNGs on API 26+.
@@ -214,6 +217,7 @@ jobs:
       - name: Verify generated Android manifest
         run: |
           manifest="android/app/src/main/AndroidManifest.xml"
+          grep -q 'android:windowSoftInputMode="adjustResize"' "$manifest"
           grep -q 'android.permission.INTERNET' "$manifest"
           if grep -E 'android.permission.(ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|RECORD_AUDIO|CAMERA|READ_CONTACTS|WRITE_CONTACTS)' "$manifest"; then
             echo "Unexpected sensitive permission found in generated Android manifest."
