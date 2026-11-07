@@ -7,7 +7,7 @@ test('bottom navigation order and Plus placement',()=>{
  const ai=s.slice(s.indexOf('if(view==="HusPass AI")'),s.indexOf('if(view==="Mere")'));
  const more=s.slice(s.indexOf('if(view==="Mere")'),s.indexOf('if(view==="Boligværdi")'));
  expect(ai).toContain('Flere HusPass Plus-funktioner');
- expect(ai).toContain('Billedgalleri');
+ expect(ai).not.toContain('Billedgalleri');
  expect(ai).toContain('Bolig og grundværdi');
  expect(ai).toContain('Del bolig & husstand');
  expect(more).not.toContain('Billedgalleri');
