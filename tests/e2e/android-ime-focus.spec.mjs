@@ -30,3 +30,17 @@ test('IME composition does not remount the focused field', async ({ page }) => {
   await expect(email).toBeFocused();
   expect(await page.evaluate(() => window.__huspassFocusedInput === document.activeElement)).toBe(true);
 });
+
+test('ordinary typing never drops focus between successive keystrokes', async ({ page }) => {
+  await page.goto('/');
+  const email = page.locator('input[type="email"]').first();
+  await expect(email).toBeVisible();
+  await email.focus();
+  await page.evaluate(() => { window.__huspassTypingField = document.activeElement; });
+  for (const character of 'oneplus13@example.com') {
+    await page.keyboard.type(character);
+    await expect(email).toBeFocused();
+    expect(await page.evaluate(() => window.__huspassTypingField === document.activeElement)).toBe(true);
+  }
+  await expect(email).toHaveValue('oneplus13@example.com');
+});
