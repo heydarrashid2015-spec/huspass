@@ -1,0 +1,28 @@
+name: HusPass browser smoke tests
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx --yes --package=@playwright/test playwright install --with-deps chromium
+      - run: npx --yes --package=@playwright/test playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-failure-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
