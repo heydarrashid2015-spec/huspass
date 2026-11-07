@@ -296,3 +296,6 @@ body{min-height:100dvh}
 
 /* Android / installed web app: visible green system status-bar backdrop. */
 @media (max-width:699px){html{background:#008f5a}body{background:#008f5a}main{background:#fff}main:not(.authPage){padding-top:max(env(safe-area-inset-top),24px)}@supports (padding-top:env(safe-area-inset-top)){main:not(.authPage){padding-top:env(safe-area-inset-top)}}}
+
+/* Project assistant: mobile-friendly, explicit answers instead of free-text yes/no */
+.aiProjectQuestion{display:flex;flex-direction:column;gap:8px;margin:14px 0}.aiProjectQuestion label{font-weight:650;color:#174a37;line-height:1.35}.aiProjectQuestion input,.aiProjectQuestion select{box-sizing:border-box;display:block;width:100%;min-height:48px;padding:11px 13px;border:1px solid #aabbb2;border-radius:10px;background:#fff;color:#173a2d;font:inherit;font-size:16px}.aiProjectQuestion input:focus-visible,.aiProjectQuestion select:focus-visible{outline:3px solid #8bcbb2;outline-offset:1px;border-color:#167b56}
