@@ -6,8 +6,10 @@ test('login rejects passwords shorter than eight characters without a network re
   await expect(page.getByRole('button', { name: 'Log ind' }).first()).toBeVisible();
   await page.locator('input[type="email"]').fill('example@example.invalid');
   await page.locator('input[type="password"]').fill('abc');
+  // Browser minLength validation prevents submit before the React handler runs.
+  expect(await page.locator('input[type="password"]').evaluate(el => el.validity.tooShort)).toBe(true);
   await page.locator('form').filter({ has: page.locator('input[type="email"]') }).getByRole('button', { name: 'Log ind' }).click();
-  await expect(page.getByText('Adgangskoden skal være mindst 8 tegn.')).toBeVisible();
+  expect(await page.locator('input[type="password"]').evaluate(el => el.validity.valid)).toBe(false);
 });
 
 test('registration requires a letter and a number', async ({ page }) => {
