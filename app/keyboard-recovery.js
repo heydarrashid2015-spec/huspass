@@ -2,53 +2,56 @@
 
 import { useEffect, useState } from "react";
 
-// Recovery for Android IMEs that dismiss themselves while an editable field
-// remains focused (observed when long-pressing the space bar to change language).
-// Never steal focus or automatically reopen the keyboard.
+// Android Chrome can dismiss the IME while the editable element remains focused.
+// The control is a user-initiated recovery only; it never forces the IME open.
 export default function KeyboardRecovery() {
   const [target, setTarget] = useState(null);
   useEffect(() => {
     if (!/Android/i.test(navigator.userAgent) || !window.visualViewport) return;
     const viewport = window.visualViewport;
-    let keyboardWasOpen = false;
-    let baseline = Math.max(window.innerHeight, viewport.height);
+    // Capture the initial full viewport, before focusing a field. The previous
+    // implementation used window.innerHeight as a baseline, which may itself
+    // shrink with the keyboard and prevent detecting a close transition.
+    let fullHeight = viewport.height;
     let tracked = null;
-    const editable = el => el instanceof HTMLInputElement &&
-      !["checkbox","radio","file","button","submit","reset","hidden","date","time"].includes(el.type) ||
-      el instanceof HTMLTextAreaElement;
-    const check = () => {
+    let pending = null;
+    const editable = el => (el instanceof HTMLTextAreaElement ||
+      (el instanceof HTMLInputElement &&
+        !["checkbox","radio","file","button","submit","reset","hidden","date","time"].includes(el.type))) &&
+      !el.disabled && !el.readOnly;
+    const cancel = () => { if (pending !== null) clearTimeout(pending); pending = null; };
+    const inspect = () => {
+      cancel();
       const active = document.activeElement;
-      const height = viewport.height;
-      // Baseline is the full-height viewport seen while the IME is closed.
-      // Keep it fixed while the field is focused, to avoid false positives.
       if (!editable(active)) {
         tracked = null;
-        keyboardWasOpen = false;
-        baseline = Math.max(baseline, height);
+        setTarget(null);
+        fullHeight = Math.max(fullHeight, viewport.height);
+        return;
+      }
+      if (active !== tracked) { tracked = active; setTarget(null); }
+      const height = viewport.height;
+      // Record the full-height viewport even if Android resized the layout.
+      fullHeight = Math.max(fullHeight, height);
+      if (fullHeight - height > 140) {
         setTarget(null);
         return;
       }
-      if (active !== tracked) {
-        tracked = active;
-        keyboardWasOpen = false;
-        setTarget(null);
-      }
-      if (baseline - height > 140) {
-        keyboardWasOpen = true;
-        setTarget(null);
-      } else if (keyboardWasOpen && baseline - height < 90) {
-        // IME disappeared, but the same field is still focused.
-        setTarget(active);
-        keyboardWasOpen = false;
-      }
+      // A focused field with a full-height viewport suggests the IME is hidden.
+      // Delay so a normal tap has time to raise the keyboard without a flash.
+      pending = setTimeout(() => {
+        if (document.activeElement === active && active.isConnected &&
+            fullHeight - viewport.height < 100) setTarget(active);
+      }, 700);
     };
-    const onFocus = () => { tracked = document.activeElement; keyboardWasOpen = false; setTarget(null); };
-    const onBlur = () => { tracked = null; keyboardWasOpen = false; setTarget(null); };
-    viewport.addEventListener("resize", check);
+    const onFocus = () => { setTarget(null); inspect(); };
+    const onBlur = () => { cancel(); tracked = null; setTarget(null); };
+    viewport.addEventListener("resize", inspect);
     document.addEventListener("focusin", onFocus, true);
     document.addEventListener("focusout", onBlur, true);
     return () => {
-      viewport.removeEventListener("resize", check);
+      cancel();
+      viewport.removeEventListener("resize", inspect);
       document.removeEventListener("focusin", onFocus, true);
       document.removeEventListener("focusout", onBlur, true);
     };
@@ -58,8 +61,6 @@ export default function KeyboardRecovery() {
       setTarget(null);
       return;
     }
-    // Executed only in response to a user tap, which permits Android Chrome
-    // to show its IME. A focus cycle is needed when the field never blurred.
     target.blur();
     target.focus({ preventScroll: true });
     try { navigator.virtualKeyboard?.show?.(); } catch {}
