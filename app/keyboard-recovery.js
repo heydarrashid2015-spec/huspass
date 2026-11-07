@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 export default function KeyboardRecovery() {
   const [target, setTarget] = useState(null);
   useEffect(() => {
-    if (!/Android/i.test(navigator.userAgent) || !window.visualViewport) return;
+    if (window.location.pathname === "/keyboard-test" || !/Android/i.test(navigator.userAgent) || !window.visualViewport) return;
     const viewport = window.visualViewport;
     let keyboardWasOpen = false;
     let baseline = Math.max(window.innerHeight, viewport.height);
