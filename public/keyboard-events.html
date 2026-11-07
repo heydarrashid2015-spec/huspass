@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="da">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HusPass keyboard event diagnostics</title></head>
+<body>
+<h1>Keyboard events</h1>
+<p>Focus the input and open the keyboard language selector. No typed text is collected, transmitted, or stored.</p>
+<label for="ime">Test input</label>
+<input id="ime" type="text" autocomplete="off" style="font-size:18px;padding:12px;width:90%">
+<p><button type="button" id="copy">Copy event report</button> <button type="button" id="clear">Clear</button></p>
+<pre id="events" aria-live="off" style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px"></pre>
+<script>
+(function () {
+  "use strict";
+  var entries = [];
+  var field = document.getElementById("ime");
+  var output = document.getElementById("events");
+  var start = performance.now();
+  var lastHeight = -1;
+  function record(name, detail) {
+    var active = document.activeElement === field ? "input" : "other";
+    var viewport = window.visualViewport;
+    var h = Math.round(viewport ? viewport.height : window.innerHeight);
+    var row = [Math.round(performance.now()-start)+"ms",name,"focus="+active,"vh="+h];
+    if(detail) row.push(detail);
+    entries.push(row.join(" | "));
+    if(entries.length > 70) entries.shift();
+    output.textContent = entries.join("\n");
+  }
+  ["focus","blur","focusin","focusout","compositionstart","compositionend","keydown","keyup"].forEach(function(type){
+    document.addEventListener(type,function(event){
+      if(event.target!==field) return;
+      if(type==="keydown"||type==="keyup"){
+        // Log only whether key is space; never log text or other keys.
+        if(event.key!==" ") return;
+        record(type,"space");
+      } else record(type);
+    },true);
+  });
+  document.addEventListener("visibilitychange",function(){record("visibilitychange",document.visibilityState);});
+  window.addEventListener("pagehide",function(){record("pagehide");});
+  window.addEventListener("pageshow",function(){record("pageshow");});
+  window.addEventListener("resize",function(){record("window.resize");});
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize",function(){
+      var h=Math.round(window.visualViewport.height);
+      if(h===lastHeight)return;
+      lastHeight=h;record("visualViewport.resize");
+    });
+  }
+  document.getElementById("copy").addEventListener("click",function(){
+    var report = "User agent: "+navigator.userAgent+"\n"+entries.join("\n");
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(report).catch(function(){output.textContent=report;});
+    }else output.textContent=report;
+  });
+  document.getElementById("clear").addEventListener("click",function(){entries=[];output.textContent="";start=performance.now();});
+  record("ready");
+})();
+</script>
+</body></html>
