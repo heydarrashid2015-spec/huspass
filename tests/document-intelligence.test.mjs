@@ -18,3 +18,16 @@ test("rejects impossible dates",()=>{
  const r=parseDanishDocumentText("Faktura\n31.02.2026\nTotal: 1.000,00");
  assert.equal(r.documentDate,null);assert.equal(r.amount,1000);
 });
+
+test("reads receipt with labelled payable amount and leap day",()=>{
+ const r=parseDanishDocumentText("Butik ApS\nKvittering\n29.02.2024\nAt betale: 2.499,95 kr.");
+ assert.equal(r.documentDate,"2024-02-29");assert.equal(r.amount,2499.95);assert.equal(r.type,"Kvittering");
+});
+test("does not treat unlabelled amounts as total",()=>{
+ const r=parseDanishDocumentText("Faktura\nVare 1.000,00\nMoms 250,00\nRabat 100,00");
+ assert.equal(r.amount,null);assert.equal(r.requiresReview,true);
+});
+test("empty input returns no fabricated metadata",()=>{
+ const r=parseDanishDocumentText("");
+ assert.equal(r.amount,null);assert.equal(r.documentDate,null);assert.equal(r.cvr,null);assert.equal(r.warrantyEnd,null);
+});
