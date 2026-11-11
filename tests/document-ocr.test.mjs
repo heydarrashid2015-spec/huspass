@@ -17,3 +17,13 @@ test("rejects files over ten megabytes before parsing",async()=>{
 test("rejects missing input",async()=>{
  await assert.rejects(readDocumentText(null),/Vælg en fil/);
 });
+
+test("rejects images with extension/MIME disagreement",async()=>{
+ await assert.rejects(readDocumentText(file("invoice.png","image/jpeg")),/Kun PDF, JPG, PNG og WebP/);
+ await assert.rejects(readDocumentText(file("invoice.jpg","image/webp")),/Kun PDF, JPG, PNG og WebP/);
+ await assert.rejects(readDocumentText(file("invoice.webp","image/png")),/Kun PDF, JPG, PNG og WebP/);
+});
+test("rejects zero-byte or malformed file size",async()=>{
+ await assert.rejects(readDocumentText(file("invoice.pdf","application/pdf",0)),/tom eller ugyldig/);
+ await assert.rejects(readDocumentText(file("invoice.png","image/png",NaN)),/tom eller ugyldig/);
+});
