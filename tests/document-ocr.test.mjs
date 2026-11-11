@@ -27,3 +27,14 @@ test("rejects zero-byte or malformed file size",async()=>{
  await assert.rejects(readDocumentText(file("invoice.pdf","application/pdf",0)),/tom eller ugyldig/);
  await assert.rejects(readDocumentText(file("invoice.png","image/png",NaN)),/tom eller ugyldig/);
 });
+
+test("rejects spoofed file headers even when MIME and extension agree",async()=>{
+ const fake=(name,type,bytes)=>({name,type,size:bytes.length,slice:()=>({arrayBuffer:async()=>Uint8Array.from(bytes).buffer})});
+ await assert.rejects(readDocumentText(fake("invoice.pdf","application/pdf",[60,115,118,103,62])),/indhold matcher ikke/);
+ await assert.rejects(readDocumentText(fake("invoice.png","image/png",[255,216,255,0])),/indhold matcher ikke/);
+ await assert.rejects(readDocumentText(fake("invoice.jpg","image/jpeg",[137,80,78,71,13,10,26,10])),/indhold matcher ikke/);
+ await assert.rejects(readDocumentText(fake("invoice.webp","image/webp",[82,73,70,70,0,0,0,0,74,80,69,71])),/indhold matcher ikke/);
+});
+test("rejects malformed file objects without a slice API",async()=>{
+ await assert.rejects(readDocumentText(file("invoice.pdf","application/pdf")) ,/Ugyldig fil/);
+});
