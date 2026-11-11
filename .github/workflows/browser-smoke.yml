@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --no-package-lock
-      - run: node --test tests/document-intelligence.test.mjs
+      - run: node --test tests/document-intelligence.test.mjs tests/document-ocr.test.mjs
       - run: npm run build
       - run: npm install --no-save --package-lock=false @playwright/test
       - run: npx playwright install --with-deps chromium
