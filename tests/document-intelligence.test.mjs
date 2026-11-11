@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {parseDanishDocumentText} from "../lib/document-intelligence.js";
+import {readFile} from "node:fs/promises";
+const source=await readFile(new URL("../lib/document-intelligence.js",import.meta.url),"utf8");
+const {parseDanishDocumentText}=await import("data:text/javascript;base64,"+Buffer.from(source).toString("base64"));
 
 test("extracts labelled total and valid invoice metadata",()=>{
  const r=parseDanishDocumentText("Nord El ApS\nFaktura\nDato 05.11.2026\nCVR 12 34 56 78\nElektriker\nMoms 250,00\nI alt: 1.250,00");
