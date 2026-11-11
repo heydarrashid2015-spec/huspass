@@ -23,3 +23,20 @@ test('missing scope or warranty prevents misleading price comparison', () => {
   assert.equal(result.comparable,false);
   assert.ok(result.missingFields.includes('warranty'));
 });
+
+test('null and blank prices never become zero-valued verified quotes', () => {
+  for (const totalPrice of [null, undefined, '', '  ']) {
+    const [result] = compareVerifiedQuotes([{totalPrice,currency:'DKK',sourceType:'contractor_document',documentId:'doc1',scope:'paint',materials:'included',vatIncluded:true,warranty:'2 years',validUntil:'2027-01-01'}]);
+    assert.equal(result.verifiedPrice,null);
+    assert.equal(result.comparable,false);
+  }
+});
+test('unsubstantiated CVR and specialism flags do not boost ranking', () => {
+  const [result] = rankContractors([{name:'A',services:['maling'],sourceUrl:'https://example.org/a',cvr:'12345678',cvrVerified:true,specialismVerified:true}],{category:'maling'});
+  assert.equal(result.score,50);
+  assert.deepEqual(result.evidence,[]);
+});
+test('attributed CVR and specialism evidence are counted', () => {
+  const [result] = rankContractors([{name:'A',services:['maling'],sourceUrl:'https://example.org/a',cvr:'12345678',cvrVerified:true,cvrEvidenceUrl:'https://example.org/cvr',specialismVerified:true,specialismEvidenceUrl:'https://example.org/services'}],{category:'maling'});
+  assert.equal(result.score,75);
+});
