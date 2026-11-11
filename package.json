@@ -14,7 +14,9 @@
     "next": "16.4.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "@supabase/supabase-js": "^2.57.4"
+    "@supabase/supabase-js": "^2.57.4",
+    "pdfjs-dist": "^5.4.296",
+    "tesseract.js": "^6.0.1"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.0.0",
