@@ -16,7 +16,7 @@ Status: design and test contract, **not deployed**. Never grant cross-account ac
 - Documents, file paths, image storage and task offers remain owner-only until separately audited and explicitly opted in.
 - Use a server-authorized membership lookup in RLS for homes and tasks; never trust client-supplied home_id, role or email. Maintain both SELECT and UPDATE policies with WITH CHECK to prevent cross-home reassignment.
 - Existing client queries filter by user_id, so shared-home reads and writes require explicit refactoring; adding RLS alone will **not** make sharing work.
-- Revocation must stop new reads and writes immediately, including signed file URLs (short expiry). No service-role key in browser.
+- Revocation must stop new database reads/writes and issuance of new file URLs immediately. **Previously issued Supabase Storage signed URLs are bearer credentials and can remain usable until expiration even after membership revocation.** Never promise immediate revocation of an already issued signed URL. Keep shared files private by default; before enabling shared documents, choose a documented mitigation (short-lived signed URLs with a clearly bounded exposure window, or an authenticated server proxy that rechecks current membership on every request), and test direct URL reuse after revocation. No service-role key in browser.
 
 ## Required integration tests before enabling
 1. Owner invites a second verified account; invitation cannot be accepted by another email.
@@ -25,7 +25,7 @@ Status: design and test contract, **not deployed**. Never grant cross-account ac
 4. Editor updates a permitted field; owner sees it on the same home after reload.
 5. Editor cannot edit a different home by replacing home_id or user_id in a request.
 6. Revoked member immediately loses read/write access to home and tasks.
-7. Documents, storage objects, offers and private profile remain inaccessible.
+7. Documents, storage objects, offers and private profile remain inaccessible; attempt direct object paths and guessed document IDs across accounts. Test that a signed URL issued before revocation behaves according to the chosen revocation design, and that no new URL can be issued afterward.
 8. Existing single-user workflows continue to work with no memberships.
 9. Parallel acceptance and revocation cannot create duplicate memberships.
 10. Audit log captures who changed what and when, without storing invite tokens.
