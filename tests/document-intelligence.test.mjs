@@ -213,3 +213,20 @@ test("unlabelled receipt date is not made ambiguous by warranty expiry",()=>{
  assert.equal(r.documentDate,"2026-11-05");
  assert.equal(r.warrantyEnd,"2028-11-05");
 });
+
+test("reads OCR-split warranty expiry without treating it as purchase date or supplier",()=>{
+ const r=parseDanishDocumentText("Kvittering\nGaranti udløber\n05.11.2028\nI alt: 500,00");
+ assert.equal(r.warrantyEnd,"2028-11-05");
+ assert.equal(r.documentDate,null);
+ assert.equal(r.supplier,null);
+ assert.equal(r.requiresReview,true);
+});
+test("does not borrow an unrelated date for split warranty expiry",()=>{
+ const r=parseDanishDocumentText("Kvittering\nGaranti udløber\nKøbsdato 05.11.2026\n05.11.2028");
+ assert.equal(r.warrantyEnd,null);
+ assert.equal(r.documentDate,"2026-11-05");
+});
+test("rejects conflicting split and inline warranty expiry dates",()=>{
+ const r=parseDanishDocumentText("Kvittering\nGaranti udløber\n05.11.2028\nGaranti udløber: 06.11.2028");
+ assert.equal(r.warrantyEnd,null);
+});
