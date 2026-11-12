@@ -168,3 +168,13 @@ test("split due date is never interpreted as document date",()=>{
  assert.equal(r.documentDate,null);
  assert.equal(r.amount,500);
 });
+
+// OCR often separates Danish thousands with a regular or non-breaking space.
+test("reads spaced thousands in labelled invoice totals",()=>{
+ const r=parseDanishDocumentText("Nord El ApS\nFaktura\nI alt: 1 250,00");
+ assert.equal(r.amount,1250);
+});
+test("reads non-breaking-space thousands in split OCR total",()=>{
+ const r=parseDanishDocumentText("Faktura\nAt betale\n2\u00a0499,95");
+ assert.equal(r.amount,2499.95);
+});
