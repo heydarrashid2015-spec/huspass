@@ -9,14 +9,14 @@ const section = source.slice(start, source.indexOf('</button>', start));
 const match = section.match(/onClick=\{(async\(\)=>\{[\s\S]*?\})\}\>/);
 assert.ok(match, 'forgot-password click handler is isolated');
 
-async function run(email, resetPasswordForEmail) {
+async function run(email, resetPasswordForEmail, authBusy = false) {
   const state = { messages: [], busy: [], calls: [] };
   const supabase = { auth: { resetPasswordForEmail: async (...args) => {
     state.calls.push(args);
     return resetPasswordForEmail(...args);
   } } };
-  const build = new Function('supabase', 'email', 'setAuthMsg', 'setAuthBusy', 'return (' + match[1] + ')');
-  await build(supabase, email, value => state.messages.push(value), value => state.busy.push(value))();
+  const build = new Function('supabase', 'email', 'setAuthMsg', 'setAuthBusy', 'authBusy', 'return (' + match[1] + ')');
+  await build(supabase, email, value => state.messages.push(value), value => state.busy.push(value), authBusy)();
   return state;
 }
 
@@ -41,4 +41,11 @@ test('empty email does not call Supabase', async () => {
   assert.equal(result.calls.length, 0);
   assert.deepEqual(result.busy, []);
   assert.match(result.messages.at(-1), /e-mail/);
+});
+
+test('busy recovery request cannot trigger a second email or overwrite feedback', async () => {
+  const result = await run('person@example.com', async () => { throw new Error('duplicate request'); }, true);
+  assert.deepEqual(result.calls, []);
+  assert.deepEqual(result.busy, []);
+  assert.deepEqual(result.messages, []);
 });
