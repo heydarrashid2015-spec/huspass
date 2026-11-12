@@ -123,3 +123,14 @@ test("skips document numbers and keeps an explicit company supplier",()=>{
  const r=parseDanishDocumentText("Faktura\nFakturanr. 123456\nOrdrenummer 987654\nNord El ApS\nI alt: 500,00");
  assert.equal(r.supplier,"Nord El ApS");
 });
+
+test("reads invoice fields split across OCR lines",()=>{
+ const r=parseDanishDocumentText("Nord El ApS\nFaktura\nFakturadato\n05.11.2026\nI alt\n1.250,00");
+ assert.equal(r.documentDate,"2026-11-05");
+ assert.equal(r.amount,1250);
+ assert.equal(r.requiresReview,true);
+});
+test("does not join an invoice label across unrelated OCR content",()=>{
+ const r=parseDanishDocumentText("Faktura\nI alt\nMoms 250,00\n1.250,00");
+ assert.equal(r.amount,null);
+});
