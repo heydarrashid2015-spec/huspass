@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { verifyDocumentPriceLine } from '../../lib/ai/document-price-line-proof.mjs';
+const doc = 'Materialer 2.000 kr\nSamlet pris: 12.500 kr inkl. moms';
+const ev = () => ({lineNumber:2,sourceText:'Samlet pris: 12.500 kr inkl. moms',amountDkk:12500,currency:'DKK'});
+test('binds cited total to exact document line',()=>assert.equal(verifyDocumentPriceLine(doc,ev()).verified,true));
+test('rejects forged citation text',()=>assert.ok(verifyDocumentPriceLine(doc,{...ev(),sourceText:'Samlet pris: 99.000 kr'}).reasons.includes('source_line_mismatch')));
+test('rejects wrong line number',()=>assert.ok(verifyDocumentPriceLine(doc,{...ev(),lineNumber:1}).reasons.includes('no_explicit_total')));
+test('rejects out-of-range citation',()=>assert.ok(verifyDocumentPriceLine(doc,{...ev(),lineNumber:3}).reasons.includes('line_out_of_range')));
+test('rejects invented total',()=>assert.ok(verifyDocumentPriceLine(doc,{...ev(),amountDkk:15000}).reasons.includes('total_amount_mismatch')));
+test('rejects unlabeled amount',()=>assert.ok(verifyDocumentPriceLine('12.500 kr',{...ev(),lineNumber:1,sourceText:'12.500 kr'}).reasons.includes('no_explicit_total')));
+test('rejects ambiguous multiple totals',()=>assert.ok(verifyDocumentPriceLine('Total: 12.500 kr Total: 14.000 kr',{...ev(),lineNumber:1,sourceText:'Total: 12.500 kr Total: 14.000 kr'}).reasons.includes('ambiguous_totals')));
+test('rejects unsupported currency',()=>assert.ok(verifyDocumentPriceLine(doc,{...ev(),currency:'EUR'}).reasons.includes('invalid_amount_or_currency')));
