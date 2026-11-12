@@ -234,7 +234,7 @@ test("rejects conflicting split and inline warranty expiry dates",()=>{
 // OCR metadata labels must not become invented merchant names.
 test("warranty labels cannot be inferred as suppliers",()=>{
  for(const label of ["Garanti udløber","Garanti udløber: 05.11.2028","Garanti gyldig til","Garantiudløb: 05.11.2028"]){
-  const result=parseDanishDocumentText("Kvittering\\n"+label+"\\nI alt: 500,00");
+  const result=parseDanishDocumentText("Kvittering\n"+label+"\nI alt: 500,00");
   assert.equal(result.supplier,null,label);
  }
 });
