@@ -80,3 +80,13 @@ test("accepts repeated identical labelled invoice dates",()=>{
  const r=parseDanishDocumentText("Faktura\nFakturadato: 05.11.2026\nDato: 05.11.2026");
  assert.equal(r.documentDate,"2026-11-05");
 });
+
+test("requires review when unlabelled document dates conflict",()=>{
+ const r=parseDanishDocumentText("Kvittering\n05.11.2026\n06.11.2026\nI alt: 100,00");
+ assert.equal(r.documentDate,null);
+ assert.equal(r.requiresReview,true);
+});
+test("accepts repeated identical unlabelled dates",()=>{
+ const r=parseDanishDocumentText("Kvittering\n05.11.2026\n05.11.2026");
+ assert.equal(r.documentDate,"2026-11-05");
+});
