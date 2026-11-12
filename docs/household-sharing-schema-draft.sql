@@ -20,7 +20,9 @@ create table if not exists public.home_invitations (
  created_at timestamptz not null default now(),
  check (expires_at > created_at),
  check (accepted_at is null or (accepted_at >= created_at and accepted_at <= expires_at)),
- check (revoked_at is null or revoked_at >= created_at)
+ check (revoked_at is null or revoked_at >= created_at),
+ -- A consumed invitation cannot be revoked before it was accepted.
+ check (accepted_at is null or revoked_at is null or revoked_at >= accepted_at)
 );
 create index if not exists home_memberships_user_idx on public.home_memberships(user_id);
 create index if not exists home_invitations_home_idx on public.home_invitations(home_id);
