@@ -86,3 +86,24 @@ test('pending email request retains busy state until Supabase settles', async ()
   assert.deepEqual(state.busy, [true, false]);
   assert.equal(state.messages.length, 1);
 });
+
+test('pending recovery request clears busy state after an asynchronous rejection', async () => {
+  let rejectRequest;
+  const pending = new Promise((_, reject) => { rejectRequest = reject; });
+  const state = { busy: [], messages: [], calls: [] };
+  const supabase = { auth: { resetPasswordForEmail: (...args) => {
+    state.calls.push(args);
+    return pending;
+  } } };
+  const build = new Function('supabase', 'email', 'setAuthMsg', 'setAuthBusy', 'authBusy', 'return (' + match[1] + ')');
+  const handler = build(supabase, 'person@example.com', value => state.messages.push(value), value => state.busy.push(value), false);
+  const running = handler();
+  assert.deepEqual(state.busy, [true]);
+  assert.deepEqual(state.messages, []);
+  rejectRequest(new Error('temporary network outage'));
+  await running;
+  assert.equal(state.calls.length, 1);
+  assert.deepEqual(state.busy, [true, false]);
+  assert.equal(state.messages.length, 1);
+  assert.doesNotMatch(state.messages[0], /network|outage|error/i);
+});
