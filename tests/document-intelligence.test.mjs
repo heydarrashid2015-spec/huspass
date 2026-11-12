@@ -201,3 +201,15 @@ test("never guesses warranty from a duration or conflicting expiry dates",()=>{
  assert.equal(parseDanishDocumentText("Garanti udløber: 05.11.2028\nGaranti udløber: 06.11.2028").warrantyEnd,null);
  assert.equal(parseDanishDocumentText("Garanti udløber: 31.02.2028").warrantyEnd,null);
 });
+
+// Warranty expiry must never be silently substituted for a purchase/invoice date.
+test("warranty expiry alone is not a document date",()=>{
+ const r=parseDanishDocumentText("Kvittering\nGaranti udløber: 05.11.2028\nI alt: 500,00");
+ assert.equal(r.documentDate,null);
+ assert.equal(r.warrantyEnd,"2028-11-05");
+});
+test("unlabelled receipt date is not made ambiguous by warranty expiry",()=>{
+ const r=parseDanishDocumentText("Kvittering\n05.11.2026\nGaranti udløber: 05.11.2028\nI alt: 500,00");
+ assert.equal(r.documentDate,"2026-11-05");
+ assert.equal(r.warrantyEnd,"2028-11-05");
+});
