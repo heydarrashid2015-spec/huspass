@@ -46,11 +46,17 @@ test("prioritizes purchase date over payment due date",()=>{
 });
 
 test("does not infer invoice date from payment deadline alone",()=>{
- const r=parseDanishDocumentText("Faktura\\nBetalingsfrist 30.11.2026\\nForfaldsdato: 01.12.2026\\nTotal: 100,00");
+ const r=parseDanishDocumentText("Faktura\nBetalingsfrist 30.11.2026\nForfaldsdato: 01.12.2026\nTotal: 100,00");
  assert.equal(r.documentDate,null);
  assert.equal(r.requiresReview,true);
 });
 test("keeps a valid unlabelled date while excluding due date",()=>{
- const r=parseDanishDocumentText("Faktura\\nBetalingsfrist 30.11.2026\\n05.11.2026\\nTotal: 100,00");
+ const r=parseDanishDocumentText("Faktura\nBetalingsfrist 30.11.2026\n05.11.2026\nTotal: 100,00");
  assert.equal(r.documentDate,"2026-11-05");
+});
+
+test("rejects payment deadline while keeping unrelated valid receipt date",()=>{
+ const r=parseDanishDocumentText("Betalingsfrist 30.11.2026\\nKvittering\\n05.11.2026\\nI alt: 100,00");
+ assert.equal(r.documentDate,"2026-11-05");
+ assert.equal(r.amount,100);
 });
