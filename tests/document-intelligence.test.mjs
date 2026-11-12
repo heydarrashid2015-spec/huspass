@@ -60,3 +60,13 @@ test("rejects payment deadline while keeping unrelated valid receipt date",()=>{
  assert.equal(r.documentDate,"2026-11-05");
  assert.equal(r.amount,100);
 });
+
+test("does not silently choose between conflicting labelled totals",()=>{
+ const r=parseDanishDocumentText("Faktura\nTotal: 1.000,00\nAt betale: 1.250,00");
+ assert.equal(r.amount,null);
+ assert.equal(r.requiresReview,true);
+});
+test("accepts repeated identical labelled totals",()=>{
+ const r=parseDanishDocumentText("Faktura\nTotal: 1.250,00\nAt betale: 1.250,00");
+ assert.equal(r.amount,1250);
+});
