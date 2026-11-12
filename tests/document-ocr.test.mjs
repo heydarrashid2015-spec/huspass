@@ -46,3 +46,10 @@ test("rejects WebP containers with unsupported or missing image chunk",async()=>
  await assert.rejects(readDocumentText(fake([...prefix,74,85,78,75])),/indhold matcher ikke/);
  await assert.rejects(readDocumentText(fake(prefix)),/indhold matcher ikke/);
 });
+
+test("rejects truncated WebP RIFF payload and inconsistent declared container length",async()=>{
+ const fake=(bytes,size=bytes.length)=>({name:"invoice.webp",type:"image/webp",size,slice:()=>({arrayBuffer:async()=>Uint8Array.from(bytes).buffer})});
+ const riff=(declared)=>[82,73,70,70,declared&255,(declared>>8)&255,(declared>>16)&255,(declared>>24)&255,87,69,66,80,86,80,56,32];
+ await assert.rejects(readDocumentText(fake(riff(12))),/indhold matcher ikke/);
+ await assert.rejects(readDocumentText(fake(riff(9999),100)),/indhold matcher ikke/);
+});
