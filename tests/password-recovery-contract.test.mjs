@@ -34,3 +34,10 @@ test('recovery is email-only and does not alter home records during password upd
   assert.match(recoveryForm, /supabase\.auth\.updateUser\(\{password:newPassword\}\)/);
   assert.doesNotMatch(recoveryForm, /supabase\.from\(|deleteUser\(|signOut\(|signInWithOtp\(|phone:|sms/i);
 });
+
+
+test('email confirmation polling cannot override password recovery', () => {
+  assert.match(source, /if\(!active\|\|checking\|\|passwordRecoveryActiveRef\.current\|\|document\.visibilityState==="hidden"\)return/);
+  assert.match(source, /if\(passwordRecoveryActiveRef\.current\)return;if\(session\?\.user\?\.email/);
+  assert.match(source, /if\(active&&!passwordRecoveryActiveRef\.current&&!error&&data\?\.session\?\.user\)/);
+});
