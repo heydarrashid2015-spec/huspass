@@ -134,3 +134,13 @@ test("does not join an invoice label across unrelated OCR content",()=>{
  const r=parseDanishDocumentText("Faktura\nI alt\nMoms 250,00\n1.250,00");
  assert.equal(r.amount,null);
 });
+
+test("does not misidentify customer and delivery addresses as supplier",()=>{
+ const r=parseDanishDocumentText("Faktura\nKunde: Privat Person\nLeveringsadresse: Testvej 1\nFakturaadresse: Testvej 1\nI alt: 500,00");
+ assert.equal(r.supplier,null);
+ assert.equal(r.requiresReview,true);
+});
+test("skips customer metadata before a genuine supplier",()=>{
+ const r=parseDanishDocumentText("Faktura\nKundenavn: Privat Person\nLeveringsadresse: Testvej 1\nNord El ApS\nI alt: 500,00");
+ assert.equal(r.supplier,"Nord El ApS");
+});
