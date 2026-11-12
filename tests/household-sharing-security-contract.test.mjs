@@ -67,3 +67,13 @@ test('ownership guard stays invoker-scoped and cannot be silently disabled in mi
   assert.match(sql, /before\s+update\s+on\s+public\.homes\s+for\s+each\s+row/i);
   assert.match(sql, /before\s+update\s+on\s+public\.tasks\s+for\s+each\s+row/i);
 });
+
+test('household sharing mutations are gated in both handlers and UI until backend security is verified', () => {
+  const page = read('app/page.js');
+  assert.match(page, /const HOUSEHOLD_SHARING_ENABLED=false;/);
+  assert.match(page, /sendHouseholdInvitation=async\(\)=>\{if\(!HOUSEHOLD_SHARING_ENABLED\)return/);
+  assert.match(page, /acceptHouseholdInvitation=async\(id\)=>\{if\(!HOUSEHOLD_SHARING_ENABLED\)return/);
+  assert.match(page, /disabled=\{!HOUSEHOLD_SHARING_ENABLED\|\|!home\?\.id\|\|householdInviting\}/);
+  assert.match(page, /disabled=\{!HOUSEHOLD_SHARING_ENABLED\|\|householdActionBusy\} onClick=\{\(\)=>acceptHouseholdInvitation/);
+  assert.match(page, /if\(!HOUSEHOLD_SHARING_ENABLED\)return;if\(!window\.confirm/);
+});
