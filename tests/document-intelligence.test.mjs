@@ -90,3 +90,14 @@ test("accepts repeated identical unlabelled dates",()=>{
  const r=parseDanishDocumentText("Kvittering\n05.11.2026\n05.11.2026");
  assert.equal(r.documentDate,"2026-11-05");
 });
+
+
+test("does not misidentify invoice metadata as supplier",()=>{
+ const r=parseDanishDocumentText("Faktura\nBetalingsfrist 30.11.2026\nFakturadato: 05.11.2026\nAt betale: 1.250,00");
+ assert.equal(r.supplier,null);
+ assert.equal(r.requiresReview,true);
+});
+test("identifies a supplier after invoice metadata",()=>{
+ const r=parseDanishDocumentText("Faktura\nFakturadato: 05.11.2026\nNord El ApS\nI alt: 1.250,00");
+ assert.equal(r.supplier,"Nord El ApS");
+});
