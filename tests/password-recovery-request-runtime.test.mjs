@@ -66,3 +66,23 @@ test('whitespace-only addresses never trigger recovery requests', async () => {
     assert.deepEqual(result.busy, []);
   }
 });
+
+test('pending email request retains busy state until Supabase settles', async () => {
+  let release;
+  const pending = new Promise(resolve => { release = resolve; });
+  const state = { busy: [], messages: [], calls: [] };
+  const supabase = { auth: { resetPasswordForEmail: (...args) => {
+    state.calls.push(args);
+    return pending;
+  } } };
+  const build = new Function('supabase', 'email', 'setAuthMsg', 'setAuthBusy', 'authBusy', 'return (' + match[1] + ')');
+  const handler = build(supabase, 'person@example.com', value => state.messages.push(value), value => state.busy.push(value), false);
+  const running = handler();
+  assert.equal(state.calls.length, 1);
+  assert.deepEqual(state.busy, [true]);
+  assert.deepEqual(state.messages, []);
+  release({ error: null });
+  await running;
+  assert.deepEqual(state.busy, [true, false]);
+  assert.equal(state.messages.length, 1);
+});
