@@ -24,3 +24,13 @@ test('password update handles rejected promises and clears busy state', () => {
 test('late session bootstrap cannot override active password recovery', () => {
   assert.match(source, /getSession\(\)\.then\(\(\{data\}\)=>\{if\(!mounted\|\|passwordRecoveryActiveRef\.current\)return;/);
 });
+
+test('recovery session cannot be redirected to home by a later SIGNED_IN event', () => {
+  assert.match(source, /event==="SIGNED_IN"&&passwordRecoveryActiveRef\.current\)\{setRecoveryMode\(true\);setView\("Auth"\);setAuthReady\(true\);return\}/);
+});
+
+test('recovery is email-only and does not alter home records during password update', () => {
+  const recoveryForm = source.slice(source.indexOf('<h1>Ny adgangskode</h1>'), source.indexOf('if(view==="Auth")'));
+  assert.match(recoveryForm, /supabase\.auth\.updateUser\(\{password:newPassword\}\)/);
+  assert.doesNotMatch(recoveryForm, /supabase\.from\(|deleteUser\(|signOut\(|signInWithOtp\(|phone:|sms/i);
+});
