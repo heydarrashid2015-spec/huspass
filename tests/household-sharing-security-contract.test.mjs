@@ -29,3 +29,20 @@ test('immutable ownership guards cover homes and tasks', () => {
   assert.match(sql, /before update on public\.homes/i);
   assert.match(sql, /before update on public\.tasks/i);
 });
+
+test('invitation schema rejects empty credentials and inconsistent lifecycle timestamps', () => {
+  const sql = read('docs/household-sharing-schema-draft.sql');
+  assert.match(sql, /invited_email text not null check \(length\(btrim\(invited_email\)\) > 0\)/i);
+  assert.match(sql, /token_hash text not null unique check \(length\(btrim\(token_hash\)\) > 0\)/i);
+  assert.match(sql, /expires_at > created_at/i);
+  assert.match(sql, /accepted_at >= created_at and accepted_at <= expires_at/i);
+  assert.match(sql, /revoked_at >= created_at/i);
+  assert.match(sql, /revoked_at >= accepted_at/i);
+});
+
+test('immutable ownership guards also protect primary identifiers', () => {
+  const sql = read('docs/household-sharing-ownership-guard.sql');
+  assert.match(sql, /new\.id is distinct from old\.id/i);
+  assert.match(sql, /create trigger household_guard_home_ownership/i);
+  assert.match(sql, /create trigger household_guard_task_ownership/i);
+});
