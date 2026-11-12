@@ -31,3 +31,16 @@ test("empty input returns no fabricated metadata",()=>{
  const r=parseDanishDocumentText("");
  assert.equal(r.amount,null);assert.equal(r.documentDate,null);assert.equal(r.cvr,null);assert.equal(r.warrantyEnd,null);
 });
+
+test("prioritizes invoice date over earlier due-date text",()=>{
+ const r=parseDanishDocumentText("Betalingsfrist 30.11.2026\nFakturadato: 05.11.2026\nI alt: 500,00");
+ assert.equal(r.documentDate,"2026-11-05");
+});
+test("ignores impossible labelled date and falls back to valid date",()=>{
+ const r=parseDanishDocumentText("Dato: 31.02.2026\nForfald 10.03.2026");
+ assert.equal(r.documentDate,"2026-03-10");
+});
+test("prioritizes purchase date over payment due date",()=>{
+ const r=parseDanishDocumentText("Forfaldsdato 12.12.2026\nKøbsdato 01.11.2026\nAt betale: 399,00");
+ assert.equal(r.documentDate,"2026-11-01");
+});
