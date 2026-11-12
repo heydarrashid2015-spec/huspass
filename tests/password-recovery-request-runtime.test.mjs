@@ -49,3 +49,20 @@ test('busy recovery request cannot trigger a second email or overwrite feedback'
   assert.deepEqual(result.busy, []);
   assert.deepEqual(result.messages, []);
 });
+
+test('surrounding whitespace is removed before requesting recovery', async () => {
+  const result = await run('  Person+test@example.com  ', async () => ({ error: null }));
+  assert.deepEqual(result.calls, [[
+    'Person+test@example.com',
+    { redirectTo: 'https://huspass.dk' }
+  ]]);
+  assert.deepEqual(result.busy, [true, false]);
+});
+
+test('whitespace-only addresses never trigger recovery requests', async () => {
+  for (const email of [' ', '\t\n', '   \t   ']) {
+    const result = await run(email, async () => { throw new Error('must not send'); });
+    assert.equal(result.calls.length, 0);
+    assert.deepEqual(result.busy, []);
+  }
+});
