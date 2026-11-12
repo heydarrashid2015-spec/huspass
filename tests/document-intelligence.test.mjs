@@ -144,3 +144,16 @@ test("skips customer metadata before a genuine supplier",()=>{
  const r=parseDanishDocumentText("Faktura\nKundenavn: Privat Person\nLeveringsadresse: Testvej 1\nNord El ApS\nI alt: 500,00");
  assert.equal(r.supplier,"Nord El ApS");
 });
+
+test("reads split OCR invoice date without borrowing payment deadline",()=>{
+ const r=parseDanishDocumentText("Faktura\nBetalingsfrist\n30.11.2026\nFakturadato\n05.11.2026");
+ assert.equal(r.documentDate,"2026-11-05");
+});
+test("does not borrow an unrelated amount after a split total label",()=>{
+ const r=parseDanishDocumentText("Faktura\nI alt\nMoms 250,00\n1.250,00");
+ assert.equal(r.amount,null);
+});
+test("reads split payable amount when directly adjacent",()=>{
+ const r=parseDanishDocumentText("Faktura\nAt betale\n1.250,00");
+ assert.equal(r.amount,1250);
+});
