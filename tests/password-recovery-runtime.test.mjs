@@ -67,3 +67,20 @@ test('busy password update does not submit a duplicate request or change recover
   assert.equal(h.passwordRecoveryActiveRef.current, true);
   assert.deepEqual(h.state.views, []);
 });
+
+test('pending password update keeps recovery active until Supabase confirms success', async () => {
+  let settle;
+  const pending = new Promise(resolve => { settle = resolve; });
+  const h = harness(async () => pending);
+  const running = h.submit('SecurePass123')({ preventDefault() {} });
+  assert.equal(h.state.updates, 1);
+  assert.deepEqual(h.state.busy, [true]);
+  assert.equal(h.passwordRecoveryActiveRef.current, true);
+  assert.deepEqual(h.state.views, []);
+  assert.deepEqual(h.state.clearedPassword, []);
+  settle({ error: null });
+  await running;
+  assert.deepEqual(h.state.busy, [true, false]);
+  assert.equal(h.passwordRecoveryActiveRef.current, false);
+  assert.deepEqual(h.state.views, ['Overblik']);
+});
