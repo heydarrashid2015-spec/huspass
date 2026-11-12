@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { prepareQuoteRequest } from '../lib/ai-quote-request-preflight.mjs';
+const base = {authenticatedUserId:'user-a', project:{id:'p1',ownerId:'user-a',category:'maling',publicDescription:'Mal stuen',address:'SECRET',phone:'12345678'},contractor:{id:'c1',sourceUrl:'https://example.dk/c1'},consent:{id:'ok',ownerId:'user-a',projectId:'p1',contractorId:'c1',granted:true,expiresAt:2000}};
+test('allowlisted payload omits private fields',()=>{const r=prepareQuoteRequest({...base,now:1000});assert.equal(r.ok,true);assert.equal(JSON.stringify(r.payload).includes('SECRET'),false);assert.equal(Object.hasOwn(r.payload,'phone'),false)});
+test('reject cross-account project',()=>assert.equal(prepareQuoteRequest({...base,authenticatedUserId:'user-b',now:1000}).ok,false));
+test('reject cross-contractor consent',()=>assert.equal(prepareQuoteRequest({...base,consent:{...base.consent,contractorId:'c2'},now:1000}).ok,false));
+test('reject expired consent',()=>assert.equal(prepareQuoteRequest({...base,now:2000}).ok,false));
+test('reject reused consent',()=>assert.equal(prepareQuoteRequest({...base,consent:{...base.consent,used:true},now:1000}).ok,false));
+test('reject missing attributable source',()=>assert.equal(prepareQuoteRequest({...base,contractor:{id:'c1'},now:1000}).ok,false));
