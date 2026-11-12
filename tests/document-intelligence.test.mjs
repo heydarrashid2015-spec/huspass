@@ -178,3 +178,14 @@ test("reads non-breaking-space thousands in split OCR total",()=>{
  const r=parseDanishDocumentText("Faktura\nAt betale\n2\u00a0499,95");
  assert.equal(r.amount,2499.95);
 });
+
+// OCR can introduce stray spaces: reject ambiguous grouping rather than guessing a total.
+test("rejects malformed thousands grouping in labelled totals",()=>{
+ const r=parseDanishDocumentText("Faktura\nI alt: 12 34,00");
+ assert.equal(r.amount,null);
+ assert.equal(r.requiresReview,true);
+});
+test("accepts correctly grouped multi-thousand totals",()=>{
+ const r=parseDanishDocumentText("Faktura\nI alt: 1 234 567,89");
+ assert.equal(r.amount,1234567.89);
+});
