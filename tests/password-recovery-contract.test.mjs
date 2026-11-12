@@ -19,3 +19,8 @@ test('recovery event switches to password update view', () => {
 test('password update handles rejected promises and clears busy state', () => {
   assert.match(source, /try\{const \{error\}=await supabase\.auth\.updateUser\(\{password:newPassword\}\);passwordUpdateError=error\}catch\(error\)\{passwordUpdateError=error\}finally\{setAuthBusy\(false\)\}/);
 });
+
+
+test('late session bootstrap cannot override active password recovery', () => {
+  assert.match(source, /getSession\(\)\.then\(\(\{data\}\)=>\{if\(!mounted\|\|passwordRecoveryActiveRef\.current\)return;/);
+});
