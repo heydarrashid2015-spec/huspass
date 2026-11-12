@@ -7,7 +7,7 @@ const start = source.indexOf('<h1>Ny adgangskode</h1>');
 const end = source.indexOf('<label>Ny adgangskode', start);
 assert.ok(start >= 0 && end > start, 'password recovery form exists');
 const form = source.slice(start, end);
-const match = form.match(/onSubmit=\{(async e=>\{[\s\S]*?\})\}\}>/);
+const match = form.match(/onSubmit=\{(async e=>\{[\s\S]*?\})\}>/);
 assert.ok(match, 'recovery submit handler can be isolated');
 
 function harness(updateUser) {
