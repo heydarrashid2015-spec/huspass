@@ -46,3 +46,14 @@ test('immutable ownership guards also protect primary identifiers', () => {
   assert.match(sql, /create trigger household_guard_home_ownership/i);
   assert.match(sql, /create trigger household_guard_task_ownership/i);
 });
+
+test('draft schema does not accidentally enable client access or permissive sharing policies', () => {
+  const sql = read('docs/household-sharing-schema-draft.sql')
+    .replace(/--[^\n]*/g, '');
+  assert.doesNotMatch(sql, /create\s+policy\b/i);
+  assert.doesNotMatch(sql, /grant\s+(?:all|select|insert|update|delete)\b/i);
+  assert.doesNotMatch(sql, /disable\s+row\s+level\s+security/i);
+  for (const table of ['home_memberships', 'home_invitations']) {
+    assert.match(sql, new RegExp('alter\\s+table\\s+public\\.' + table + '\\s+enable\\s+row\\s+level\\s+security', 'i'));
+  }
+});
