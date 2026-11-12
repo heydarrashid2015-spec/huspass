@@ -53,3 +53,10 @@ test("rejects truncated WebP RIFF payload and inconsistent declared container le
  await assert.rejects(readDocumentText(fake(riff(12))),/indhold matcher ikke/);
  await assert.rejects(readDocumentText(fake(riff(9999),100)),/indhold matcher ikke/);
 });
+
+// Reject trailing bytes outside the RIFF container rather than passing ambiguous payloads to OCR.
+test("rejects WebP with appended bytes beyond declared RIFF length",async()=>{
+ const bytes=[82,73,70,70,12,0,0,0,87,69,66,80,86,80,56,32,0,0,0,0,65,66,67,68];
+ const fake={name:"invoice.webp",type:"image/webp",size:bytes.length,slice:()=>({arrayBuffer:async()=>Uint8Array.from(bytes.slice(0,16)).buffer})};
+ await assert.rejects(readDocumentText(fake),/indhold matcher ikke/);
+});
