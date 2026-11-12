@@ -57,3 +57,13 @@ test('draft schema does not accidentally enable client access or permissive shar
     assert.match(sql, new RegExp('alter\\s+table\\s+public\\.' + table + '\\s+enable\\s+row\\s+level\\s+security', 'i'));
   }
 });
+
+test('ownership guard stays invoker-scoped and cannot be silently disabled in migration', () => {
+  const sql = read('docs/household-sharing-ownership-guard.sql').replace(/--[^\n]*/g, '');
+  assert.match(sql, /security\s+invoker\s+set\s+search_path\s*=\s*''/i);
+  assert.doesNotMatch(sql, /security\s+definer/i);
+  assert.doesNotMatch(sql, /alter\s+table\s+[^;]+disable\s+trigger/i);
+  assert.doesNotMatch(sql, /drop\s+trigger\s+(?!if\s+exists\s+household_guard_(?:home|task)_ownership)/i);
+  assert.match(sql, /before\s+update\s+on\s+public\.homes\s+for\s+each\s+row/i);
+  assert.match(sql, /before\s+update\s+on\s+public\.tasks\s+for\s+each\s+row/i);
+});
