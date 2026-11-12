@@ -10,12 +10,12 @@ const form = source.slice(start, end);
 const match = form.match(/onSubmit=\{(async e=>\{[\s\S]*?\})\}>/);
 assert.ok(match, 'recovery submit handler can be isolated');
 
-function harness(updateUser) {
+function harness(updateUser, authBusy = false) {
   const state = { busy: [], messages: [], views: [], recovery: [], notifications: [], updates: 0, clearedPassword: [] };
   const supabase = { auth: { updateUser: async payload => { state.updates++; return updateUser(payload); } } };
   const passwordRecoveryActiveRef = { current: true };
   const build = new Function('supabase', 'passwordRecoveryActiveRef', 'setAuthBusy', 'setAuthMsg', 'setRecoveryMode', 'setNewPassword', 'setView', 'notify', 'newPassword', 'authBusy', 'return (' + match[1] + ')');
-  const submit = password => build(supabase, passwordRecoveryActiveRef, x => state.busy.push(x), x => state.messages.push(x), x => state.recovery.push(x), x => state.clearedPassword.push(x), x => state.views.push(x), x => state.notifications.push(x), password, false);
+  const submit = password => build(supabase, passwordRecoveryActiveRef, x => state.busy.push(x), x => state.messages.push(x), x => state.recovery.push(x), x => state.clearedPassword.push(x), x => state.views.push(x), x => state.notifications.push(x), password, authBusy);
   return { state, passwordRecoveryActiveRef, submit };
 }
 
@@ -56,4 +56,14 @@ test('successful password update exits recovery without modifying home data', as
   assert.deepEqual(h.state.recovery, [false]);
   assert.deepEqual(h.state.views, ['Overblik']);
   assert.deepEqual(h.state.clearedPassword, ['']);
+});
+
+test('busy password update does not submit a duplicate request or change recovery state', async () => {
+  const h = harness(async () => { throw new Error('duplicate update must not run'); }, true);
+  await h.submit('SecurePass123')({ preventDefault() {} });
+  assert.equal(h.state.updates, 0);
+  assert.deepEqual(h.state.busy, []);
+  assert.deepEqual(h.state.messages, []);
+  assert.equal(h.passwordRecoveryActiveRef.current, true);
+  assert.deepEqual(h.state.views, []);
 });
