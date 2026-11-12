@@ -84,3 +84,22 @@ test('pending password update keeps recovery active until Supabase confirms succ
   assert.equal(h.passwordRecoveryActiveRef.current, false);
   assert.deepEqual(h.state.views, ['Overblik']);
 });
+
+test('pending password update rejection preserves recovery state and entered password', async () => {
+  let rejectUpdate;
+  const pending = new Promise((_, reject) => { rejectUpdate = reject; });
+  const h = harness(async () => pending);
+  const running = h.submit('SecurePass123')({ preventDefault() {} });
+  assert.deepEqual(h.state.busy, [true]);
+  assert.equal(h.passwordRecoveryActiveRef.current, true);
+  assert.deepEqual(h.state.views, []);
+  assert.deepEqual(h.state.clearedPassword, []);
+  rejectUpdate(new Error('network unavailable'));
+  await running;
+  assert.deepEqual(h.state.busy, [true, false]);
+  assert.equal(h.passwordRecoveryActiveRef.current, true);
+  assert.deepEqual(h.state.views, []);
+  assert.deepEqual(h.state.clearedPassword, []);
+  assert.equal(h.state.updates, 1);
+  assert.match(h.state.messages.at(-1), /kunne ikke ændres/);
+});
