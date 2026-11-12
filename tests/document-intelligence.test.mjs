@@ -157,3 +157,14 @@ test("reads split payable amount when directly adjacent",()=>{
  const r=parseDanishDocumentText("Faktura\nAt betale\n1.250,00");
  assert.equal(r.amount,1250);
 });
+
+test("split labels and values preserve invoice date and payable total",()=>{
+ const r=parseDanishDocumentText("Faktura\nFakturadato\n05.11.2026\nI alt\n1.250,00");
+ assert.equal(r.documentDate,"2026-11-05");
+ assert.equal(r.amount,1250);
+});
+test("split due date is never interpreted as document date",()=>{
+ const r=parseDanishDocumentText("Faktura\nBetalingsfrist\n30.11.2026\nI alt\n500,00");
+ assert.equal(r.documentDate,null);
+ assert.equal(r.amount,500);
+});
