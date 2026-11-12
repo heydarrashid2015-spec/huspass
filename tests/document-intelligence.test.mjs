@@ -56,7 +56,7 @@ test("keeps a valid unlabelled date while excluding due date",()=>{
 });
 
 test("rejects payment deadline while keeping unrelated valid receipt date",()=>{
- const r=parseDanishDocumentText("Betalingsfrist 30.11.2026\\nKvittering\\n05.11.2026\\nI alt: 100,00");
+ const r=parseDanishDocumentText("Betalingsfrist 30.11.2026\nKvittering\n05.11.2026\nI alt: 100,00");
  assert.equal(r.documentDate,"2026-11-05");
  assert.equal(r.amount,100);
 });
