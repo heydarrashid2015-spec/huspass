@@ -112,3 +112,14 @@ test("skips payment details and identifies an actual supplier",()=>{
  const r=parseDanishDocumentText("Faktura\nIBAN DK50 0040 0440 1162 43\nKontonummer 1234567890\nNord El ApS\nI alt: 100,00");
  assert.equal(r.supplier,"Nord El ApS");
 });
+
+
+test("does not treat a standalone date or amount as supplier",()=>{
+ const r=parseDanishDocumentText("Faktura\n05.11.2026\n1.250,00\nTotal: 1.250,00");
+ assert.equal(r.supplier,null);
+ assert.equal(r.requiresReview,true);
+});
+test("skips document numbers and keeps an explicit company supplier",()=>{
+ const r=parseDanishDocumentText("Faktura\nFakturanr. 123456\nOrdrenummer 987654\nNord El ApS\nI alt: 500,00");
+ assert.equal(r.supplier,"Nord El ApS");
+});
