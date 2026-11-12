@@ -26,3 +26,11 @@ test('duplicate recipients denied',()=>assert.equal(run({recipients:[recipients[
 test('duplicate evidence denied',()=>assert.equal(run({evidence:[evidence[0],evidence[0]]}).status,'denied'));
 test('email header injection denied',()=>assert.equal(run({recipients:[{...recipients[0],contactEmail:'x@y.dk\r\nBcc:z@x.dk'}]}).status,'denied'));
 test('more than three recipients denied',()=>assert.equal(run({recipients:[...recipients,...recipients,...recipients,...recipients]}).status,'denied'));
+
+test("lookalike CVR domain" rejected,()=>assert.equal(run({evidence:[{...evidence[0],registryUrl:"https://datacvr.virk.dk.attacker.example/enhed/virksomhed/12345678"}]}).status,'denied'));
+test("unrelated HTTPS registry" rejected,()=>assert.equal(run({evidence:[{...evidence[0],registryUrl:"https://example.dk/enhed/virksomhed/12345678"}]}).status,'denied'));
+test("different CVR number" rejected,()=>assert.equal(run({evidence:[{...evidence[0],registryUrl:"https://datacvr.virk.dk/enhed/virksomhed/87654321"}]}).status,'denied'));
+test("query-string CVR substitution" rejected,()=>assert.equal(run({evidence:[{...evidence[0],registryUrl:"https://datacvr.virk.dk/enhed/virksomhed/12345678?cvr=87654321"}]}).status,'denied'));
+test("fragment CVR substitution" rejected,()=>assert.equal(run({evidence:[{...evidence[0],registryUrl:"https://datacvr.virk.dk/enhed/virksomhed/12345678#87654321"}]}).status,'denied'));
+test("path prefix attack" rejected,()=>assert.equal(run({evidence:[{...evidence[0],registryUrl:"https://datacvr.virk.dk/enhed/virksomhed/12345678/extra"}]}).status,'denied'));
+test("userinfo hostname trick" rejected,()=>assert.equal(run({evidence:[{...evidence[0],registryUrl:"https://datacvr.virk.dk@attacker.example/enhed/virksomhed/12345678"}]}).status,'denied'));
