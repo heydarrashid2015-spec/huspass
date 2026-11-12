@@ -189,3 +189,15 @@ test("accepts correctly grouped multi-thousand totals",()=>{
  const r=parseDanishDocumentText("Faktura\nI alt: 1 234 567,89");
  assert.equal(r.amount,1234567.89);
 });
+
+
+test("suggests only explicitly dated warranty expiry for user review",()=>{
+ const r=parseDanishDocumentText("Nord El ApS\nKvittering\nKøbsdato 05.11.2026\nGaranti udløber: 05.11.2028");
+ assert.equal(r.warrantyEnd,"2028-11-05");
+ assert.equal(r.requiresReview,true);
+});
+test("never guesses warranty from a duration or conflicting expiry dates",()=>{
+ assert.equal(parseDanishDocumentText("Kvittering\n2 års garanti\nKøbsdato 05.11.2026").warrantyEnd,null);
+ assert.equal(parseDanishDocumentText("Garanti udløber: 05.11.2028\nGaranti udløber: 06.11.2028").warrantyEnd,null);
+ assert.equal(parseDanishDocumentText("Garanti udløber: 31.02.2028").warrantyEnd,null);
+});
