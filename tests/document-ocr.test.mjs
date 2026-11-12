@@ -38,3 +38,11 @@ test("rejects spoofed file headers even when MIME and extension agree",async()=>
 test("rejects malformed file objects without a slice API",async()=>{
  await assert.rejects(readDocumentText(file("invoice.pdf","application/pdf")) ,/Ugyldig fil/);
 });
+
+// RIFF/WEBP is a container header, not proof of a supported WebP image payload.
+test("rejects WebP containers with unsupported or missing image chunk",async()=>{
+ const fake=(bytes)=>({name:"invoice.webp",type:"image/webp",size:bytes.length,slice:()=>({arrayBuffer:async()=>Uint8Array.from(bytes).buffer})});
+ const prefix=[82,73,70,70,16,0,0,0,87,69,66,80];
+ await assert.rejects(readDocumentText(fake([...prefix,74,85,78,75])),/indhold matcher ikke/);
+ await assert.rejects(readDocumentText(fake(prefix)),/indhold matcher ikke/);
+});
