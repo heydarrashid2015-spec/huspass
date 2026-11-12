@@ -70,3 +70,13 @@ test("accepts repeated identical labelled totals",()=>{
  const r=parseDanishDocumentText("Faktura\nTotal: 1.250,00\nAt betale: 1.250,00");
  assert.equal(r.amount,1250);
 });
+
+test("does not choose between conflicting labelled invoice dates",()=>{
+ const r=parseDanishDocumentText("Faktura\nFakturadato: 05.11.2026\nDato: 06.11.2026\nTotal: 100,00");
+ assert.equal(r.documentDate,null);
+ assert.equal(r.requiresReview,true);
+});
+test("accepts repeated identical labelled invoice dates",()=>{
+ const r=parseDanishDocumentText("Faktura\nFakturadato: 05.11.2026\nDato: 05.11.2026");
+ assert.equal(r.documentDate,"2026-11-05");
+});
