@@ -144,3 +144,14 @@ test('different email addresses and thrown provider errors produce the same neut
   assert.equal(new Set(results).size, 1);
   assert.match(results[0], /Hvis e-mailadressen er registreret/);
 });
+
+
+test('malformed provider responses remain neutral and restore the request state', async () => {
+  const baseline = await run('person@example.com', async () => ({ error: null }));
+  for (const response of [null, undefined, { error: null }, { error: { message: 'Internal auth failure' } }]) {
+    const result = await run('person@example.com', async () => response);
+    assert.deepEqual(result.busy, [true, false]);
+    assert.equal(result.calls.length, 1);
+    assert.deepEqual(result.messages, baseline.messages);
+  }
+});
