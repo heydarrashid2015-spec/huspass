@@ -366,3 +366,14 @@ test("rejects CVR suggestion when another CVR label has no value",()=>{
  assert.equal(r.cvr,null);
  assert.equal(r.requiresReview,true);
 });
+
+// Empty OCR total fields must count as competing evidence, not disappear.
+test("rejects a total when a second explicitly labelled total is empty",()=>{
+ const r=parseDanishDocumentText("Faktura\nTotal: 1.250,00\nAt betale:\nMoms 250,00");
+ assert.equal(r.amount,null);
+ assert.equal(r.requiresReview,true);
+});
+test("rejects a total when an empty total label precedes a valid total",()=>{
+ const r=parseDanishDocumentText("Faktura\nI alt:\nTotal: 1.250,00");
+ assert.equal(r.amount,null);
+});
