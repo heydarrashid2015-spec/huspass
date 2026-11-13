@@ -49,7 +49,7 @@ test('invalid password is rejected locally without updating Supabase', async () 
 });
 
 test('successful password update exits recovery without modifying home data', async () => {
-  const h = harness(async payload => { assert.deepEqual(payload, { password: 'SecurePass123' }); return { error: null }; });
+  const h = harness(async payload => { assert.deepEqual(payload, { password: 'SecurePass123' }); return { data: { user: { id: 'recovered-user' } }, error: null }; });
   await h.submit('SecurePass123')({ preventDefault() {} });
   assert.equal(h.state.updates, 1);
   assert.equal(h.passwordRecoveryActiveRef.current, false);
