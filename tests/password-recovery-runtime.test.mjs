@@ -133,3 +133,18 @@ test('failed recovery never emits success notification or clears password', asyn
     assert.deepEqual(h.state.busy, [true, false]);
   }
 });
+
+test('malformed password update responses fail closed without reporting success', async () => {
+  for (const response of [null, undefined, { error: { message: 'Auth unavailable' } }]) {
+    const h = harness(async () => response);
+    await h.submit('SecurePass123')({ preventDefault() {} });
+    assert.equal(h.state.updates, 1);
+    assert.deepEqual(h.state.busy, [true, false]);
+    assert.equal(h.passwordRecoveryActiveRef.current, true);
+    assert.deepEqual(h.state.recovery, []);
+    assert.deepEqual(h.state.views, []);
+    assert.deepEqual(h.state.clearedPassword, []);
+    assert.deepEqual(h.state.notifications, []);
+    assert.match(h.state.messages.at(-1), /kunne ikke ændres/);
+  }
+});
