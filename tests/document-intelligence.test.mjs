@@ -301,3 +301,14 @@ test("repeated identical CVR remains a suggestion for review",()=>{
  const r=parseDanishDocumentText("Faktura\nCVR: 12345678\nCVR-nr: 12345678\nI alt: 500,00");
  assert.equal(r.cvr,"12345678");
 });
+
+// A malformed competing labelled total must not be silently discarded.
+test("requires manual review when one of two labelled totals is malformed",()=>{
+ const r=parseDanishDocumentText("Faktura\nTotal: 1.250,00\nAt betale: 12 50,00");
+ assert.equal(r.amount,null);
+ assert.equal(r.requiresReview,true);
+});
+test("does not infer a total from a valid label if another labelled total is truncated",()=>{
+ const r=parseDanishDocumentText("Faktura\nTotal: 1.250,00\nAt betale: 1250,0");
+ assert.equal(r.amount,null);
+});
