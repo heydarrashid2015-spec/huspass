@@ -148,3 +148,19 @@ test('malformed password update responses fail closed without reporting success'
     assert.match(h.state.messages.at(-1), /kunne ikke ændres/);
   }
 });
+
+test('provider error takes precedence over a populated user payload', async () => {
+  const h = harness(async () => ({
+    data: { user: { id: 'recovered-user' } },
+    error: { message: 'Token has expired' }
+  }));
+  await h.submit('SecurePass123')({ preventDefault() {} });
+  assert.equal(h.state.updates, 1);
+  assert.deepEqual(h.state.busy, [true, false]);
+  assert.equal(h.passwordRecoveryActiveRef.current, true);
+  assert.deepEqual(h.state.recovery, []);
+  assert.deepEqual(h.state.views, []);
+  assert.deepEqual(h.state.clearedPassword, []);
+  assert.deepEqual(h.state.notifications, []);
+  assert.match(h.state.messages.at(-1), /kunne ikke ændres/);
+});
