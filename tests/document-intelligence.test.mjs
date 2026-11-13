@@ -336,3 +336,15 @@ test("finds merchant after customer contact fields",()=>{
  const r=parseDanishDocumentText("Faktura\nTelefon: 12345678\nE-mail: kunde@example.dk\nNord El ApS\nI alt: 500,00");
  assert.equal(r.supplier,"Nord El ApS");
 });
+
+// An invalid competing explicitly labelled date must not be silently discarded.
+test("rejects valid invoice date when another labelled invoice date is impossible",()=>{
+ const r=parseDanishDocumentText("Faktura\nFakturadato: 05.11.2026\nDato: 31.02.2026\nI alt: 500,00");
+ assert.equal(r.documentDate,null);
+ assert.equal(r.requiresReview,true);
+});
+test("rejects valid warranty expiry when a competing labelled expiry is impossible",()=>{
+ const r=parseDanishDocumentText("Kvittering\nGaranti udløber: 05.11.2028\nGaranti udløber: 31.02.2028");
+ assert.equal(r.warrantyEnd,null);
+ assert.equal(r.requiresReview,true);
+});
