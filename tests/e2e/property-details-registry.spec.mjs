@@ -7,7 +7,8 @@ test('rooms preview is confined to authorized Android Plus access',()=>{
  expect(page).toContain('const canPreviewPlus=aiAccess&&isAndroidWebView');
  expect(page).toContain('disabled={!canPreviewPlus}');
  expect(page).toContain('canPreviewPlus&&plusPreviewSection');
- expect(page).toContain('plusPreviewSection==="details"');
+ expect(page).toContain('if(view==="Boligens detaljer")return !canPreviewPlus');
+ expect(page).toContain('id==="details"?setView("Boligens detaljer")');
  expect(page).not.toContain('<b>Boligens detaljer</b><span>Rum og installationer · Kommer senere</span>');
 });
 test('room and installation writes bind to authenticated home and selected room',()=>{
