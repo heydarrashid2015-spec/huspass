@@ -359,3 +359,10 @@ test("rejects a valid CVR when another labelled CVR has OCR letters",()=>{
  const r=parseDanishDocumentText("Faktura\nCVR: 12345678\nCVR: 8765O321");
  assert.equal(r.cvr,null);
 });
+
+// An empty competing CVR field may be an OCR failure; never trust the other value.
+test("rejects CVR suggestion when another CVR label has no value",()=>{
+ const r=parseDanishDocumentText("Faktura\nCVR: 12345678\nCVR:\nI alt: 500,00");
+ assert.equal(r.cvr,null);
+ assert.equal(r.requiresReview,true);
+});
