@@ -26,3 +26,11 @@ test("rejoins split thousands groups but retains spaces between distinct words",
 test("keeps adjacent numeric glyphs together while separating unrelated values",()=>{
  assert.equal(extractPdfPageText([{str:"Total: 12",hasEOL:false},{str:"50,00",hasEOL:true},{str:"Moms",hasEOL:false},{str:"250,00",hasEOL:true}]),"Total: 1250,00\nMoms 250,00");
 });
+
+// PDF.js can split the fractional digits after the decimal comma.
+test("rejoins fractional digits split immediately after the decimal comma",()=>{
+ assert.equal(extractPdfPageText([{str:"I alt: 1.250,",hasEOL:false},{str:"00",hasEOL:true}]),"I alt: 1.250,00");
+});
+test("does not join a decimal comma across an explicit PDF line break",()=>{
+ assert.equal(extractPdfPageText([{str:"I alt: 1.250,",hasEOL:true},{str:"00",hasEOL:true}]),"I alt: 1.250,\n00");
+});
