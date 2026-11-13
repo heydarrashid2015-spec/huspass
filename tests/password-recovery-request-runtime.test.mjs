@@ -124,3 +124,23 @@ test('Supabase error responses never disclose account status or delivery configu
     assert.doesNotMatch(result.messages.join(' '), /user not found|rate limit|smtp|not confirmed|404|429|503/i);
   }
 });
+
+test('different email addresses and thrown provider errors produce the same neutral confirmation', async () => {
+  const cases = [
+    ['existing@example.com', async () => ({ error: null })],
+    ['missing@example.com', async () => ({ error: { message: 'User not found', status: 404 } })],
+    ['blocked@example.com', async () => { throw new Error('SMTP delivery rejected'); }],
+    ['limited@example.com', async () => { throw new Error('rate limit exceeded'); }]
+  ];
+  const results = [];
+  for (const [address, response] of cases) {
+    const result = await run(address, response);
+    assert.equal(result.calls.length, 1);
+    assert.equal(result.calls[0][0], address);
+    assert.deepEqual(result.busy, [true, false]);
+    assert.equal(result.messages.length, 1);
+    results.push(result.messages[0]);
+  }
+  assert.equal(new Set(results).size, 1);
+  assert.match(results[0], /Hvis e-mailadressen er registreret/);
+});
