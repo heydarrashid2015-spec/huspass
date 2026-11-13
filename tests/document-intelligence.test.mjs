@@ -323,3 +323,16 @@ test("generic warranty date does not conflict with a real purchase date",()=>{
  const r=parseDanishDocumentText("Kvittering\nKøbsdato 05.11.2026\nGaranti\n05.11.2028");
  assert.equal(r.documentDate,"2026-11-05");
 });
+
+// Customer contact and identity fields must not be proposed as a merchant.
+test("does not infer supplier from personal contact or CPR metadata",()=>{
+ for(const line of ["CPR: 010190-1234","Telefon: 12345678","Tlf. 12345678","E-mail: kunde@example.dk","Adresse: Testvej 1"]){
+  const r=parseDanishDocumentText("Faktura\n"+line+"\nI alt: 500,00");
+  assert.equal(r.supplier,null,line);
+  assert.equal(r.requiresReview,true);
+ }
+});
+test("finds merchant after customer contact fields",()=>{
+ const r=parseDanishDocumentText("Faktura\nTelefon: 12345678\nE-mail: kunde@example.dk\nNord El ApS\nI alt: 500,00");
+ assert.equal(r.supplier,"Nord El ApS");
+});
