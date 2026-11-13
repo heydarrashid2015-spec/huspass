@@ -24,3 +24,16 @@ for (const [name, change] of [
  ['invalid CVR', x => x.contractor.cvr = '1234'],
  ['missing actor', x => x.actorId = '']
 ]) test('deny '+name, () => { const x=valid();change(x);assert.equal(authorizeContractorOutreach(x).allowed,false); });
+
+test('CVR is exactly eight ASCII digits, not a literal backslash-d sequence', () => {
+  for (const cvr of ['12345678', '00000000']) {
+    const input = valid();
+    input.contractor.cvr = cvr;
+    assert.equal(authorizeContractorOutreach(input).allowed, true, cvr);
+  }
+  for (const cvr of ['1234567', '123456789', '1234 5678', 'abcdefgh', '１２３４５６７８', String.raw`\\d{8}`]) {
+    const input = valid();
+    input.contractor.cvr = cvr;
+    assert.equal(authorizeContractorOutreach(input).allowed, false, cvr);
+  }
+});
