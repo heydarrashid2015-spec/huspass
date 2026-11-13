@@ -92,3 +92,17 @@ test('ownership migration cannot grant clients new privileges', () => {
   assert.doesNotMatch(sql, /\bgrant\s+(?:all|execute|update|insert|delete)\b/i);
   assert.doesNotMatch(sql, /\bdisable\s+row\s+level\s+security\b/i);
 });
+
+test('read-only staging audit covers RLS, privileges, ownership triggers and Storage without mutation', () => {
+  const audit = read('docs/household-sharing-readonly-security-audit.sql');
+  const sql = audit.replace(/--[^\n]*/g, '').trim();
+  assert.match(sql, /from\s+pg_class\b/i);
+  assert.match(sql, /from\s+pg_policies\b/i);
+  assert.match(sql, /from\s+information_schema\.role_table_grants\b/i);
+  assert.match(sql, /from\s+pg_trigger\b/i);
+  assert.match(sql, /schemaname\s*=\s*'storage'/i);
+  for (const table of ['homes', 'tasks', 'documents', 'home_memberships', 'home_invitations']) {
+    assert.match(sql, new RegExp("'"+table+"'"));
+  }
+  assert.doesNotMatch(sql, /\b(?:insert|update|delete|alter|create|drop|truncate|grant|revoke|execute|call)\b/i);
+});
