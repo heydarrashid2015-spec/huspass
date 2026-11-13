@@ -22,3 +22,7 @@ test("rejoins split decimal amount glyphs without inserting whitespace",()=>{
 test("rejoins split thousands groups but retains spaces between distinct words",()=>{
  assert.equal(extractPdfPageText([{str:"I alt: 1.",hasEOL:false},{str:"250,00",hasEOL:true},{str:"Nord",hasEOL:false},{str:"El ApS",hasEOL:true}]),"I alt: 1.250,00\nNord El ApS");
 });
+
+test("keeps adjacent numeric glyphs together while separating unrelated values",()=>{
+ assert.equal(extractPdfPageText([{str:"Total: 12",hasEOL:false},{str:"50,00",hasEOL:true},{str:"Moms",hasEOL:false},{str:"250,00",hasEOL:true}]),"Total: 1250,00\nMoms 250,00");
+});
