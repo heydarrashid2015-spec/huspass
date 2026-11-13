@@ -50,3 +50,14 @@ test('fail closed for ambiguous revocation flags', () => {
     assert.equal(authorizeContractorOutreach(input).allowed, true);
   }
 });
+
+test('CVR must be a string and cannot be coerced from untrusted values', () => {
+  for (const cvr of [12345678, 0, null, undefined, true, ['12345678'], { toString: () => '12345678' }]) {
+    const input = valid();
+    input.contractor.cvr = cvr;
+    assert.equal(authorizeContractorOutreach(input).allowed, false, String(cvr));
+  }
+  const input = valid();
+  input.contractor.cvr = '01234567';
+  assert.equal(authorizeContractorOutreach(input).allowed, true, 'leading zero must be preserved');
+});
