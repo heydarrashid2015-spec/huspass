@@ -34,3 +34,11 @@ test("rejoins fractional digits split immediately after the decimal comma",()=>{
 test("does not join a decimal comma across an explicit PDF line break",()=>{
  assert.equal(extractPdfPageText([{str:"I alt: 1.250,",hasEOL:true},{str:"00",hasEOL:true}]),"I alt: 1.250,\n00");
 });
+
+test("rejoins an eight-digit CVR split into two four-digit PDF glyph runs",()=>{
+ assert.equal(extractPdfPageText([{str:"CVR: 1234",hasEOL:false},{str:"5678",hasEOL:true}]),"CVR: 12345678");
+});
+test("does not merge distinct numeric fields or cross an explicit line break",()=>{
+ assert.equal(extractPdfPageText([{str:"CVR: 1234",hasEOL:true},{str:"5678",hasEOL:true}]),"CVR: 1234\n5678");
+ assert.equal(extractPdfPageText([{str:"Ordre 1234",hasEOL:false},{str:"5678",hasEOL:true}]),"Ordre 1234 5678");
+});
