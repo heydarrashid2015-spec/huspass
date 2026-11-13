@@ -164,3 +164,18 @@ test('provider error takes precedence over a populated user payload', async () =
   assert.deepEqual(h.state.notifications, []);
   assert.match(h.state.messages.at(-1), /kunne ikke ændres/);
 });
+
+test('user payload without a valid identifier cannot confirm password recovery', async () => {
+  for (const user of [{}, { id: '' }, { id: '   ' }, { id: 42 }, { id: null }]) {
+    const h = harness(async () => ({ data: { user }, error: null }));
+    await h.submit('SecurePass123')({ preventDefault() {} });
+    assert.equal(h.state.updates, 1);
+    assert.deepEqual(h.state.busy, [true, false]);
+    assert.equal(h.passwordRecoveryActiveRef.current, true);
+    assert.deepEqual(h.state.recovery, []);
+    assert.deepEqual(h.state.views, []);
+    assert.deepEqual(h.state.clearedPassword, []);
+    assert.deepEqual(h.state.notifications, []);
+    assert.match(h.state.messages.at(-1), /kunne ikke ændres/);
+  }
+});
