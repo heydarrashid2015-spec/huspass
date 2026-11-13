@@ -277,3 +277,16 @@ test("excludes OCR-split Garanti date from document date",()=>{
  const r=parseDanishDocumentText("Kvittering\nGaranti:\n05.11.2028\nI alt: 500,00");
  assert.equal(r.documentDate,null);
 });
+
+// Complaint-right marketing lines are not merchant identities, regardless of word order.
+test("does not infer supplier from reversed complaint-right duration",()=>{
+ for(const line of ["2 år reklamationsret","24 måneders reklamationsret","Reklamationsret: 24 måneder"]){
+  const r=parseDanishDocumentText("Kvittering\n"+line+"\nI alt: 500,00");
+  assert.equal(r.supplier,null,line);
+  assert.equal(r.requiresReview,true);
+ }
+});
+test("preserves genuine supplier after complaint-right marketing",()=>{
+ const r=parseDanishDocumentText("Kvittering\n2 år reklamationsret\nNord El ApS\nI alt: 500,00");
+ assert.equal(r.supplier,"Nord El ApS");
+});
