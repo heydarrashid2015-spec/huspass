@@ -41,7 +41,7 @@ test('network rejection cannot unlock recovery screen or strand busy indicator',
 
 test('invalid password is rejected locally without updating Supabase', async () => {
   for (const password of ['short1', 'onlyletters', '12345678']) {
-    const h = harness(async () => ({ error: null }));
+    const h = harness(async () => ({ data: { user: { id: 'recovered-user' } }, error: null }));
     await h.submit(password)({ preventDefault() {} });
     assert.equal(h.state.updates, 0);
     assert.equal(h.passwordRecoveryActiveRef.current, true);
@@ -78,7 +78,7 @@ test('pending password update keeps recovery active until Supabase confirms succ
   assert.equal(h.passwordRecoveryActiveRef.current, true);
   assert.deepEqual(h.state.views, []);
   assert.deepEqual(h.state.clearedPassword, []);
-  settle({ error: null });
+  settle({ data: { user: { id: 'recovered-user' } }, error: null });
   await running;
   assert.deepEqual(h.state.busy, [true, false]);
   assert.equal(h.passwordRecoveryActiveRef.current, false);
@@ -135,7 +135,7 @@ test('failed recovery never emits success notification or clears password', asyn
 });
 
 test('malformed password update responses fail closed without reporting success', async () => {
-  for (const response of [null, undefined, { error: { message: 'Auth unavailable' } }]) {
+  for (const response of [null, undefined, {}, { error: null }, { data: { user: null }, error: null }, { error: { message: 'Auth unavailable' } }]) {
     const h = harness(async () => response);
     await h.submit('SecurePass123')({ preventDefault() {} });
     assert.equal(h.state.updates, 1);
