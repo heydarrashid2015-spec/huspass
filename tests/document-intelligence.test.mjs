@@ -238,3 +238,16 @@ test("warranty labels cannot be inferred as suppliers",()=>{
   assert.equal(result.supplier,null,label);
  }
 });
+
+// Warranty marketing text is not evidence of the merchant identity.
+test("does not mistake warranty duration text for supplier",()=>{
+ for(const label of ["2 års garanti","Garanti 24 måneder","Reklamationsret 2 år"]){
+  const r=parseDanishDocumentText("Kvittering\n"+label+"\nI alt: 500,00");
+  assert.equal(r.supplier,null,label);
+  assert.equal(r.requiresReview,true);
+ }
+});
+test("keeps real supplier after warranty duration text",()=>{
+ const r=parseDanishDocumentText("Kvittering\n2 års garanti\nNord El ApS\nI alt: 500,00");
+ assert.equal(r.supplier,"Nord El ApS");
+});
