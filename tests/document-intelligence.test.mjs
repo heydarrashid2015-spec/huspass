@@ -348,3 +348,14 @@ test("rejects valid warranty expiry when a competing labelled expiry is impossib
  assert.equal(r.warrantyEnd,null);
  assert.equal(r.requiresReview,true);
 });
+
+// A malformed second CVR must not allow a seemingly verified supplier ID.
+test("rejects a valid CVR when a second labelled CVR is truncated",()=>{
+ const r=parseDanishDocumentText("Faktura\nCVR: 12345678\nCVR: 8765432\nI alt: 500,00");
+ assert.equal(r.cvr,null);
+ assert.equal(r.requiresReview,true);
+});
+test("rejects a valid CVR when another labelled CVR has OCR letters",()=>{
+ const r=parseDanishDocumentText("Faktura\nCVR: 12345678\nCVR: 8765O321");
+ assert.equal(r.cvr,null);
+});
