@@ -37,3 +37,16 @@ test('CVR is exactly eight ASCII digits, not a literal backslash-d sequence', ()
     assert.equal(authorizeContractorOutreach(input).allowed, false, cvr);
   }
 });
+
+test('fail closed for ambiguous revocation flags', () => {
+  for (const revoked of ['true', 'false', 1, 0, null, {}, []]) {
+    const input = valid();
+    input.consent.revoked = revoked;
+    assert.equal(authorizeContractorOutreach(input).allowed, false, String(revoked));
+  }
+  for (const revoked of [false]) {
+    const input = valid();
+    input.consent.revoked = revoked;
+    assert.equal(authorizeContractorOutreach(input).allowed, true);
+  }
+});
