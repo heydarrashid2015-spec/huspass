@@ -107,3 +107,20 @@ test('pending recovery request clears busy state after an asynchronous rejection
   assert.equal(state.messages.length, 1);
   assert.doesNotMatch(state.messages[0], /network|outage|error/i);
 });
+
+test('Supabase error responses never disclose account status or delivery configuration', async () => {
+  const failures = [
+    { error: { message: 'User not found', status: 404 } },
+    { error: { message: 'Email rate limit exceeded', status: 429 } },
+    { error: { message: 'SMTP provider unavailable', status: 503 } },
+    { error: { message: 'Email address not confirmed', status: 400 } }
+  ];
+  const baseline = await run('person@example.com', async () => ({ error: null }));
+  for (const failure of failures) {
+    const result = await run('person@example.com', async () => failure);
+    assert.deepEqual(result.busy, [true, false]);
+    assert.equal(result.calls.length, 1);
+    assert.deepEqual(result.messages, baseline.messages);
+    assert.doesNotMatch(result.messages.join(' '), /user not found|rate limit|smtp|not confirmed|404|429|503/i);
+  }
+});
