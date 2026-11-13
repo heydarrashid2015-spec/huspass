@@ -179,3 +179,19 @@ test('user payload without a valid identifier cannot confirm password recovery',
     assert.match(h.state.messages.at(-1), /kunne ikke ændres/);
   }
 });
+
+test('unexpected thrown values fail closed and restore the form state', async () => {
+  for (const thrown of [null, undefined, 'expired token', { message: 'invalid session' }]) {
+    const h = harness(async () => { throw thrown; });
+    await h.submit('SecurePass123')({ preventDefault() {} });
+    assert.equal(h.state.updates, 1);
+    assert.deepEqual(h.state.busy, [true, false]);
+    assert.equal(h.passwordRecoveryActiveRef.current, true);
+    assert.deepEqual(h.state.recovery, []);
+    assert.deepEqual(h.state.views, []);
+    assert.deepEqual(h.state.clearedPassword, []);
+    assert.deepEqual(h.state.notifications, []);
+    assert.match(h.state.messages.at(-1), /kunne ikke ændres/);
+    assert.doesNotMatch(h.state.messages.at(-1), /expired token|invalid session/i);
+  }
+});
