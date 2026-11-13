@@ -267,3 +267,13 @@ test("unlabelled purchase date remains available alongside warranty deadline",()
  const r=parseDanishDocumentText("Kvittering\n05.11.2026\nGaranti: 05.11.2028\nI alt: 500,00");
  assert.equal(r.documentDate,"2026-11-05");
 });
+
+// Warranty-only dates must not become receipt dates, including split OCR labels.
+test("excludes standalone Garanti date from document date",()=>{
+ const r=parseDanishDocumentText("Kvittering\nGaranti: 05.11.2028\nI alt: 500,00");
+ assert.equal(r.documentDate,null);
+});
+test("excludes OCR-split Garanti date from document date",()=>{
+ const r=parseDanishDocumentText("Kvittering\nGaranti:\n05.11.2028\nI alt: 500,00");
+ assert.equal(r.documentDate,null);
+});
