@@ -61,3 +61,15 @@ test('CVR must be a string and cannot be coerced from untrusted values', () => {
   input.contractor.cvr = '01234567';
   assert.equal(authorizeContractorOutreach(input).allowed, true, 'leading zero must be preserved');
 });
+
+// Reject non-string and blank identifiers before any server-side outreach preparation.
+test('project and contractor identifiers must be nonblank strings', () => {
+  for (const id of [0, 123, null, undefined, true, [], {}, '', '   ']) {
+    const projectInput = valid();
+    projectInput.project.id = id;
+    assert.equal(authorizeContractorOutreach(projectInput).allowed, false, 'project id');
+    const contractorInput = valid();
+    contractorInput.contractor.id = id;
+    assert.equal(authorizeContractorOutreach(contractorInput).allowed, false, 'contractor id');
+  }
+});
