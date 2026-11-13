@@ -73,3 +73,17 @@ test('project and contractor identifiers must be nonblank strings', () => {
     assert.equal(authorizeContractorOutreach(contractorInput).allowed, false, 'contractor id');
   }
 });
+
+
+test('recorded revocation timestamp always blocks outreach, even with revoked false', () => {
+  for (const revokedAt of ['2026-11-13T10:00:00.000Z', 'invalid', '', 0, false, {}]) {
+    const input = valid();
+    input.consent.revoked = false;
+    input.consent.revokedAt = revokedAt;
+    assert.equal(authorizeContractorOutreach(input).allowed, false, String(revokedAt));
+  }
+  const input = valid();
+  input.consent.revoked = false;
+  input.consent.revokedAt = null;
+  assert.equal(authorizeContractorOutreach(input).allowed, true);
+});
