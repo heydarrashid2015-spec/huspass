@@ -290,3 +290,14 @@ test("preserves genuine supplier after complaint-right marketing",()=>{
  const r=parseDanishDocumentText("Kvittering\n2 år reklamationsret\nNord El ApS\nI alt: 500,00");
  assert.equal(r.supplier,"Nord El ApS");
 });
+
+// Conflicting seller identifiers must be reviewed rather than silently selecting the first.
+test("does not select one of two conflicting CVR numbers",()=>{
+ const r=parseDanishDocumentText("Faktura\nCVR: 12345678\nCVR: 87654321\nI alt: 500,00");
+ assert.equal(r.cvr,null);
+ assert.equal(r.requiresReview,true);
+});
+test("repeated identical CVR remains a suggestion for review",()=>{
+ const r=parseDanishDocumentText("Faktura\nCVR: 12345678\nCVR-nr: 12345678\nI alt: 500,00");
+ assert.equal(r.cvr,"12345678");
+});
