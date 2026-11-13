@@ -117,3 +117,19 @@ test('expired and invalid tokens preserve the entered password and never navigat
     assert.doesNotMatch(h.state.messages.at(-1), /SecurePass123|Invalid Refresh Token|Token has expired/);
   }
 });
+
+test('failed recovery never emits success notification or clears password', async () => {
+  for (const updateUser of [
+    async () => ({ error: { message: 'Invalid Refresh Token' } }),
+    async () => { throw new Error('connection interrupted'); }
+  ]) {
+    const h = harness(updateUser);
+    await h.submit('SecurePass123')({ preventDefault() {} });
+    assert.deepEqual(h.state.notifications, []);
+    assert.deepEqual(h.state.clearedPassword, []);
+    assert.deepEqual(h.state.recovery, []);
+    assert.deepEqual(h.state.views, []);
+    assert.equal(h.passwordRecoveryActiveRef.current, true);
+    assert.deepEqual(h.state.busy, [true, false]);
+  }
+});
