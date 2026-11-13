@@ -77,3 +77,18 @@ test('household sharing mutations are gated in both handlers and UI until backen
   assert.match(page, /disabled=\{!HOUSEHOLD_SHARING_ENABLED\|\|householdActionBusy\} onClick=\{\(\)=>acceptHouseholdInvitation/);
   assert.match(page, /if\(!HOUSEHOLD_SHARING_ENABLED\)return;if\(!window\.confirm/);
 });
+
+test('sharing contract explicitly blocks cross-account document and storage access', () => {
+  const contract = read('docs/household-sharing-security-contract.md');
+  assert.match(contract, /guessed document IDs across accounts/i);
+  assert.match(contract, /no new URL can be issued afterward/i);
+  assert.match(contract, /signed URLs are bearer credentials/i);
+  assert.match(contract, /authenticated server proxy that rechecks current membership/i);
+});
+
+test('ownership migration cannot grant clients new privileges', () => {
+  const sql = read('docs/household-sharing-ownership-guard.sql').replace(/--[^\n]*/g, '');
+  assert.match(sql, /revoke all on function public\.household_guard_immutable_ownership\(\) from public, anon, authenticated/i);
+  assert.doesNotMatch(sql, /\bgrant\s+(?:all|execute|update|insert|delete)\b/i);
+  assert.doesNotMatch(sql, /\bdisable\s+row\s+level\s+security\b/i);
+});
