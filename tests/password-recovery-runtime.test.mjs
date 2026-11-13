@@ -103,3 +103,17 @@ test('pending password update rejection preserves recovery state and entered pas
   assert.equal(h.state.updates, 1);
   assert.match(h.state.messages.at(-1), /kunne ikke ændres/);
 });
+
+test('expired and invalid tokens preserve the entered password and never navigate', async () => {
+  for (const message of ['Token has expired', 'Invalid Refresh Token']) {
+    const h = harness(async () => ({ error: { message } }));
+    await h.submit('SecurePass123')({ preventDefault() {} });
+    assert.equal(h.state.updates, 1);
+    assert.deepEqual(h.state.clearedPassword, []);
+    assert.deepEqual(h.state.recovery, []);
+    assert.deepEqual(h.state.views, []);
+    assert.equal(h.passwordRecoveryActiveRef.current, true);
+    assert.deepEqual(h.state.busy, [true, false]);
+    assert.doesNotMatch(h.state.messages.at(-1), /SecurePass123|Invalid Refresh Token|Token has expired/);
+  }
+});
