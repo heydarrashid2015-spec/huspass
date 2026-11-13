@@ -251,3 +251,19 @@ test("keeps real supplier after warranty duration text",()=>{
  const r=parseDanishDocumentText("Kvittering\n2 års garanti\nNord El ApS\nI alt: 500,00");
  assert.equal(r.supplier,"Nord El ApS");
 });
+
+test("unlabelled warranty validity date is not mistaken for invoice date",()=>{
+ const r=parseDanishDocumentText("Kvittering\nGaranti: 05.11.2028\nI alt: 500,00");
+ assert.equal(r.documentDate,null);
+ assert.equal(r.warrantyEnd,null);
+ assert.equal(r.requiresReview,true);
+});
+test("consumer complaint deadline is not a purchase date",()=>{
+ const r=parseDanishDocumentText("Kvittering\nReklamationsret til 05.11.2028\nI alt: 500,00");
+ assert.equal(r.documentDate,null);
+ assert.equal(r.requiresReview,true);
+});
+test("unlabelled purchase date remains available alongside warranty deadline",()=>{
+ const r=parseDanishDocumentText("Kvittering\n05.11.2026\nGaranti: 05.11.2028\nI alt: 500,00");
+ assert.equal(r.documentDate,"2026-11-05");
+});
