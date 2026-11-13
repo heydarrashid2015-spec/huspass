@@ -312,3 +312,14 @@ test("does not infer a total from a valid label if another labelled total is tru
  const r=parseDanishDocumentText("Faktura\nTotal: 1.250,00\nAt betale: 1250,0");
  assert.equal(r.amount,null);
 });
+
+// A generic warranty date is not an invoice/purchase date.
+test("does not infer purchase date from standalone Garanti date",()=>{
+ const r=parseDanishDocumentText("Kvittering\nGaranti\n05.11.2028\nI alt: 500,00");
+ assert.equal(r.documentDate,null);
+ assert.equal(r.requiresReview,true);
+});
+test("generic warranty date does not conflict with a real purchase date",()=>{
+ const r=parseDanishDocumentText("Kvittering\nKøbsdato 05.11.2026\nGaranti\n05.11.2028");
+ assert.equal(r.documentDate,"2026-11-05");
+});
