@@ -106,3 +106,14 @@ test('read-only staging audit covers RLS, privileges, ownership triggers and Sto
   }
   assert.doesNotMatch(sql, /\b(?:insert|update|delete|alter|create|drop|truncate|grant|revoke|execute|call)\b/i);
 });
+
+
+test('release blocker audit remains read-only and detects absent or disabled ownership guards', () => {
+  const sql = read('docs/household-sharing-release-blockers.sql').replace(/--[^\n]*/g, '').trim();
+  assert.match(sql, /MISSING_ENABLED_OWNERSHIP_GUARD/);
+  assert.match(sql, /SHARED_UPDATE_WITHOUT_GUARD/);
+  assert.match(sql, /t\.tgenabled\s+in\s*\('O','A'\)/i);
+  assert.match(sql, /household_guard_home_ownership/);
+  assert.match(sql, /household_guard_task_ownership/);
+  assert.doesNotMatch(sql, /\b(?:insert|update|delete|alter|create|drop|truncate|grant|revoke|execute|call)\s+(?:table|on|into|from|function|trigger|policy)\b/i);
+});
