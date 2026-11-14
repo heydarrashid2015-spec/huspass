@@ -406,3 +406,14 @@ test("does not suggest an unlabelled date when another OCR date is impossible",(
  assert.equal(r.documentDate,null);
  assert.equal(r.requiresReview,true);
 });
+
+// Monetary suggestions must never silently round amounts beyond JS safe precision.
+test("rejects totals whose øre cannot be represented exactly",()=>{
+ const r=parseDanishDocumentText("Faktura\nTotal: 90.071.992.547.409,93");
+ assert.equal(r.amount,null);
+ assert.equal(r.requiresReview,true);
+});
+test("retains exact ordinary two-decimal invoice totals",()=>{
+ const r=parseDanishDocumentText("Faktura\nTotal: 12.345,67");
+ assert.equal(r.amount,12345.67);
+});
