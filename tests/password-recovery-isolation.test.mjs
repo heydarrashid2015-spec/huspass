@@ -31,3 +31,27 @@ test('password recovery request does not include credentials or personal records
   assert.doesNotMatch(section, /supabase\.from\(|supabase\.storage|updateUser\(|signInWithPassword\(|signOut\(|deleteUser\(/);
   assert.match(section, /resetPasswordForEmail\(cleanEmail,/);
 });
+
+test('failed email recovery never touches housing tables or document storage', async () => {
+  for (const failure of [
+    async () => ({ error: { message: 'User not found' } }),
+    async () => { throw new Error('SMTP provider unavailable'); }
+  ]) {
+    const calls = [];
+    const supabase = {
+      auth: { resetPasswordForEmail: async (...args) => { calls.push(args); return failure(); } },
+      from: () => { throw new Error('housing data must remain untouched'); },
+      storage: { from: () => { throw new Error('documents must remain untouched'); } }
+    };
+    const messages = [];
+    const busy = [];
+    const handler = new Function('supabase', 'email', 'setAuthMsg', 'setAuthBusy', 'authBusy', 'return (' + match[1] + ')')(
+      supabase, 'Owner@example.com', x => messages.push(x), x => busy.push(x), false
+    );
+    await handler();
+    assert.equal(calls.length, 1);
+    assert.deepEqual(busy, [true, false]);
+    assert.match(messages.at(-1), /Hvis e-mailadressen er registreret/);
+    assert.doesNotMatch(messages.join(' '), /User not found|SMTP provider unavailable/i);
+  }
+});
