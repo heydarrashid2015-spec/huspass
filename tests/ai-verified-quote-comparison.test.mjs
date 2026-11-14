@@ -47,3 +47,13 @@ test('rejects accessor properties without invoking getters', () => {
 test('rejects unsupported or empty materials evidence', () => {
   assert.equal(run([q('a', 100, { materials: '' }), q('b', 200)]).accepted, false);
 });
+
+test('accepts ordinary Danish øre prices despite binary floating point', () => {
+  const result = run([q('a', 0.29), q('b', 0.3)]);
+  assert.equal(result.accepted, true);
+  assert.deepEqual(result.comparisons.map(x => x.totalPrice), [0.29, 0.3]);
+});
+test('rejects fractional øre and amounts beyond safe integer minor units', () => {
+  assert.equal(run([q('a', 0.291), q('b', 1)]).accepted, false);
+  assert.equal(run([q('a', Number.MAX_SAFE_INTEGER), q('b', 1)]).accepted, false);
+});
