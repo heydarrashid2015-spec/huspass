@@ -67,3 +67,10 @@ test("rejects WebP with no image chunk payload",async()=>{
  const fake={name:"invoice.webp",type:"image/webp",size:bytes.length,slice:()=>({arrayBuffer:async()=>Uint8Array.from(bytes).buffer})};
  await assert.rejects(readDocumentText(fake),/indhold matcher ikke/);
 });
+
+test("rejects PNG signature without a complete IHDR chunk before OCR",async()=>{
+ const png=[137,80,78,71,13,10,26,10];
+ const fake=(bytes)=>({name:"invoice.png",type:"image/png",size:bytes.length,slice:()=>({arrayBuffer:async()=>Uint8Array.from(bytes.slice(0,20)).buffer})});
+ await assert.rejects(readDocumentText(fake(png)),/indhold matcher ikke/);
+ await assert.rejects(readDocumentText(fake([...png,0,0,0,13,73,72,68,82])),/indhold matcher ikke/);
+});
