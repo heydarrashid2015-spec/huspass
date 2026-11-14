@@ -399,3 +399,10 @@ test("reads adjacent OCR-split CVR without borrowing a later unrelated number",(
  assert.equal(r.cvr,"12345678");
  assert.equal(r.requiresReview,true);
 });
+
+// A malformed unlabelled OCR date must not be hidden by a second valid date.
+test("does not suggest an unlabelled date when another OCR date is impossible",()=>{
+ const r=parseDanishDocumentText("Faktura\n05.11.2026\n31.02.2026\nTotal: 500,00");
+ assert.equal(r.documentDate,null);
+ assert.equal(r.requiresReview,true);
+});
