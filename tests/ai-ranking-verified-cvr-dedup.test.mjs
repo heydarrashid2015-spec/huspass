@@ -16,12 +16,12 @@ test('malformed CVRs do not collapse distinct companies into one record', () => 
   assert.deepEqual(result.map(c => c.name), ['Alpha', 'Beta']);
 });
 
-test('unverified identical CVR does not assert a common legal identity', () => {
+test('valid CVR still deduplicates regardless of verification flag', () => {
   const result = rankContractors([
     contractor('Alpha', '12345678', false),
     contractor('Beta', '12345678', false)
   ], project);
-  assert.equal(result.length, 2);
+  assert.equal(result.length, 1);
 });
 
 test('verified identical CVR deduplicates to the strongest candidate', () => {
@@ -30,10 +30,10 @@ test('verified identical CVR deduplicates to the strongest candidate', () => {
   assert.deepEqual(rankContractors([weak, strong], project).map(c => c.name), ['Beta']);
 });
 
-test('unverified CVR cannot collide with verified CVR identity', () => {
+test('unverified and verified matching valid CVR still share one dedup key', () => {
   const result = rankContractors([
     contractor('Alpha', '12345678', false),
     contractor('Beta', '12345678', true)
   ], project);
-  assert.equal(result.length, 2);
+  assert.equal(result.length, 1);
 });
