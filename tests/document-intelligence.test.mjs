@@ -430,3 +430,18 @@ test("keeps merchant after standalone numeric invoice identifier",()=>{
  const r=parseDanishDocumentText("Faktura\n12345678\nNord El ApS\nTotal: 500,00");
  assert.equal(r.supplier,"Nord El ApS");
 });
+
+
+test("OCR-split payment deadline must not become an invoice date",()=>{
+ const r=parseDanishDocumentText("Faktura\nBetalingsfrist\n30.11.2026\nI alt: 500,00");
+ assert.equal(r.documentDate,null);
+ assert.equal(r.amount,500);
+});
+test("OCR-split payment deadline must not conflict with actual invoice date",()=>{
+ const r=parseDanishDocumentText("Faktura\nBetalingsfrist\n30.11.2026\nFakturadato\n05.11.2026\nI alt: 500,00");
+ assert.equal(r.documentDate,"2026-11-05");
+});
+test("OCR-split forfaldsdato must not become purchase date",()=>{
+ const r=parseDanishDocumentText("Kvittering\nForfaldsdato\n30.11.2026");
+ assert.equal(r.documentDate,null);
+});
