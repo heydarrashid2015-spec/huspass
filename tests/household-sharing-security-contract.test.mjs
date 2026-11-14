@@ -117,3 +117,10 @@ test('release blocker audit remains read-only and detects absent or disabled own
   assert.match(sql, /household_guard_task_ownership/);
   assert.doesNotMatch(sql, /\b(?:insert|update|delete|alter|create|drop|truncate|grant|revoke|execute|call)\s+(?:table|on|into|from|function|trigger|policy)\b/i);
 });
+
+
+test('release blocker requires row-level ownership triggers rather than statement triggers', () => {
+  const sql = read('docs/household-sharing-release-blockers.sql').replace(/--[^\n]*/g, '');
+  assert.match(sql, /\(t\.tgtype\s*&\s*1\)\s*<>\s*0\s+as\s+is_row/i);
+  assert.equal((sql.match(/and\s+t\.is_before\s+and\s+t\.is_update\s+and\s+t\.is_row/gi) || []).length, 2);
+});
