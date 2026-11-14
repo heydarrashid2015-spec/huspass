@@ -175,7 +175,7 @@ test('recovery feedback never echoes the submitted email address', async () => {
     const result = await run(address, async () => ({ error: { message: 'User not found' } }));
     assert.deepEqual(result.busy, [true, false]);
     assert.equal(result.calls.length, 1);
-    assert.doesNotMatch(result.messages.join(' '), new RegExp(address.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
+    assert.equal(result.messages.join(' ').toLowerCase().includes(address.toLowerCase()), false);
     assert.match(result.messages.at(-1), /Hvis e-mailadressen er registreret/);
   }
 });
