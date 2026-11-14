@@ -155,3 +155,13 @@ test('malformed provider responses remain neutral and restore the request state'
     assert.deepEqual(result.messages, baseline.messages);
   }
 });
+
+test('non-Error thrown values never expose internal details in recovery feedback', async () => {
+  const baseline = await run('person@example.com', async () => ({ error: null }));
+  for (const thrown of [null, undefined, 'SMTP secret failure', { message: 'account exists', status: 409 }, 429]) {
+    const result = await run('person@example.com', async () => { throw thrown; });
+    assert.deepEqual(result.busy, [true, false]);
+    assert.equal(result.calls.length, 1);
+    assert.deepEqual(result.messages, baseline.messages);
+  }
+});
