@@ -140,8 +140,9 @@ test('different email addresses and thrown provider errors produce the same neut
     assert.equal(result.calls.length, 1);
     assert.equal(result.calls[0][0], address);
     assert.deepEqual(result.busy, [true, false]);
-    assert.equal(result.messages.length, 1);
-    results.push(result.messages[0]);
+    assert.deepEqual(result.messages[0], 'Sender link...');
+    assert.equal(result.messages.length, 2);
+    results.push(result.messages.at(-1));
   }
   assert.equal(new Set(results).size, 1);
   assert.match(results[0], /Hvis e-mailadressen er registreret/);
