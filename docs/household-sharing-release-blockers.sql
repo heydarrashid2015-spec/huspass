@@ -35,4 +35,9 @@ union all
 select 'MISSING_SHARING_TABLE', required.table_name, 'public table absent'
 from (values ('home_memberships'),('home_invitations')) as required(table_name)
 where to_regclass('public.' || required.table_name) is null
+union all
+select 'MISSING_OR_DISABLED_RLS', required.table_name, 'RLS must be enabled'
+from (values ('homes'),('tasks'),('documents'),('home_memberships'),('home_invitations')) as required(table_name)
+left join pg_class c on c.oid = to_regclass('public.' || required.table_name)
+where c.oid is not null and not c.relrowsecurity
 order by finding,table_name,detail;
