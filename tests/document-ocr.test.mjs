@@ -60,3 +60,10 @@ test("rejects WebP with appended bytes beyond declared RIFF length",async()=>{
  const fake={name:"invoice.webp",type:"image/webp",size:bytes.length,slice:()=>({arrayBuffer:async()=>Uint8Array.from(bytes.slice(0,16)).buffer})};
  await assert.rejects(readDocumentText(fake),/indhold matcher ikke/);
 });
+
+// A WebP RIFF header and four-byte chunk tag alone do not contain an image.
+test("rejects WebP with no image chunk payload",async()=>{
+ const bytes=[82,73,70,70,12,0,0,0,87,69,66,80,86,80,56,32,0,0,0,0];
+ const fake={name:"invoice.webp",type:"image/webp",size:bytes.length,slice:()=>({arrayBuffer:async()=>Uint8Array.from(bytes).buffer})};
+ await assert.rejects(readDocumentText(fake),/indhold matcher ikke/);
+});
