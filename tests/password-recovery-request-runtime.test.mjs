@@ -168,3 +168,14 @@ test('non-Error thrown values never expose internal details in recovery feedback
     assert.deepEqual(result.messages, baseline.messages);
   }
 });
+
+
+test('recovery feedback never echoes the submitted email address', async () => {
+  for (const address of ['Private.Person+home@example.com', 'missing-user@example.org']) {
+    const result = await run(address, async () => ({ error: { message: 'User not found' } }));
+    assert.deepEqual(result.busy, [true, false]);
+    assert.equal(result.calls.length, 1);
+    assert.doesNotMatch(result.messages.join(' '), new RegExp(address.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
+    assert.match(result.messages.at(-1), /Hvis e-mailadressen er registreret/);
+  }
+});
