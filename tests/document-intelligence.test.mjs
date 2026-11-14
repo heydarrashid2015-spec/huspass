@@ -417,3 +417,16 @@ test("retains exact ordinary two-decimal invoice totals",()=>{
  const r=parseDanishDocumentText("Faktura\nTotal: 12.345,67");
  assert.equal(r.amount,12345.67);
 });
+
+// Standalone OCR identifiers are not merchant names.
+test("does not infer supplier from standalone numeric invoice identifiers",()=>{
+ for(const line of ["12345678","123456789012","202611140001"]){
+  const r=parseDanishDocumentText("Faktura\\n"+line+"\\nTotal: 500,00");
+  assert.equal(r.supplier,null,line);
+  assert.equal(r.requiresReview,true);
+ }
+});
+test("keeps merchant after standalone numeric invoice identifier",()=>{
+ const r=parseDanishDocumentText("Faktura\\n12345678\\nNord El ApS\\nTotal: 500,00");
+ assert.equal(r.supplier,"Nord El ApS");
+});
