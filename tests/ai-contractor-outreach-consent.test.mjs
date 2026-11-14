@@ -34,3 +34,20 @@ test('rejects getters without evaluating them', () => {
   Object.defineProperty(x.consent, 'ownerId', { get() { throw Error('getter executed'); } });
   assert.equal(authorizeContractorOutreach(x).allowed, false);
 });
+
+test('accepts a syntactically valid eight-digit CVR and contractor email', () => {
+  const x = base();
+  assert.equal(authorizeContractorOutreach(x).allowed, true);
+});
+for (const [label, cvr] of [['letters', 'abcdefgh'], ['too short', '1234567'], ['too long', '123456789'], ['embedded spaces', '1234 678']]) {
+  test('rejects CVR with ' + label, () => {
+    const x = base(); x.contractor.cvr = cvr;
+    assert.equal(authorizeContractorOutreach(x).allowed, false);
+  });
+}
+for (const [label, email] of [['missing dot', 'firm@exampledk'], ['whitespace', 'firm name@example.dk'], ['missing at sign', 'firm.example.dk']]) {
+  test('rejects contractor email with ' + label, () => {
+    const x = base(); x.contractor.email = email;
+    assert.equal(authorizeContractorOutreach(x).allowed, false);
+  });
+}
