@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --no-package-lock
-      - run: node --test tests/document-intelligence-syntax.test.mjs tests/document-intelligence.test.mjs tests/document-total-inkl-moms-split.test.mjs tests/document-ocr.test.mjs tests/document-pdf-text.test.mjs tests/document-pdf-raster-limits.test.mjs tests/document-warranty-label-conflict.test.mjs tests/document-webp-dimensions.test.mjs tests/document-webp-legacy-dimensions.test.mjs
+      - run: node --test tests/document-intelligence-syntax.test.mjs tests/document-intelligence.test.mjs tests/document-cvr-ocr-split.test.mjs tests/document-total-inkl-moms-split.test.mjs tests/document-ocr.test.mjs tests/document-pdf-text.test.mjs tests/document-pdf-raster-limits.test.mjs tests/document-warranty-label-conflict.test.mjs tests/document-webp-dimensions.test.mjs tests/document-webp-legacy-dimensions.test.mjs
       - run: npm run build
       - run: npm install --no-save --package-lock=false @playwright/test
       - run: npx playwright install --with-deps chromium
