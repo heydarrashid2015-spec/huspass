@@ -7,7 +7,7 @@ const base = () => ({
   project: { id: 'project-a', ownerId: 'owner-a', description: 'Udskift køkkenbord' },
   contractor: { id: 'firm-a', cvr: '12345678', cvrVerified: true, email: 'firm@example.dk' },
   consent: { id: 'consent-a', ownerId: 'owner-a', projectId: 'project-a', contractorId: 'firm-a',
-    action: 'request_quote', granted: true, revoked: false, channel: 'email', approvedCvr: '12345678',
+    action: 'request_quote', granted: true, revoked: false, channel: 'email', approvedCvr: '12345678', approvedEmail: 'firm@example.dk',
     grantedAt: '2026-11-14T10:00:00Z', expiresAt: '2026-11-15T10:00:00Z',
     approvedDescription: 'Udskift køkkenbord' }
 });
@@ -102,6 +102,16 @@ for (const [label, mutate] of [
   ['different approved CVR', x => { x.consent.approvedCvr = '87654321'; }],
   ['coercible approved CVR', x => { x.consent.approvedCvr = { toString() { throw Error('unsafe'); } }; }]
 ]) test('rejects ' + label + ' despite matching contractor ID', () => {
+  const x = base(); mutate(x);
+  assert.equal(authorizeContractorOutreach(x).allowed, false);
+});
+
+for (const [label, mutate] of [
+  ['missing approved recipient', x => { delete x.consent.approvedEmail; }],
+  ['changed contractor mailbox', x => { x.contractor.email = 'attacker@example.dk'; }],
+  ['different approved mailbox', x => { x.consent.approvedEmail = 'other@example.dk'; }],
+  ['coercible approved mailbox', x => { x.consent.approvedEmail = { toString() { throw Error('unsafe'); } }; }]
+]) test('rejects ' + label + ' even when CVR is unchanged', () => {
   const x = base(); mutate(x);
   assert.equal(authorizeContractorOutreach(x).allowed, false);
 });
