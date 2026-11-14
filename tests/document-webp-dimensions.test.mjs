@@ -13,3 +13,11 @@ test("rejects WebP VP8X decompression-bomb dimensions before loading OCR",async(
   slice:(start,end)=>({arrayBuffer:async()=>bytes.slice(start,end).buffer})};
  await assert.rejects(readDocumentText(file),/indhold matcher ikke/);
 });
+
+test("rejects WebP VP8X with undersized declared image chunk before OCR",async()=>{
+ const bytes=new Uint8Array(30);
+ bytes.set([82,73,70,70,22,0,0,0,87,69,66,80,86,80,56,88,1,0,0,0],0);
+ const file={name:"invoice.webp",type:"image/webp",size:bytes.length,
+  slice:(start,end)=>({arrayBuffer:async()=>bytes.slice(start,end).buffer})};
+ await assert.rejects(readDocumentText(file),/indhold matcher ikke/);
+});
