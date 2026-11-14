@@ -195,3 +195,17 @@ test('unexpected thrown values fail closed and restore the form state', async ()
     assert.doesNotMatch(h.state.messages.at(-1), /expired token|invalid session/i);
   }
 });
+
+test('successful recovery feedback never exposes the new password', async () => {
+  const password = 'PrivatePass987';
+  const h = harness(async payload => {
+    assert.deepEqual(payload, { password });
+    return { data: { user: { id: 'recovered-user' } }, error: null };
+  });
+  await h.submit(password)({ preventDefault() {} });
+  assert.equal(h.state.updates, 1);
+  assert.equal(h.passwordRecoveryActiveRef.current, false);
+  assert.deepEqual(h.state.busy, [true, false]);
+  assert.deepEqual(h.state.clearedPassword, ['']);
+  assert.doesNotMatch(JSON.stringify([...h.state.messages, ...h.state.notifications]), /PrivatePass987/);
+});
