@@ -5,16 +5,18 @@ with required_triggers(table_name, trigger_name) as (
  values ('homes','household_guard_home_ownership'),
         ('tasks','household_guard_task_ownership')
 ), triggers as (
- select c.relname::text as table_name,t.tgname::text as trigger_name,t.tgenabled, p.proname::text as function_name
+ select c.relname::text as table_name,t.tgname::text as trigger_name,t.tgenabled, p.proname::text as function_name, pn.nspname::text as function_schema, (t.tgtype & 2) <> 0 as is_before, (t.tgtype & 16) <> 0 as is_update
  from pg_trigger t join pg_class c on c.oid=t.tgrelid
  join pg_namespace n on n.oid=c.relnamespace
  join pg_proc p on p.oid=t.tgfoid
+ join pg_namespace pn on pn.oid=p.pronamespace
  where n.nspname='public' and not t.tgisinternal
 )
 select 'MISSING_ENABLED_OWNERSHIP_GUARD' as finding, r.table_name, r.trigger_name as detail
 from required_triggers r left join triggers t
  on t.table_name=r.table_name and t.trigger_name=r.trigger_name and t.tgenabled in ('O','A')
- and t.function_name='household_guard_immutable_ownership'
+ and t.function_name='household_guard_immutable_ownership' and t.function_schema='public'
+ and t.is_before and t.is_update
 where t.trigger_name is null
 union all
 select 'SHARED_UPDATE_WITHOUT_GUARD',p.tablename,p.policyname
@@ -26,6 +28,7 @@ where p.schemaname='public' and p.tablename in ('homes','tasks')
   select 1 from triggers t join required_triggers r
    on r.table_name=t.table_name and r.trigger_name=t.trigger_name
   where t.table_name=p.tablename and t.tgenabled in ('O','A')
-   and t.function_name='household_guard_immutable_ownership'
+   and t.function_name='household_guard_immutable_ownership' and t.function_schema='public'
+ and t.is_before and t.is_update
  )
 order by finding,table_name,detail;
