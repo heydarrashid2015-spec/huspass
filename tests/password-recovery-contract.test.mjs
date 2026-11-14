@@ -17,9 +17,9 @@ test('recovery event switches to password update view', () => {
 });
 
 test('password update handles rejected promises and clears busy state', () => {
-  assert.match(source, /try\\{const result=await supabase\\.auth\\.updateUser\\(\\{password:newPassword\\}\\)/);
-  assert.match(source, /catch\\(error\\)\\{passwordUpdateError=error\\|\\|new Error\\("Password update rejected"\\)\\}finally\\{setAuthBusy\\(false\\)\\}/);
-  assert.match(source, /if\\(passwordUpdateError\\)return setAuthMsg\\("Adgangskoden kunne ikke ændres\\."\\)/);
+  assert.match(source, /try\{const result=await supabase\.auth\.updateUser\(\{password:newPassword\}\)/);
+  assert.match(source, /catch\(error\)\{passwordUpdateError=error\|\|new Error\("Password update rejected"\)\}finally\{setAuthBusy\(false\)\}/);
+  assert.match(source, /if\(passwordUpdateError\)return setAuthMsg\("Adgangskoden kunne ikke ændres\."\)/);
 });
 
 
