@@ -80,11 +80,12 @@ test('pending email request retains busy state until Supabase settles', async ()
   const running = handler();
   assert.equal(state.calls.length, 1);
   assert.deepEqual(state.busy, [true]);
-  assert.deepEqual(state.messages, []);
+  assert.deepEqual(state.messages, ['Sender link...']);
   release({ error: null });
   await running;
   assert.deepEqual(state.busy, [true, false]);
-  assert.equal(state.messages.length, 1);
+  assert.equal(state.messages.length, 2);
+  assert.match(state.messages.at(-1), /Hvis e-mailadressen er registreret/);
 });
 
 test('pending recovery request clears busy state after an asynchronous rejection', async () => {
@@ -99,13 +100,14 @@ test('pending recovery request clears busy state after an asynchronous rejection
   const handler = build(supabase, 'person@example.com', value => state.messages.push(value), value => state.busy.push(value), false);
   const running = handler();
   assert.deepEqual(state.busy, [true]);
-  assert.deepEqual(state.messages, []);
+  assert.deepEqual(state.messages, ['Sender link...']);
   rejectRequest(new Error('temporary network outage'));
   await running;
   assert.equal(state.calls.length, 1);
   assert.deepEqual(state.busy, [true, false]);
-  assert.equal(state.messages.length, 1);
-  assert.doesNotMatch(state.messages[0], /network|outage|error/i);
+  assert.equal(state.messages.length, 2);
+  assert.match(state.messages.at(-1), /Hvis e-mailadressen er registreret/);
+  assert.doesNotMatch(state.messages.at(-1), /network|outage|error/i);
 });
 
 test('Supabase error responses never disclose account status or delivery configuration', async () => {
