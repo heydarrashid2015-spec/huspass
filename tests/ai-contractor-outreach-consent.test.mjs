@@ -7,7 +7,7 @@ const base = () => ({
   project: { id: 'project-a', ownerId: 'owner-a', description: 'Udskift køkkenbord' },
   contractor: { id: 'firm-a', cvr: '12345678', cvrVerified: true, email: 'firm@example.dk' },
   consent: { id: 'consent-a', ownerId: 'owner-a', projectId: 'project-a', contractorId: 'firm-a',
-    action: 'request_quote', granted: true, revoked: false, channel: 'email',
+    action: 'request_quote', granted: true, revoked: false, channel: 'email', approvedCvr: '12345678',
     grantedAt: '2026-11-14T10:00:00Z', expiresAt: '2026-11-15T10:00:00Z',
     approvedDescription: 'Udskift køkkenbord' }
 });
@@ -92,6 +92,16 @@ for (const [label, mutate] of [
   ['date-only timestamp', x => { x.now = '2026-11-14'; }],
   ['invalid hour rollover', x => { x.consent.grantedAt = '2026-11-14T25:00:00Z'; }]
 ]) test('rejects ' + label + ' in consent timestamps', () => {
+  const x = base(); mutate(x);
+  assert.equal(authorizeContractorOutreach(x).allowed, false);
+});
+
+for (const [label, mutate] of [
+  ['missing approved CVR', x => { delete x.consent.approvedCvr; }],
+  ['changed contractor legal entity', x => { x.contractor.cvr = '87654321'; }],
+  ['different approved CVR', x => { x.consent.approvedCvr = '87654321'; }],
+  ['coercible approved CVR', x => { x.consent.approvedCvr = { toString() { throw Error('unsafe'); } }; }]
+]) test('rejects ' + label + ' despite matching contractor ID', () => {
   const x = base(); mutate(x);
   assert.equal(authorizeContractorOutreach(x).allowed, false);
 });
