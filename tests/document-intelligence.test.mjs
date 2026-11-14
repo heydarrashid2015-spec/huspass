@@ -377,3 +377,18 @@ test("rejects a total when an empty total label precedes a valid total",()=>{
  const r=parseDanishDocumentText("Faktura\nI alt:\nTotal: 1.250,00");
  assert.equal(r.amount,null);
 });
+
+// OCR can split a CVR label and its value across adjacent lines.
+test("reads CVR split across adjacent OCR lines",()=>{
+ const r=parseDanishDocumentText("Nord El ApS\nFaktura\nCVR\n12345678\nI alt: 500,00");
+ assert.equal(r.cvr,"12345678");
+ assert.equal(r.requiresReview,true);
+});
+test("does not accept a split CVR if another labelled CVR conflicts",()=>{
+ const r=parseDanishDocumentText("Faktura\nCVR\n12345678\nCVR: 87654321");
+ assert.equal(r.cvr,null);
+});
+test("does not borrow an unrelated OCR line for a split CVR",()=>{
+ const r=parseDanishDocumentText("Faktura\nCVR\nNord El ApS\n12345678");
+ assert.equal(r.cvr,null);
+});
