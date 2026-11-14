@@ -74,3 +74,10 @@ test("rejects PNG signature without a complete IHDR chunk before OCR",async()=>{
  await assert.rejects(readDocumentText(fake(png)),/indhold matcher ikke/);
  await assert.rejects(readDocumentText(fake([...png,0,0,0,13,73,72,68,82])),/indhold matcher ikke/);
 });
+
+// A JPEG SOI marker alone is not a complete image; require the EOI marker too.
+test("rejects truncated JPEG without end-of-image marker before OCR",async()=>{
+ const bytes=[255,216,255,224,0,16,74,70,73,70,0,0,0,0,0,0,0,0,0,0,1,2];
+ const fake={name:"invoice.jpg",type:"image/jpeg",size:bytes.length,slice:(start,end)=>({arrayBuffer:async()=>Uint8Array.from(bytes.slice(start<0?bytes.length+start:start,end)).buffer})};
+ await assert.rejects(readDocumentText(fake),/indhold matcher ikke/);
+});
