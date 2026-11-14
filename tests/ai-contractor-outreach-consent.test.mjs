@@ -70,3 +70,17 @@ test('rejects coercible clock without invoking user-defined conversion', () => {
   assert.equal(authorizeContractorOutreach(x).allowed, false);
   assert.equal(called, false);
 });
+
+for (const [label, revocation] of [
+  ['missing revocation state', undefined],
+  ['null revocation state', null],
+  ['string false revocation state', 'false'],
+  ['numeric revocation state', 0]
+]) {
+  test('rejects ' + label, () => {
+    const x = base();
+    if (revocation === undefined) delete x.consent.revoked;
+    else x.consent.revoked = revocation;
+    assert.equal(authorizeContractorOutreach(x).allowed, false);
+  });
+}
