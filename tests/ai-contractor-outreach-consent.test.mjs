@@ -51,3 +51,22 @@ for (const [label, email] of [['missing dot', 'firm@exampledk'], ['whitespace', 
     assert.equal(authorizeContractorOutreach(x).allowed, false);
   });
 }
+
+test('rejects coercible CVR without invoking user-defined conversion', () => {
+  const x = base();
+  let called = false;
+  x.contractor.cvr = { toString() { called = true; throw Error('unsafe conversion'); } };
+  assert.equal(authorizeContractorOutreach(x).allowed, false);
+  assert.equal(called, false);
+});
+test('rejects numeric CVR instead of silently converting it', () => {
+  const x = base(); x.contractor.cvr = 12345678;
+  assert.equal(authorizeContractorOutreach(x).allowed, false);
+});
+test('rejects coercible clock without invoking user-defined conversion', () => {
+  const x = base();
+  let called = false;
+  x.now = { toString() { called = true; throw Error('unsafe clock'); } };
+  assert.equal(authorizeContractorOutreach(x).allowed, false);
+  assert.equal(called, false);
+});
