@@ -420,7 +420,7 @@ test("retains exact ordinary two-decimal invoice totals",()=>{
 
 // Standalone OCR identifiers are not merchant names.
 test("does not infer supplier from standalone numeric invoice identifiers",()=>{
- for(const line of ["12345678","123456789012","202611140001"]){
+ for(const line of ["12345678","123456789012","202611140001","1234-5678","2026/1114/001"]){
   const r=parseDanishDocumentText("Faktura\n"+line+"\nTotal: 500,00");
   assert.equal(r.supplier,null,line);
   assert.equal(r.requiresReview,true);
