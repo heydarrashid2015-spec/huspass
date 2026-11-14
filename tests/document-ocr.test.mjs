@@ -81,3 +81,16 @@ test("rejects truncated JPEG without end-of-image marker before OCR",async()=>{
  const fake={name:"invoice.jpg",type:"image/jpeg",size:bytes.length,slice:(start,end)=>({arrayBuffer:async()=>Uint8Array.from(bytes.slice(start<0?bytes.length+start:start,end)).buffer})};
  await assert.rejects(readDocumentText(fake),/indhold matcher ikke/);
 });
+
+test("rejects PNG with zero width or height in IHDR before starting OCR",async()=>{
+ const makePng=(width,height)=>{
+  const bytes=[137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,
+   (width>>>24)&255,(width>>>16)&255,(width>>>8)&255,width&255,
+   (height>>>24)&255,(height>>>16)&255,(height>>>8)&255,height&255,
+   8,2,0,0,0,0,0,0,0,0,0,0,0];
+  return {name:"invoice.png",type:"image/png",size:bytes.length,
+   slice:(start,end)=>({arrayBuffer:async()=>Uint8Array.from(bytes.slice(start,end)).buffer})};
+ };
+ await assert.rejects(readDocumentText(makePng(0,100)),/indhold matcher ikke/);
+ await assert.rejects(readDocumentText(makePng(100,0)),/indhold matcher ikke/);
+});
