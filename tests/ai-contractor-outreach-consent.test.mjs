@@ -84,3 +84,14 @@ for (const [label, revocation] of [
     assert.equal(authorizeContractorOutreach(x).allowed, false);
   });
 }
+
+for (const [label, mutate] of [
+  ['timezone-free timestamp', x => { x.now = '2026-11-14T12:00:00'; }],
+  ['offset timestamp', x => { x.consent.grantedAt = '2026-11-14T11:00:00+01:00'; }],
+  ['invalid calendar date', x => { x.consent.expiresAt = '2026-11-31T10:00:00Z'; }],
+  ['date-only timestamp', x => { x.now = '2026-11-14'; }],
+  ['invalid hour rollover', x => { x.consent.grantedAt = '2026-11-14T25:00:00Z'; }]
+]) test('rejects ' + label + ' in consent timestamps', () => {
+  const x = base(); mutate(x);
+  assert.equal(authorizeContractorOutreach(x).allowed, false);
+});
