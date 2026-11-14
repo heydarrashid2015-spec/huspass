@@ -31,4 +31,8 @@ where p.schemaname='public' and p.tablename in ('homes','tasks')
    and t.function_name='household_guard_immutable_ownership' and t.function_schema='public'
  and t.is_before and t.is_update and t.is_row
  )
+union all
+select 'MISSING_SHARING_TABLE', required.table_name, 'public table absent'
+from (values ('home_memberships'),('home_invitations')) as required(table_name)
+where to_regclass('public.' || required.table_name) is null
 order by finding,table_name,detail;
