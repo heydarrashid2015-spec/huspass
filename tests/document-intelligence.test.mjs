@@ -392,3 +392,10 @@ test("does not borrow an unrelated OCR line for a split CVR",()=>{
  const r=parseDanishDocumentText("Faktura\nCVR\nNord El ApS\n12345678");
  assert.equal(r.cvr,null);
 });
+
+// Regression: OCR separates CVR label from its eight-digit value.
+test("reads adjacent OCR-split CVR without borrowing a later unrelated number",()=>{
+ const r=parseDanishDocumentText("Nord El ApS\nFaktura\nCVR:\n12345678\nI alt: 500,00");
+ assert.equal(r.cvr,"12345678");
+ assert.equal(r.requiresReview,true);
+});
