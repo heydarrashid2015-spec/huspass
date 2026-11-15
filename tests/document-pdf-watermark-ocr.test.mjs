@@ -16,3 +16,8 @@ test("short but substantive invoice text retains its text layer",()=>{
 test("non-document short PDF text layer triggers OCR fallback",()=>{
  assert.equal(needsPdfPageOcr("Page 1 - copied text layer"),true);
 });
+
+test("scanner watermark and scanner URL on separate lines still trigger OCR",()=>{
+ assert.equal(needsPdfPageOcr("Scanned with CamScanner\nhttps://www.camscanner.com"),true);
+ assert.equal(needsPdfPageOcr("Created with Adobe Scan\nhttps://scan.example"),true);
+});
