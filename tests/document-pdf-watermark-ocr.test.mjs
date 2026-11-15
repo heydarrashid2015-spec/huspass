@@ -26,3 +26,9 @@ test("scanner metadata with a date or page counter still requires OCR",()=>{
  assert.equal(needsPdfPageOcr("Scanned with CamScanner\nDato: 12.11.2026"),true);
  assert.equal(needsPdfPageOcr("Created with Adobe Scan\nPage 1\nhttps://scan.example"),true);
 });
+
+// PDF.js can emit empty lines between scanner metadata entries.
+test("blank lines between scanner metadata must not suppress OCR",()=>{
+ assert.equal(needsPdfPageOcr("Scanned with CamScanner\n\nDato: 12.11.2026\n\nPage 1"),true);
+ assert.equal(needsPdfPageOcr("Created with Adobe Scan\r\n\r\nhttps://scan.example\r\nPage 2"),true);
+});
