@@ -1,5 +1,7 @@
 name: HusPass browser smoke tests
 on:
+  push:
+    branches: [feat/smart-document-archive-ocr-20261111]
   pull_request:
     branches: [main]
   workflow_dispatch:
