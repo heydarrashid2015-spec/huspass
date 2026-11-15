@@ -32,3 +32,10 @@ test("blank lines between scanner metadata must not suppress OCR",()=>{
  assert.equal(needsPdfPageOcr("Scanned with CamScanner\n\nDato: 12.11.2026\n\nPage 1"),true);
  assert.equal(needsPdfPageOcr("Created with Adobe Scan\r\n\r\nhttps://scan.example\r\nPage 2"),true);
 });
+
+// Scanner text layers can include the invoice heading without any invoice fields.
+test("scanner watermark plus a bare invoice heading still requires OCR",()=>{
+ assert.equal(needsPdfPageOcr("Scanned with CamScanner\nFaktura"),true);
+ assert.equal(needsPdfPageOcr("Created with Adobe Scan\nInvoice\nPage 1"),true);
+ assert.equal(needsPdfPageOcr("Scanned with CamScanner\nFaktura\nCVR: 12345678\nTotal: 250,00"),false);
+});
