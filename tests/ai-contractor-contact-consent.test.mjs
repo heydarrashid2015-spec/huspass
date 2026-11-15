@@ -70,3 +70,14 @@ test('preserves ordinary Danish Unicode characters in safe project descriptions'
  assert.equal(result.allowed, true);
  assert.equal(result.payload.description, 'Udskiftning af køkkenlåger på 12 m²');
 });
+
+test('rejects compatibility Unicode obfuscation of embedded contact information', () => {
+ for (const description of ['Kontakt kunde＠example．dk', 'telefon: １２３４５６７８', 'Ring ＋４５ １２ ３４ ５６ ７８']) {
+   const result = prepareContractorContact({...args, project:{...project, description}});
+   assert.equal(result.allowed, false, description);
+   assert.equal(result.reason, 'personal_contact_in_project_text');
+   assert.equal(result.payload, null);
+ }
+ const result = prepareContractorContact({...args, project:{...project, category:'mail kunde＠example．dk'}});
+ assert.equal(result.allowed, false);
+});
