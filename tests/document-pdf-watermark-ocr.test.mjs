@@ -21,3 +21,8 @@ test("scanner watermark and scanner URL on separate lines still trigger OCR",()=
  assert.equal(needsPdfPageOcr("Scanned with CamScanner\nhttps://www.camscanner.com"),true);
  assert.equal(needsPdfPageOcr("Created with Adobe Scan\nhttps://scan.example"),true);
 });
+
+test("scanner metadata with a date or page counter still requires OCR",()=>{
+ assert.equal(needsPdfPageOcr("Scanned with CamScanner\\nDato: 12.11.2026"),true);
+ assert.equal(needsPdfPageOcr("Created with Adobe Scan\\nPage 1\\nhttps://scan.example"),true);
+});
