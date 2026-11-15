@@ -52,3 +52,21 @@ test('rejects malformed category and preserves ordinary category', () => {
  }
  assert.equal(prepareContractorContact(args).allowed, true);
 });
+
+test('rejects Unicode bidirectional and invisible format spoofing in outbound text', () => {
+ for (const character of ['\u202E', '\u2066', '\u200B', '\uFEFF', '\u2028', '\u0085']) {
+   const description = 'Mal' + character + 'ing af stue';
+   const result = prepareContractorContact({...args, project:{...project, description}});
+   assert.equal(result.allowed, false, 'description rejected for U+' + character.codePointAt(0).toString(16));
+   assert.equal(result.reason, 'unsafe_project_text');
+   assert.equal(result.payload, null);
+   const categoryResult = prepareContractorContact({...args, project:{...project, category:'mal' + character + 'ing'}});
+   assert.equal(categoryResult.allowed, false);
+   assert.equal(categoryResult.reason, 'unsafe_project_category');
+ }
+});
+test('preserves ordinary Danish Unicode characters in safe project descriptions', () => {
+ const result = prepareContractorContact({...args, project:{...project, description:'Udskiftning af køkkenlåger på 12 m²', category:'køkken'}});
+ assert.equal(result.allowed, true);
+ assert.equal(result.payload.description, 'Udskiftning af køkkenlåger på 12 m²');
+});
