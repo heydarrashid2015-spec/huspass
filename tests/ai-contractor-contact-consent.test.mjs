@@ -93,3 +93,16 @@ test('blocks unlabeled eight-digit Danish phone numbers without rejecting dimens
    assert.equal(prepareContractorContact({...args, project:{...project, description}}).allowed, true, description);
  }
 });
+
+
+test('blocks outbound links that could carry private tokens or addresses', () => {
+ for (const description of ['Se https://example.dk/?token=secret', 'Se www.example.dk/privat', 'Se example.dk/kunde/privat', 'Se ｈｔｔｐｓ：／／example.dk/private']) {
+   const result = prepareContractorContact({...args, project:{...project, description}});
+   assert.equal(result.allowed, false, description);
+   assert.equal(result.reason, 'unverified_link_in_project_text');
+   assert.equal(result.payload, null);
+ }
+ const categoryResult = prepareContractorContact({...args, project:{...project, category:'www.example.dk/privat'}});
+ assert.equal(categoryResult.allowed, false);
+ assert.equal(prepareContractorContact({...args, project:{...project, description:'Mal vægge i køkkenet på 12 m²'}}).allowed, true);
+});
