@@ -20,3 +20,18 @@ test('prepares minimal payload only after approval without leaking contact detai
  assert.deepEqual(result.payload,{projectId:'p1',contractorCvr:'12345678',description:'Maling af stue',category:'maling'});
  assert.equal(JSON.stringify(result).includes('PRIVATE'),false);
 });
+
+test('rejects contact information embedded in free-text description or category', () => {
+ for (const description of ['Maling; skriv til kunde@example.dk', 'Ring +45 12 34 56 78 om maling', 'telefon: 12345678']) {
+   const result = prepareContractorContact({...args, project:{...project, description}});
+   assert.equal(result.allowed, false);
+   assert.equal(result.reason, 'personal_contact_in_project_text');
+   assert.equal(result.payload, null);
+ }
+ const result = prepareContractorContact({...args, project:{...project, category:'mail owner@example.dk'}});
+ assert.equal(result.allowed, false);
+});
+test('allows ordinary dimensions and work descriptions without contact details', () => {
+ const result = prepareContractorContact({...args, project:{...project, description:'Mal 8 vægge på 45 m2'}});
+ assert.equal(result.allowed, true);
+});
