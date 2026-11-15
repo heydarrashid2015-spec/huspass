@@ -10,8 +10,8 @@ test("scanner watermark does not suppress OCR on scanned invoice pages",()=>{
  assert.equal(needsPdfPageOcr(""),true);
 });
 test("short but substantive invoice text retains its text layer",()=>{
- assert.equal(needsPdfPageOcr("Faktura\\nCVR: 12345678\\nTotal: 250,00"),false);
- assert.equal(needsPdfPageOcr("Kvittering\\nDato: 12.11.2026"),false);
+ assert.equal(needsPdfPageOcr("Faktura\nCVR: 12345678\nTotal: 250,00"),false);
+ assert.equal(needsPdfPageOcr("Kvittering\nDato: 12.11.2026"),false);
 });
 test("non-document short PDF text layer triggers OCR fallback",()=>{
  assert.equal(needsPdfPageOcr("Page 1 - copied text layer"),true);
@@ -23,6 +23,6 @@ test("scanner watermark and scanner URL on separate lines still trigger OCR",()=
 });
 
 test("scanner metadata with a date or page counter still requires OCR",()=>{
- assert.equal(needsPdfPageOcr("Scanned with CamScanner\\nDato: 12.11.2026"),true);
- assert.equal(needsPdfPageOcr("Created with Adobe Scan\\nPage 1\\nhttps://scan.example"),true);
+ assert.equal(needsPdfPageOcr("Scanned with CamScanner\nDato: 12.11.2026"),true);
+ assert.equal(needsPdfPageOcr("Created with Adobe Scan\nPage 1\nhttps://scan.example"),true);
 });
