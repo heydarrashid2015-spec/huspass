@@ -35,3 +35,20 @@ test('allows ordinary dimensions and work descriptions without contact details',
  const result = prepareContractorContact({...args, project:{...project, description:'Mal 8 vægge på 45 m2'}});
  assert.equal(result.allowed, true);
 });
+
+test('rejects control characters in outbound text', () => {
+ for (const description of ['Maling\nBcc: attacker@example.dk', 'Maling\rTil: anden', 'Maling\u0000af stue', 'Maling\tstue']) {
+   const result = prepareContractorContact({...args, project:{...project, description}});
+   assert.equal(result.allowed, false);
+   assert.equal(result.reason, 'unsafe_project_text');
+   assert.equal(result.payload, null);
+ }
+});
+test('rejects malformed category and preserves ordinary category', () => {
+ for (const category of ['maling\r\nX-Header: bad', 'x'.repeat(101), null]) {
+   const result = prepareContractorContact({...args, project:{...project, category}});
+   assert.equal(result.allowed, false);
+   assert.equal(result.reason, 'unsafe_project_category');
+ }
+ assert.equal(prepareContractorContact(args).allowed, true);
+});
