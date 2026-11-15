@@ -81,3 +81,15 @@ test('rejects compatibility Unicode obfuscation of embedded contact information'
  const result = prepareContractorContact({...args, project:{...project, category:'mail kunde＠example．dk'}});
  assert.equal(result.allowed, false);
 });
+
+test('blocks unlabeled eight-digit Danish phone numbers without rejecting dimensions', () => {
+ for (const description of ['Kontakt 12345678 vedrørende maling', 'Ring 12 34 56 78', 'Kontakt 12-34-56-78']) {
+   const result = prepareContractorContact({...args, project:{...project, description}});
+   assert.equal(result.allowed, false, description);
+   assert.equal(result.reason, 'personal_contact_in_project_text');
+   assert.equal(result.payload, null);
+ }
+ for (const description of ['Mal 8 vægge på 45 m2', 'Mal 123456789 m²']) {
+   assert.equal(prepareContractorContact({...args, project:{...project, description}}).allowed, true, description);
+ }
+});
