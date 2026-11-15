@@ -179,3 +179,16 @@ test('recovery feedback never echoes the submitted email address', async () => {
     assert.match(result.messages.at(-1), /Hvis e-mailadressen er registreret/);
   }
 });
+
+
+test('provider errors containing private email and token details are not reflected in UI', async () => {
+  const address = 'private.owner+house@example.com';
+  const secret = 'recovery-token-should-never-appear';
+  const result = await run(address, async () => {
+    throw new Error(`SMTP failed for ${address}; token=${secret}`);
+  });
+  assert.equal(result.calls.length, 1);
+  assert.deepEqual(result.busy, [true, false]);
+  assert.match(result.messages.at(-1), /Hvis e-mailadressen er registreret/);
+  assert.doesNotMatch(result.messages.join(' '), /private\.owner|recovery-token-should-never-appear|SMTP failed/i);
+});
