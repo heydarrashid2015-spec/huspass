@@ -1,0 +1,28 @@
+name: Household sharing security gate
+
+on:
+  pull_request:
+    paths:
+      - 'app/page.js'
+      - 'docs/household-sharing-*.sql'
+      - 'docs/household-sharing-*.md'
+      - 'tests/household-sharing-*.test.mjs'
+      - 'package.json'
+      - '.github/workflows/household-sharing-security.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security-contract:
+    name: Household security contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify household sharing remains disabled until integration validation
+        run: npm run test:household-security
