@@ -9,6 +9,16 @@ on:
       - 'tests/household-sharing-*.test.mjs'
       - 'package.json'
       - '.github/workflows/household-sharing-security.yml'
+  push:
+    branches:
+      - 'feat/household-sharing-foundation-20261108'
+    paths:
+      - 'app/page.js'
+      - 'docs/household-sharing-*.sql'
+      - 'docs/household-sharing-*.md'
+      - 'tests/household-sharing-*.test.mjs'
+      - 'package.json'
+      - '.github/workflows/household-sharing-security.yml'
   workflow_dispatch:
 
 permissions:
