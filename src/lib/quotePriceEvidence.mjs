@@ -12,8 +12,11 @@ export function extractQuotePriceEvidence(input) {
     if (!Number.isFinite(amount) || amount <= 0 || amount > 100000000) continue;
     const end = start + match[0].length - match[0].indexOf(raw);
     const context = input.slice(Math.max(0, start - 70), Math.min(input.length, end + 70));
-    const before = input.slice(Math.max(0, start - 35), start).toLocaleLowerCase('da-DK');
-    const after = input.slice(end, Math.min(input.length, end + 24)).toLocaleLowerCase('da-DK');
+    const lineStart = input.lastIndexOf('\n', start - 1) + 1;
+    const nextBreak = input.indexOf('\n', end);
+    const lineEnd = nextBreak === -1 ? input.length : nextBreak;
+    const before = input.slice(Math.max(lineStart, start - 35), start).toLocaleLowerCase('da-DK');
+    const after = input.slice(end, Math.min(lineEnd, end + 24)).toLocaleLowerCase('da-DK');
     const vatContext = before + ' ' + after;
     const includesVat = /(?:inkl\.?|inklusive)\s*(?:25\s*%\s*)?moms|med\s+moms/u.test(vatContext);
     const excludesVat = /(?:ekskl\.?|excl\.?|eksklusive)\s*(?:25\s*%\s*)?moms|uden\s+moms/u.test(vatContext);
