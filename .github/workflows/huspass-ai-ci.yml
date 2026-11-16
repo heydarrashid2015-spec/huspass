@@ -1,6 +1,16 @@
 name: HusPass AI integration gate
 
 on:
+  # Run directly on AI feature branches even before the workflow reaches default.
+  push:
+    branches:
+      - 'huspass-ai/**'
+    paths:
+      - 'lib/**'
+      - 'src/lib/**'
+      - 'tests/**'
+      - 'package.json'
+      - '.github/workflows/huspass-ai-ci.yml'
   pull_request:
     paths:
       - 'lib/**'
