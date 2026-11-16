@@ -1,0 +1,56 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+
+/**
+ * Read-only, opt-in RLS integration test against a real Supabase project.
+ * Set SUPABASE_URL, SUPABASE_ANON_KEY, DOCUMENT_TEST_OWNER_JWT,
+ * DOCUMENT_TEST_OTHER_JWT, DOCUMENT_TEST_ID, DOCUMENT_TEST_FILE_PATH.
+ * The fixture must belong to the owner, not the other user.
+ * Never use service_role credentials here.
+ */
+const keys=["SUPABASE_URL","SUPABASE_ANON_KEY","DOCUMENT_TEST_OWNER_JWT","DOCUMENT_TEST_OTHER_JWT","DOCUMENT_TEST_ID","DOCUMENT_TEST_FILE_PATH"];
+const missing=keys.filter(key=>!process.env[key]);
+const integration=test.skipIf(missing.length>0);
+const env=process.env;
+
+function client(token){
+ const base=env.SUPABASE_URL.replace(/\\/$/,"");
+ const headers={apikey:env.SUPABASE_ANON_KEY,Authorization:`Bearer ${token}`};
+ return {
+  async row(){
+   const url=new URL(`${base}/rest/v1/documents`);
+   url.searchParams.set("id",`eq.${env.DOCUMENT_TEST_ID}`);
+   url.searchParams.set("select","id,user_id,home_id,file_path");
+   const response=await fetch(url,{headers});
+   assert.equal(response.status,200,"documents SELECT must succeed without leaking unauthorized rows");
+   return response.json();
+  },
+  async sign(){
+   const path=env.DOCUMENT_TEST_FILE_PATH.split("/").map(encodeURIComponent).join("/");
+   const response=await fetch(`${base}/storage/v1/object/sign/home-documents/${path}`,{
+    method:"POST",headers:{...headers,"Content-Type":"application/json"},
+    body:JSON.stringify({expiresIn:60})
+   });
+   const body=await response.json();
+   return {response,body};
+  }
+ };
+}
+
+integration("Supabase documents RLS and private storage reject a second authenticated user",async()=>{
+ assert.notEqual(env.DOCUMENT_TEST_OWNER_JWT,env.DOCUMENT_TEST_OTHER_JWT,"two distinct sessions required");
+ const owner=client(env.DOCUMENT_TEST_OWNER_JWT);
+ const other=client(env.DOCUMENT_TEST_OTHER_JWT);
+ const ownRows=await owner.row();
+ assert.equal(ownRows.length,1,"fixture must be visible to its owner");
+ assert.equal(ownRows[0].file_path,env.DOCUMENT_TEST_FILE_PATH,"fixture must match the stored object");
+ const otherRows=await other.row();
+ assert.deepEqual(otherRows,[],"other account must not read owner's document metadata");
+ const ownSign=await owner.sign();
+ assert.equal(ownSign.response.status,200,"owner must be able to sign their own private object");
+ assert.ok(ownSign.body.signedURL||ownSign.body.signedUrl,"owner must receive signed URL");
+ const otherSign=await other.sign();
+ assert.ok(otherSign.response.status===400||otherSign.response.status===401||otherSign.response.status===403||otherSign.response.status===404,
+  `other account must not sign owner's object (HTTP ${otherSign.response.status})`);
+ assert.ok(!otherSign.body.signedURL&&!otherSign.body.signedUrl,"other account must not receive a signed URL");
+});
