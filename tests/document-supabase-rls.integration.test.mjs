@@ -83,7 +83,7 @@ integration("Supabase documents RLS and private storage reject a second authenti
  });
  assert.equal(otherHomeResponse.status,200,"other account home listing must be RLS-filtered");
  assert.deepEqual(await otherHomeResponse.json(),[],"other account must not enumerate victim home documents");
- assert.match(otherHomeResponse.headers.get("content-range")||"",/\\/0$/,"victim home document count must not leak");
+ assert.ok((otherHomeResponse.headers.get("content-range")||"").endsWith("/0"),"victim home document count must not leak");
  // Also verify that an unauthenticated caller cannot enumerate metadata or
  // access the private object. An anon API key is not a user session.
  const base=normalizeSupabaseUrl(env.SUPABASE_URL);
