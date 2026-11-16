@@ -40,4 +40,14 @@ select 'MISSING_OR_DISABLED_RLS', required.table_name, 'RLS must be enabled'
 from (values ('homes'),('tasks'),('documents'),('home_memberships'),('home_invitations')) as required(table_name)
 left join pg_class c on c.oid = to_regclass('public.' || required.table_name)
 where c.oid is not null and not c.relrowsecurity
+
+union all
+select 'MISSING_STORAGE_RLS','storage.objects','Storage objects RLS must be enabled'
+where exists (select 1 from pg_class c where c.oid=to_regclass('storage.objects') and not c.relrowsecurity)
+union all
+select 'PUBLIC_STORAGE_READ_POLICY','storage.objects',p.policyname
+from pg_policies p
+where p.schemaname='storage' and p.tablename='objects'
+  and p.cmd in ('SELECT','ALL')
+  and (p.roles @> array['anon']::name[] or p.roles @> array['public']::name[])
 order by finding,table_name,detail;
