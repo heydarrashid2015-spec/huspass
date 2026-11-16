@@ -33,6 +33,14 @@ function client(token){
    assert.equal(response.status,200,"documents SELECT must succeed without leaking unauthorized rows");
    return response.json();
   },
+  async download(){
+   // Direct private-object access must be denied even without a signed URL.
+   const path=env.DOCUMENT_TEST_FILE_PATH.split("/").map(encodeURIComponent).join("/");
+   const response=await fetch(`${base}/storage/v1/object/authenticated/home-documents/${path}`,{headers,redirect:"manual"});
+   // Do not download or log the fixture bytes; only inspect access status.
+   if(response.body)await response.body.cancel();
+   return response.status;
+  },
   async sign(){
    const path=env.DOCUMENT_TEST_FILE_PATH.split("/").map(encodeURIComponent).join("/");
    const response=await fetch(`${base}/storage/v1/object/sign/home-documents/${path}`,{
@@ -57,6 +65,11 @@ integration("Supabase documents RLS and private storage reject a second authenti
  assert.equal(ownRows[0].file_path,env.DOCUMENT_TEST_FILE_PATH,"fixture must match the stored object");
  const otherRows=await other.row();
  assert.deepEqual(otherRows,[],"other account must not read owner's document metadata");
+ const ownerDownloadStatus=await owner.download();
+ assert.equal(ownerDownloadStatus,200,"owner must be able to read their private object directly");
+ const otherDownloadStatus=await other.download();
+ assert.ok([400,401,403,404].includes(otherDownloadStatus),
+  `other account must not download owner's private object (HTTP ${otherDownloadStatus})`);
  const ownSign=await owner.sign();
  assert.equal(ownSign.response.status,200,"owner must be able to sign their own private object");
  assert.ok(ownSign.body.signedURL||ownSign.body.signedUrl,"owner must receive signed URL");
