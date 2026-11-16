@@ -209,3 +209,24 @@ test('successful recovery feedback never exposes the new password', async () => 
   assert.deepEqual(h.state.clearedPassword, ['']);
   assert.doesNotMatch(JSON.stringify([...h.state.messages, ...h.state.notifications]), /PrivatePass987/);
 });
+
+
+test('rejected password update never exposes recovery tokens, email or password', async () => {
+  const password = 'SensitivePass987';
+  const email = 'private.owner@example.com';
+  const token = 'secret-recovery-token';
+  const h = harness(async () => {
+    throw new Error(`Recovery failed for ${email}, token=${token}, password=${password}`);
+  });
+  await h.submit(password)({ preventDefault() {} });
+  assert.equal(h.state.updates, 1);
+  assert.deepEqual(h.state.busy, [true, false]);
+  assert.equal(h.passwordRecoveryActiveRef.current, true);
+  assert.deepEqual(h.state.recovery, []);
+  assert.deepEqual(h.state.views, []);
+  assert.deepEqual(h.state.notifications, []);
+  assert.deepEqual(h.state.clearedPassword, []);
+  assert.match(h.state.messages.at(-1), /kunne ikke ændres/);
+  const feedback = JSON.stringify([...h.state.messages, ...h.state.notifications]);
+  for (const secret of [password, email, token]) assert.equal(feedback.includes(secret), false);
+});
