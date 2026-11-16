@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
  */
 const keys=["SUPABASE_URL","SUPABASE_ANON_KEY","DOCUMENT_TEST_OWNER_JWT","DOCUMENT_TEST_OTHER_JWT","DOCUMENT_TEST_ID","DOCUMENT_TEST_FILE_PATH"];
 const missing=keys.filter(key=>!process.env[key]);
+if(process.env.DOCUMENT_REQUIRE_RLS==="1"&&missing.length)throw new Error(`Required Supabase RLS integration test cannot run: missing ${missing.join(", ")}. Configure dedicated test credentials; do not use service_role.`);
 if(missing.length>0&&missing.length<keys.length)throw new Error(`Incomplete Supabase RLS test configuration: ${missing.join(", ")}`);
 const integration=(name,fn)=>test(name,{skip:missing.length===keys.length?"Supabase integration credentials not configured":false},fn);
 const env=process.env;
