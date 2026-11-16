@@ -72,6 +72,18 @@ integration("Supabase documents RLS and private storage reject a second authenti
  assert.equal(ownRows[0].file_path,env.DOCUMENT_TEST_FILE_PATH,"fixture must match the stored object");
  const otherRows=await other.row();
  assert.deepEqual(otherRows,[],"other account must not read owner's document metadata");
+ // A list endpoint filtered by the victim's home_id must not leak documents,
+ // even when an attacker knows the home identifier from another source.
+ assert.ok(ownRows[0].home_id,"fixture must include the owner's home identifier");
+ const victimHomeUrl=new URL(`${normalizeSupabaseUrl(env.SUPABASE_URL)}/rest/v1/documents`);
+ victimHomeUrl.searchParams.set("home_id",`eq.${ownRows[0].home_id}`);
+ victimHomeUrl.searchParams.set("select","id,user_id,home_id,file_path");
+ const otherHomeResponse=await fetch(victimHomeUrl,{
+  headers:{apikey:env.SUPABASE_ANON_KEY,Authorization:`Bearer ${env.DOCUMENT_TEST_OTHER_JWT}`,"Prefer":"count=exact"}
+ });
+ assert.equal(otherHomeResponse.status,200,"other account home listing must be RLS-filtered");
+ assert.deepEqual(await otherHomeResponse.json(),[],"other account must not enumerate victim home documents");
+ assert.match(otherHomeResponse.headers.get("content-range")||"",/\\/0$/,"victim home document count must not leak");
  // Also verify that an unauthenticated caller cannot enumerate metadata or
  // access the private object. An anon API key is not a user session.
  const base=normalizeSupabaseUrl(env.SUPABASE_URL);
