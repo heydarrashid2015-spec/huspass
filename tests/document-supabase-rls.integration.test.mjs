@@ -10,13 +10,21 @@ import assert from "node:assert/strict";
  */
 const keys=["SUPABASE_URL","SUPABASE_ANON_KEY","DOCUMENT_TEST_OWNER_JWT","DOCUMENT_TEST_OTHER_JWT","DOCUMENT_TEST_ID","DOCUMENT_TEST_FILE_PATH"];
 const missing=keys.filter(key=>!process.env[key]);
-const integration=test.skipIf(missing.length>0);
+if(missing.length>0&&missing.length<keys.length)throw new Error(`Incomplete Supabase RLS test configuration: ${missing.join(", ")}`);
+const integration=test.skipIf(missing.length===keys.length);
 const env=process.env;
 
 function client(token){
  const base=env.SUPABASE_URL.replace(/\\/$/,"");
  const headers={apikey:env.SUPABASE_ANON_KEY,Authorization:`Bearer ${token}`};
  return {
+  async identity(){
+   const response=await fetch(`${base}/auth/v1/user`,{headers});
+   assert.equal(response.status,200,"test JWT must authenticate successfully");
+   const user=await response.json();
+   assert.ok(user.id,"authenticated user must have a stable id");
+   return user.id;
+  },
   async row(){
    const url=new URL(`${base}/rest/v1/documents`);
    url.searchParams.set("id",`eq.${env.DOCUMENT_TEST_ID}`);
@@ -41,7 +49,10 @@ integration("Supabase documents RLS and private storage reject a second authenti
  assert.notEqual(env.DOCUMENT_TEST_OWNER_JWT,env.DOCUMENT_TEST_OTHER_JWT,"two distinct sessions required");
  const owner=client(env.DOCUMENT_TEST_OWNER_JWT);
  const other=client(env.DOCUMENT_TEST_OTHER_JWT);
+ const [ownerId,otherId]=await Promise.all([owner.identity(),other.identity()]);
+ assert.notEqual(ownerId,otherId,"JWTs must belong to distinct Supabase users, not just different sessions");
  const ownRows=await owner.row();
+ assert.equal(ownRows[0]?.user_id,ownerId,"fixture owner must match authenticated owner JWT");
  assert.equal(ownRows.length,1,"fixture must be visible to its owner");
  assert.equal(ownRows[0].file_path,env.DOCUMENT_TEST_FILE_PATH,"fixture must match the stored object");
  const otherRows=await other.row();
