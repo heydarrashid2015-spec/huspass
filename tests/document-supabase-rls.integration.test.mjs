@@ -14,8 +14,15 @@ if(missing.length>0&&missing.length<keys.length)throw new Error(`Incomplete Supa
 const integration=test.skipIf(missing.length===keys.length);
 const env=process.env;
 
+// Supabase project URLs may be configured with one or more trailing slashes.
+// Normalize them before constructing Auth, REST, and Storage endpoints.
+export function normalizeSupabaseUrl(url){return url.replace(/\/+$/,"");}
+test("Supabase integration URLs normalize trailing slashes",()=>{
+ assert.equal(normalizeSupabaseUrl("https://example.supabase.co///"),"https://example.supabase.co");
+ assert.equal(normalizeSupabaseUrl("https://example.supabase.co"),"https://example.supabase.co");
+});
 function client(token){
- const base=env.SUPABASE_URL.replace(/\\/$/,"");
+ const base=normalizeSupabaseUrl(env.SUPABASE_URL);
  const headers={apikey:env.SUPABASE_ANON_KEY,Authorization:`Bearer ${token}`};
  return {
   async identity(){
