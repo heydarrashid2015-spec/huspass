@@ -445,3 +445,10 @@ test("OCR-split forfaldsdato must not become purchase date",()=>{
  const r=parseDanishDocumentText("Kvittering\nForfaldsdato\n30.11.2026");
  assert.equal(r.documentDate,null);
 });
+
+// An invalid explicitly labelled total must not be ignored when another total parses.
+test("rejects mixed valid total and malformed colon-labelled total",()=>{
+ const r=parseDanishDocumentText("Faktura\nTotal: 1.250,00\nAt betale: ukendt");
+ assert.equal(r.amount,null);
+ assert.equal(r.requiresReview,true);
+});
