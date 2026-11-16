@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { validateQuoteEvidence } from '../lib/ai-quote-evidence.mjs';
+const valid = () => ({ ownerId: 'owner-a', projectId: 'project-a', contractorId: 'cvr-12345678', documentId: 'private-doc', sourceType: 'contractor_document', currency: 'DKK', totalPrice: '12500.50' });
+const check = q => validateQuoteEvidence(q, { ownerId: 'owner-a', projectId: 'project-a' });
+test('accepts explicitly scoped documented price', () => { assert.deepEqual(check(valid()), { accepted: true, errors: [], price: 12500.5 }); });
+test('rejects cross-owner and cross-project evidence', () => { for (const key of ['ownerId', 'projectId']) { const q = valid(); q[key] = 'other'; assert.equal(check(q).accepted, false); } });
+test('rejects missing provenance and source claims', () => { for (const key of ['documentId', 'sourceType', 'contractorId']) { const q = valid(); delete q[key]; assert.equal(check(q).accepted, false); } });
+test('rejects coercion and fabricated price representations', () => { for (const totalPrice of [null, '', '1e5', '-1', '1,000', Infinity, NaN, {}, '1.234']) { assert.equal(check({ ...valid(), totalPrice }).accepted, false); } });
+test('rejects inherited and accessor evidence', () => { assert.equal(check(Object.create(valid())).accepted, false); const q = valid(); Object.defineProperty(q, 'totalPrice', { get() { throw new Error('must not execute'); } }); assert.deepEqual(check(q), { accepted: false, errors: ['invalid_record'], price: null }); });
+test('rejects array and custom prototype records', () => { assert.equal(check([]).accepted, false); assert.equal(check(new (class Quote {})()).accepted, false); });
