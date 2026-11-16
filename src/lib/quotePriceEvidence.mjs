@@ -7,6 +7,9 @@ export function extractQuotePriceEvidence(input) {
   for (const match of input.matchAll(re)) {
     const raw = match[1];
     const start = match.index + match[0].indexOf(raw);
+    // Do not extract a numeric suffix from malformed decimal/thousands text.
+    // For example, '12.34 kr' must not become a fabricated '34 kr' quote.
+    if (start > 0 && /[\d.,]/u.test(input[start - 1])) continue;
     // A negative amount is not a valid contractor quote. Check the complete
     // prefix, including whitespace and common Unicode minus signs, rather
     // than only the character immediately before the digits.
