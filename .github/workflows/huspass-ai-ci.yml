@@ -1,0 +1,42 @@
+name: HusPass AI integration gate
+
+on:
+  # Run directly on AI feature branches even before the workflow reaches default.
+  push:
+    branches:
+      - 'huspass-ai/**'
+    paths:
+      - 'lib/**'
+      - 'src/lib/**'
+      - 'tests/**'
+      - 'package.json'
+      - '.github/workflows/huspass-ai-ci.yml'
+  pull_request:
+    paths:
+      - 'lib/**'
+      - 'src/lib/**'
+      - 'tests/**'
+      - 'package.json'
+      - '.github/workflows/huspass-ai-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ai-unit-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Validate JavaScript syntax
+        run: find lib src/lib tests -type f -name '*.mjs' -print0 | xargs -0 -r -n 1 node --check
+      - name: Run AI and contractor regression tests
+        run: find lib src/lib tests -type f -name '*.test.mjs' -print0 | xargs -0 -r node --test
+      - name: Build Next.js
+        run: npm run build
