@@ -11,7 +11,7 @@ import assert from "node:assert/strict";
 const keys=["SUPABASE_URL","SUPABASE_ANON_KEY","DOCUMENT_TEST_OWNER_JWT","DOCUMENT_TEST_OTHER_JWT","DOCUMENT_TEST_ID","DOCUMENT_TEST_FILE_PATH"];
 const missing=keys.filter(key=>!process.env[key]);
 if(missing.length>0&&missing.length<keys.length)throw new Error(`Incomplete Supabase RLS test configuration: ${missing.join(", ")}`);
-const integration=test.skipIf(missing.length===keys.length);
+const integration=(name,fn)=>test(name,{skip:missing.length===keys.length?"Supabase integration credentials not configured":false},fn);
 const env=process.env;
 
 // Supabase project URLs may be configured with one or more trailing slashes.
