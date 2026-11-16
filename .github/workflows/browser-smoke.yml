@@ -29,3 +29,22 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 7
+
+  supabase-rls:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      DOCUMENT_REQUIRE_RLS: '1'
+      SUPABASE_URL: ${{ secrets.DOCUMENT_TEST_SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.DOCUMENT_TEST_SUPABASE_ANON_KEY }}
+      DOCUMENT_TEST_OWNER_JWT: ${{ secrets.DOCUMENT_TEST_OWNER_JWT }}
+      DOCUMENT_TEST_OTHER_JWT: ${{ secrets.DOCUMENT_TEST_OTHER_JWT }}
+      DOCUMENT_TEST_ID: ${{ secrets.DOCUMENT_TEST_ID }}
+      DOCUMENT_TEST_FILE_PATH: ${{ secrets.DOCUMENT_TEST_FILE_PATH }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/document-supabase-rls.integration.test.mjs
