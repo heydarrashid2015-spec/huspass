@@ -55,3 +55,15 @@ test('failed email recovery never touches housing tables or document storage', a
     assert.doesNotMatch(messages.join(' '), /User not found|SMTP provider unavailable/i);
   }
 });
+
+
+test('password update handler cannot mutate housing tables or document storage', () => {
+  const start = source.indexOf('<h1>Ny adgangskode</h1>');
+  const end = source.indexOf('<label>Ny adgangskode', start);
+  assert.ok(start >= 0 && end > start, 'password update form exists');
+  const form = source.slice(start, end);
+  const handler = form.match(/onSubmit=\\{(async e=>\\{[\\s\\S]*?\\})\\}>/);
+  assert.ok(handler, 'password update handler exists');
+  assert.match(handler[1], /supabase\\.auth\\.updateUser\\(/);
+  assert.doesNotMatch(handler[1], /supabase\\.from\\(|supabase\\.storage|\\.remove\\(|\\.delete\\(|signOut\\(|deleteUser\\(/);
+});
