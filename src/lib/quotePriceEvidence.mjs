@@ -39,7 +39,7 @@ export function extractQuotePriceEvidence(input) {
       end,
       context,
       vatStatus: includesVat && !excludesVat ? 'included' : excludesVat && !includesVat ? 'excluded' : 'unknown',
-      isTotal: /(?:samlet|total|i alt|tilbudssum)\s*:?\s*$/u.test(before.trim()),
+      isTotal: amountsOnLine === 1 && /(?:samlet|total|i alt|tilbudssum)\s*:?\s*$/u.test(before.trim()),
       source: 'contractor_text'
     });
   }
