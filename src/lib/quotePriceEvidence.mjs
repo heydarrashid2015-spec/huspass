@@ -7,7 +7,12 @@ export function extractQuotePriceEvidence(input) {
   for (const match of input.matchAll(re)) {
     const raw = match[1];
     const start = match.index + match[0].indexOf(raw);
-    if (start > 0 && input[start - 1] === '-') continue;
+    // A negative amount is not a valid contractor quote. Check the complete
+    // prefix, including whitespace and common Unicode minus signs, rather
+    // than only the character immediately before the digits.
+    const lineStartForSign = input.lastIndexOf('\n', start - 1) + 1;
+    const prefix = input.slice(lineStartForSign, start);
+    if (/[\-\u2212\u2013\u2014]\s*$/u.test(prefix)) continue;
     const amount = Number(raw.replace(/[. ]/g, '').replace(',', '.'));
     if (!Number.isFinite(amount) || amount <= 0 || amount > 100000000) continue;
     const end = start + match[0].length - match[0].indexOf(raw);
