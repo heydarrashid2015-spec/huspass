@@ -25,7 +25,10 @@ export function extractQuotePriceEvidence(input) {
     const lineEnd = nextBreak === -1 ? input.length : nextBreak;
     const before = input.slice(Math.max(lineStart, start - 35), start).toLocaleLowerCase('da-DK');
     const after = input.slice(end, Math.min(lineEnd, end + 24)).toLocaleLowerCase('da-DK');
-    // When a line contains multiple amounts, proximity alone cannot prove which\n    // amount a VAT label belongs to. Preserve uncertainty rather than guessing.\n    const lineText = input.slice(lineStart, lineEnd);\n    const amountsOnLine = [...lineText.matchAll(/(?:\\d{1,3}(?:[. ]\\d{3})+|\\d+)(?:,\\d{1,2})?\\s*(?:kr\\.?|dkk)\\b/giu)].length;\n    const vatContext = amountsOnLine === 1 ? before + ' ' + after : '';
+    // VAT evidence is ambiguous when more than one price occurs on a line.
+    const lineText = input.slice(lineStart, lineEnd);
+    const amountsOnLine = [...lineText.matchAll(/(?:\d{1,3}(?:[. ]\d{3})+|\d+)(?:,\d{1,2})?\s*(?:kr\.?|dkk)\b/giu)].length;
+    const vatContext = amountsOnLine === 1 ? before + ' ' + after : '';
     const includesVat = /(?:inkl\.?|inklusive)\s*(?:25\s*%\s*)?moms|med\s+moms/u.test(vatContext);
     const excludesVat = /(?:ekskl\.?|excl\.?|eksklusive)\s*(?:25\s*%\s*)?moms|uden\s+moms/u.test(vatContext);
     results.push({
