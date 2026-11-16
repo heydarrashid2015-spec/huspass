@@ -34,5 +34,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install dependencies reproducibly
+        run: npm ci
       - name: Verify household sharing remains disabled until integration validation
         run: npm run test:household-security
+      - name: Build Next.js application
+        run: npm run build
