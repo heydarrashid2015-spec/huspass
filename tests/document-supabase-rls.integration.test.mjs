@@ -72,6 +72,21 @@ integration("Supabase documents RLS and private storage reject a second authenti
  assert.equal(ownRows[0].file_path,env.DOCUMENT_TEST_FILE_PATH,"fixture must match the stored object");
  const otherRows=await other.row();
  assert.deepEqual(otherRows,[],"other account must not read owner's document metadata");
+ // Also verify that an unauthenticated caller cannot enumerate metadata or
+ // access the private object. An anon API key is not a user session.
+ const base=normalizeSupabaseUrl(env.SUPABASE_URL);
+ const anonymousHeaders={apikey:env.SUPABASE_ANON_KEY,Authorization:`Bearer ${env.SUPABASE_ANON_KEY}`};
+ const anonymousUrl=new URL(`${base}/rest/v1/documents`);
+ anonymousUrl.searchParams.set("id",`eq.${env.DOCUMENT_TEST_ID}`);
+ anonymousUrl.searchParams.set("select","id,user_id,home_id,file_path");
+ const anonymousRowsResponse=await fetch(anonymousUrl,{headers:anonymousHeaders});
+ assert.equal(anonymousRowsResponse.status,200,"anonymous documents SELECT should be RLS-filtered");
+ assert.deepEqual(await anonymousRowsResponse.json(),[],"anonymous caller must not read document metadata");
+ const encodedPath=env.DOCUMENT_TEST_FILE_PATH.split("/").map(encodeURIComponent).join("/");
+ const anonymousObjectResponse=await fetch(`${base}/storage/v1/object/authenticated/home-documents/${encodedPath}`,{headers:anonymousHeaders,redirect:"manual"});
+ if(anonymousObjectResponse.body)await anonymousObjectResponse.body.cancel();
+ assert.ok([400,401,403,404].includes(anonymousObjectResponse.status),
+  `anonymous caller must not download owner's private object (HTTP ${anonymousObjectResponse.status})`);
  const ownerDownloadStatus=await owner.download();
  assert.equal(ownerDownloadStatus,200,"owner must be able to read their private object directly");
  const otherDownloadStatus=await other.download();
