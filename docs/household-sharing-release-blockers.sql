@@ -57,6 +57,24 @@ where to_regclass('public.' || required.table_name) is not null
  )
 
 union all
+-- Conservative release gate: shared document reads must be explicitly membership-scoped.
+-- This text-based audit cannot prove the policy is secure; integration tests remain mandatory.
+select 'MISSING_SHARED_DOCUMENT_READ_POLICY','documents','No membership-scoped document SELECT policy found'
+where not exists (
+ select 1 from pg_policies p
+ where p.schemaname='public' and p.tablename='documents' and p.cmd in ('SELECT','ALL')
+ and (coalesce(p.qual,'') ilike '%household_can_access%'
+      or coalesce(p.qual,'') ilike '%home_memberships%')
+)
+union all
+select 'MISSING_MEMBERSHIP_SCOPED_STORAGE_READ_POLICY','storage.objects','No membership-scoped Storage SELECT policy found'
+where to_regclass('storage.objects') is not null and not exists (
+ select 1 from pg_policies p
+ where p.schemaname='storage' and p.tablename='objects' and p.cmd in ('SELECT','ALL')
+ and (coalesce(p.qual,'') ilike '%household_can_access%'
+      or coalesce(p.qual,'') ilike '%home_memberships%')
+)
+union all
 select 'MISSING_STORAGE_OBJECTS_TABLE','storage.objects','Storage objects table absent; cannot validate file access'
 where to_regclass('storage.objects') is null
 union all
