@@ -29,7 +29,7 @@ export function canContactContractor({ consent, customerId, homeId, contractorCv
   // IDs must be canonical, nonempty values; whitespace/control characters cannot authorize outreach.
   if (typeof customerId !== 'string' || !customerId || customerId !== customerId.trim() || /[\u0000-\u001f\u007f]/u.test(customerId)) return false;
   if (typeof homeId !== 'string' || !homeId || homeId !== homeId.trim() || /[\u0000-\u001f\u007f]/u.test(homeId)) return false;
-  if (!/^\d{8}$/.test(String(contractorCvr || ''))) return false;
+  if (typeof contractorCvr !== 'string' || !/^\d{8}$/.test(contractorCvr)) return false;
   if ((consent.revoked !== undefined && consent.revoked !== false) || consent.approved !== true) return false;
   if (consent.customerId !== customerId || consent.homeId !== homeId) return false;
   if (consent.contractorCvr !== String(contractorCvr)) return false;
