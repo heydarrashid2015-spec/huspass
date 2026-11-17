@@ -42,6 +42,9 @@ left join pg_class c on c.oid = to_regclass('public.' || required.table_name)
 where c.oid is not null and not c.relrowsecurity
 
 union all
+select 'MISSING_STORAGE_OBJECTS_TABLE','storage.objects','Storage objects table absent; cannot validate file access'
+where to_regclass('storage.objects') is null
+union all
 select 'MISSING_STORAGE_RLS','storage.objects','Storage objects RLS must be enabled'
 where exists (select 1 from pg_class c where c.oid=to_regclass('storage.objects') and not c.relrowsecurity)
 union all
