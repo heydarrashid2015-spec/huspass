@@ -23,7 +23,7 @@ export function canContactContractor({ consent, customerId, homeId, contractorCv
   if (prototype !== Object.prototype && prototype !== null) return false;
   if (typeof customerId !== 'string' || !customerId || typeof homeId !== 'string' || !homeId) return false;
   if (!/^\d{8}$/.test(String(contractorCvr || ''))) return false;
-  if (consent.revoked === true || consent.approved !== true) return false;
+  if ((consent.revoked !== undefined && consent.revoked !== false) || consent.approved !== true) return false;
   if (consent.customerId !== customerId || consent.homeId !== homeId) return false;
   if (consent.contractorCvr !== String(contractorCvr)) return false;
   if (consent.purpose !== 'request_quote') return false;
