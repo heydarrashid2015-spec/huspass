@@ -137,7 +137,7 @@ test('release blocker audits private household storage bucket configuration', ()
 });
 
 test('release blocker requires membership-scoped home and task read policies', () => {
-  const sql = read('docs/household-sharing-release-blockers.sql').replace(/--[^\\n]*/g, '');
+  const sql = read('docs/household-sharing-release-blockers.sql').replace(/--[^\n]*/g, '');
   assert.match(sql, /MISSING_MEMBERSHIP_SCOPED_HOME_READ_POLICY/);
   assert.match(sql, /MISSING_MEMBERSHIP_SCOPED_TASK_READ_POLICY/);
   for (const table of ['homes', 'tasks']) {
