@@ -16,6 +16,9 @@ export function extractQuotePriceEvidence(input) {
     const lineStartForSign = input.lastIndexOf('\n', start - 1) + 1;
     const prefix = input.slice(lineStartForSign, start);
     if (/[\-\u2212\u2013\u2014]\s*$/u.test(prefix)) continue;
+    // Parenthesized currency amounts can denote deductions; never treat them as quotes.
+    const currencyEnd = start + match[0].length - match[0].indexOf(raw);
+    if (/\(\s*$/u.test(prefix) && /^\s*\)/u.test(input.slice(currencyEnd))) continue;
     const amount = Number(raw.replace(/[. ]/g, '').replace(',', '.'));
     if (!Number.isFinite(amount) || amount <= 0 || amount > 100000000) continue;
     const end = start + match[0].length - match[0].indexOf(raw);
