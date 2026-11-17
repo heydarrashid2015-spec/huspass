@@ -8,6 +8,7 @@ on:
       - 'docs/household-sharing-*.md'
       - 'tests/household-sharing-*.test.mjs'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/household-sharing-security.yml'
   push:
     branches:
@@ -18,6 +19,7 @@ on:
       - 'docs/household-sharing-*.md'
       - 'tests/household-sharing-*.test.mjs'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/household-sharing-security.yml'
   workflow_dispatch:
 
