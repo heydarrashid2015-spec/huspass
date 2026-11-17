@@ -4,7 +4,7 @@
 // Date.parse alone accepts local dates and normalizes invalid calendar dates.
 function parseConsentTimestamp(value) {
   if (typeof value !== 'string') return NaN;
-  const match = /^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(?:\\.\\d{1,3})?(Z|[+-]\\d{2}:\\d{2})$/.exec(value);
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,3})?(Z|[+-]\d{2}:\d{2})$/.exec(value);
   if (!match) return NaN;
   const [, year, month, day, hour, minute, second, zone] = match;
   const offsetHour = zone === 'Z' ? 0 : Number(zone.slice(1, 3));
