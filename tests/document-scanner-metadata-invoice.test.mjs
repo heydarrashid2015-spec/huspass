@@ -11,3 +11,7 @@ test("scanner watermark, bare invoice heading and scanner date still require OCR
 test("actual invoice data preserves searchable PDF text",()=>{
  assert.equal(needsPdfPageOcr("Scanned with CamScanner\nFaktura\nNord El ApS\nTotal: 1.250,00\nFakturadato: 05.11.2026"),false);
 });
+
+test("scanner metadata with a bare moms label but no monetary amounts still requires OCR",()=>{
+ assert.equal(needsPdfPageOcr("Scanned with CamScanner\nFaktura\nNord El ApS\nCVR: 12345678\nMoms\nFakturadato: 05.11.2026"),true);
+});
