@@ -7,10 +7,10 @@ const base = { consent, customerId: 'owner', homeId: 'home', contractorCvr: '123
 
 test('canonical owner and home identifiers authorize only matching consent', () => {
   assert.equal(canContactContractor(base), true);
-  for (const id of [' owner', 'owner ', 'owner\\n', '\\towner', '']) {
+  for (const id of [' owner', 'owner ', 'owner\n', '\towner', '']) {
     assert.equal(canContactContractor({ ...base, customerId: id, consent: { ...consent, customerId: id } }), false);
   }
-  for (const id of [' home', 'home ', 'home\\r', '\\thome', '']) {
+  for (const id of [' home', 'home ', 'home\r', '\thome', '']) {
     assert.equal(canContactContractor({ ...base, homeId: id, consent: { ...consent, homeId: id } }), false);
   }
 });
