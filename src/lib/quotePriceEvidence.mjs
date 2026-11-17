@@ -18,6 +18,9 @@ export function extractQuotePriceEvidence(input) {
     const lineStartForSign = input.lastIndexOf('\n', start - 1) + 1;
     const prefix = input.slice(lineStartForSign, start);
     if (/[\-\u2212\u2013\u2014\uFE63\uFF0D]\s*$/u.test(prefix)) continue;
+    // Explicit discount or subtraction labels are not payable quote prices.
+    // Limit this check to the nearest phrase, not unrelated earlier lines.
+    if (/(?:^|[;:,\s])(?:rabat|fradrag|minus|besparelse)\s*(?:på|af|:)?\s*$/iu.test(prefix)) continue;
     // Parenthesized currency amounts can denote deductions; never treat them as quotes.
     const currencyEnd = start + match[0].length - match[0].indexOf(raw);
     if (/\(\s*$/u.test(prefix) && /^\s*\)/u.test(input.slice(currencyEnd))) continue;
