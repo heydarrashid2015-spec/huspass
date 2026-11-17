@@ -60,3 +60,12 @@ test('accepts an exact RFC3339 UTC timestamp and rejects escaped digit literals'
   assert.equal(check({...valid, approvedAt: 'dddd-11-17T07:00:00Z'}), false);
   assert.equal(check({...valid, approvedAt: '2026-11-17T07:00:00.123Z'}), true);
 });
+
+
+test('rejects malformed revocation flags instead of treating them as consent', () => {
+  for (const revoked of ['true', 'false', 1, 0, null, {}, []]) {
+    assert.equal(check({...valid, revoked}), false, String(revoked));
+  }
+  assert.equal(check({...valid, revoked: false}), true);
+  assert.equal(check(valid), true); // Legacy records without a revocation flag remain supported.
+});
