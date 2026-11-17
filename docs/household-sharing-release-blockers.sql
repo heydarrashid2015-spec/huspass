@@ -48,6 +48,14 @@ union all
 select 'MISSING_STORAGE_RLS','storage.objects','Storage objects RLS must be enabled'
 where exists (select 1 from pg_class c where c.oid=to_regclass('storage.objects') and not c.relrowsecurity)
 union all
+select 'MISSING_PRIVATE_STORAGE_BUCKET', required.bucket_id, 'Required private bucket is missing'
+from (values ('home-documents'),('home-images')) as required(bucket_id)
+where not exists (select 1 from storage.buckets b where b.id=required.bucket_id)
+union all
+select 'PUBLIC_HOUSEHOLD_STORAGE_BUCKET', b.id, 'Public bucket bypasses private object access expectations'
+from storage.buckets b
+where b.id in ('home-documents','home-images') and b.public is true
+union all
 select 'PUBLIC_STORAGE_READ_POLICY','storage.objects',p.policyname
 from pg_policies p
 where p.schemaname='storage' and p.tablename='objects'
