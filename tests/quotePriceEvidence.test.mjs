@@ -24,3 +24,13 @@ test('rejects unpriced, negative, malformed and excessive input', () => {
  assert.deepEqual(extractQuotePriceEvidence('x'.repeat(50001)), []);
  assert.deepEqual(extractQuotePriceEvidence(null), []);
 });
+
+test('VAT is attributed to each price on the same line, not discarded', () => {
+ const rows = extractQuotePriceEvidence('Samlet: 12.500,50 kr inkl. moms. Materialer 2.000 DKK ekskl. moms.');
+ assert.deepEqual(rows.map(row => row.vatStatus), ['included', 'excluded']);
+});
+
+test('VAT from the next quote must not leak backwards', () => {
+ const rows = extractQuotePriceEvidence('Arbejde 900 kr Materialer 2.000 kr ekskl. moms');
+ assert.deepEqual(rows.map(row => row.vatStatus), ['unknown', 'excluded']);
+});
