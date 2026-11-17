@@ -3,7 +3,7 @@
 export function canContactContractor({ consent, customerId, homeId, contractorCvr, now = Date.now() } = {}) {
   if (!consent || typeof consent !== 'object') return false;
   if (typeof customerId !== 'string' || !customerId || typeof homeId !== 'string' || !homeId) return false;
-  if (!/^\\d{8}$/.test(String(contractorCvr || ''))) return false;
+  if (!/^\d{8}$/.test(String(contractorCvr || ''))) return false;
   if (consent.revoked === true || consent.approved !== true) return false;
   if (consent.customerId !== customerId || consent.homeId !== homeId) return false;
   if (consent.contractorCvr !== String(contractorCvr)) return false;
