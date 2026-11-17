@@ -40,7 +40,7 @@ export function extractQuotePriceEvidence(input) {
     // written immediately after this amount and before the next price.
     // Never borrow a VAT marker from a neighbouring amount.
     const following = lineText.slice(end - lineStart);
-    const nextAmount = /(?:\\d{1,3}(?:[. \\u00a0\\u202f]\\d{3})+|\\d+)(?:,\\d{1,2})?\\s*(?:kr\\.?|dkk)\\b/iu.exec(following);
+    const nextAmount = /(?:\d{1,3}(?:[. \u00a0\u202f]\d{3})+|\d+)(?:,\d{1,2})?\s*(?:kr\.?|dkk)\b/iu.exec(following);
     const localAfter = (nextAmount ? following.slice(0, nextAmount.index) : following)
       .slice(0, 45).toLocaleLowerCase('da-DK');
     const vatContext = amountsOnLine === 1 ? before + ' ' + after : localAfter;

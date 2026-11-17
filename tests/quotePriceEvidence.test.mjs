@@ -34,3 +34,9 @@ test('VAT from the next quote must not leak backwards', () => {
  const rows = extractQuotePriceEvidence('Arbejde 900 kr Materialer 2.000 kr ekskl. moms');
  assert.deepEqual(rows.map(row => row.vatStatus), ['unknown', 'excluded']);
 });
+
+test('three amounts on one line keep VAT markers local to each price', () => {
+ const rows = extractQuotePriceEvidence('Arbejde 900 kr Materialer 2.000 kr ekskl. moms. Samlet 3.625 kr inkl. moms.');
+ assert.deepEqual(rows.map(row => row.amountDkk), [900, 2000, 3625]);
+ assert.deepEqual(rows.map(row => row.vatStatus), ['unknown', 'excluded', 'included']);
+});
