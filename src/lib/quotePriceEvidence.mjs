@@ -43,7 +43,14 @@ export function extractQuotePriceEvidence(input) {
     const nextAmount = /(?:\d{1,3}(?:[. \u00a0\u202f]\d{3})+|\d+)(?:,\d{1,2})?\s*(?:kr\.?|dkk)\b/iu.exec(following);
     const localAfter = (nextAmount ? following.slice(0, nextAmount.index) : following)
       .slice(0, 45).toLocaleLowerCase('da-DK');
-    const vatContext = amountsOnLine === 1 ? before + ' ' + after : localAfter;
+    // A VAT marker *before* a price is attributable only when its own
+    // semicolon-delimited clause starts with that marker. A marker following
+    // the preceding price must never spill into the next price.
+    const clauseStart = lineText.lastIndexOf(';', start - lineStart - 1);
+    const clauseBefore = lineText.slice(clauseStart + 1, start - lineStart).trim().toLocaleLowerCase('da-DK');
+    const prefixedVat = /^(?:(?:inkl\\.?|inklusive|ekskl\\.?|excl\\.?|eksklusive)\\s*(?:25\\s*%\\s*)?moms|(?:med|uden)\\s+moms)\\s*:?\\s*$/u.test(clauseBefore)
+      ? clauseBefore : '';
+    const vatContext = amountsOnLine === 1 ? before + ' ' + after : localAfter + ' ' + prefixedVat;
     const includesVat = /(?:inkl\.?|inklusive)\s*(?:25\s*%\s*)?moms|med\s+moms/u.test(vatContext);
     const excludesVat = /(?:ekskl\.?|excl\.?|eksklusive)\s*(?:25\s*%\s*)?moms|uden\s+moms/u.test(vatContext);
     results.push({
