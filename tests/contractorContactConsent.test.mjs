@@ -33,3 +33,13 @@ test('rejects expired, future, malformed and unbounded consent', () => {
   assert.equal(check({...valid, expiresAt: undefined}), false);
   assert.equal(check({...valid, approvedAt: 'invalid'}), false);
 });
+
+test('rejects consent whose expiry precedes or equals its approval', () => {
+  assert.equal(check({...valid, approvedAt: '2026-11-17T07:00:00Z', expiresAt: '2026-11-17T06:00:00Z'}, {now: Date.parse('2026-11-17T05:00:00Z')}), false);
+  assert.equal(check({...valid, expiresAt: valid.approvedAt}, {now: Date.parse('2026-11-17T06:00:00Z')}), false);
+});
+test('accepts only plain consent records, not arrays or class instances', () => {
+  assert.equal(check([valid]), false);
+  assert.equal(check(Object.assign(new (class Consent {})(), valid)), false);
+  assert.equal(check(Object.assign(Object.create(null), valid)), true);
+});
