@@ -126,11 +126,11 @@ test('release blocker requires row-level ownership triggers rather than statemen
 });
 
 test('release blocker audits private household storage bucket configuration', () => {
-  const sql = read('docs/household-sharing-release-blockers.sql').replace(/--[^\\n]*/g, '');
+  const sql = read('docs/household-sharing-release-blockers.sql').replace(/--[^\n]*/g, '');
   assert.match(sql, /MISSING_PRIVATE_STORAGE_BUCKET/);
   assert.match(sql, /PUBLIC_HOUSEHOLD_STORAGE_BUCKET/);
-  assert.match(sql, /from\\s+storage\\.buckets/i);
-  assert.match(sql, /b\\.public\\s+is\\s+true/i);
+  assert.match(sql, /from\s+storage\.buckets/i);
+  assert.match(sql, /b\.public\s+is\s+true/i);
   for (const bucket of ['home-documents', 'home-images']) {
     assert.match(sql, new RegExp("'" + bucket + "'"));
   }
