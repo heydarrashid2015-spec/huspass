@@ -52,7 +52,9 @@ export function extractQuotePriceEvidence(input) {
       ? clauseBefore : '';
     const vatContext = amountsOnLine === 1 ? before + ' ' + after : localAfter + ' ' + prefixedVat;
     // A negated inclusion is not evidence that VAT is included.
-    // Preserve unknown rather than inferring an excluded total from negation.\n    const negatedInclusion = /\b(?:ikke|ej)\s+(?:(?:inkl\.?|inklusive)\s*(?:25\s*%\s*)?moms|med\s+moms)\b/u.test(vatContext);\n    const includesVat = !negatedInclusion && /(?:inkl\.?|inklusive)\s*(?:25\s*%\s*)?moms|med\s+moms/u.test(vatContext);
+    // Preserve unknown rather than inferring an excluded total from negation.
+    const negatedInclusion = /\b(?:ikke|ej)\s+(?:(?:inkl\.?|inklusive)\s*(?:25\s*%\s*)?moms|med\s+moms)\b/u.test(vatContext);
+    const includesVat = !negatedInclusion && /(?:inkl\.?|inklusive)\s*(?:25\s*%\s*)?moms|med\s+moms/u.test(vatContext);
     const excludesVat = /(?:ekskl\.?|excl\.?|eksklusive)\s*(?:25\s*%\s*)?moms|uden\s+moms/u.test(vatContext);
     results.push({
       amountDkk: amount,
