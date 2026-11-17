@@ -23,3 +23,9 @@ test('raster dimensions reject invalid inputs and cap allocation', () => {
 test('PDF glyph runs retain split monetary punctuation', () => {
   assert.match(extractPdfPageText([{str:'Total: 1.'},{str:'250,00',hasEOL:true}]), /1\.250,00/);
 });
+
+test('metadata-only invoice text layer without scanner watermark triggers image OCR', () => {
+  assert.equal(needsPdfPageOcr('Faktura\nDato: 12.11.2026\nCVR: 12345678\nSide 1'), true);
+  assert.equal(needsPdfPageOcr('Kvittering\nKøbsdato: 12.11.2026\nButik ApS'), false);
+  assert.equal(needsPdfPageOcr('Faktura\nDato: 12.11.2026\nCVR: 12345678\nI alt: 1.250,00'), false);
+});
