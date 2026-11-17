@@ -21,6 +21,11 @@ export function canContactContractor({ consent, customerId, homeId, contractorCv
   // Authorization must come from a plain persisted record, never a class instance.
   const prototype = Object.getPrototypeOf(consent);
   if (prototype !== Object.prototype && prototype !== null) return false;
+  // Reject prototype-inherited authorization fields, including polluted Object.prototype.
+  for (const field of ['approved', 'customerId', 'homeId', 'contractorCvr', 'purpose', 'approvedAt', 'expiresAt']) {
+    if (!Object.hasOwn(consent, field)) return false;
+  }
+  if (Object.hasOwn(consent, 'revoked') && consent.revoked !== false) return false;
   if (typeof customerId !== 'string' || !customerId || typeof homeId !== 'string' || !homeId) return false;
   if (!/^\d{8}$/.test(String(contractorCvr || ''))) return false;
   if ((consent.revoked !== undefined && consent.revoked !== false) || consent.approved !== true) return false;
