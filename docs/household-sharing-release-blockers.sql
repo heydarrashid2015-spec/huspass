@@ -39,7 +39,7 @@ union all
 select 'MISSING_OR_DISABLED_RLS', required.table_name, 'RLS must be enabled'
 from (values ('homes'),('tasks'),('documents'),('home_memberships'),('home_invitations')) as required(table_name)
 left join pg_class c on c.oid = to_regclass('public.' || required.table_name)
-where c.oid is not null and not c.relrowsecurity
+where c.oid is null or not c.relrowsecurity
 
 union all
 select 'MISSING_STORAGE_OBJECTS_TABLE','storage.objects','Storage objects table absent; cannot validate file access'
