@@ -75,6 +75,24 @@ where to_regclass('storage.objects') is not null and not exists (
       or coalesce(p.qual,'') ilike '%home_memberships%')
 )
 union all
+-- Shared home/task reads must have a membership-scoped SELECT policy.
+-- This is a structural gate, not a substitute for testing the predicates as each role.
+select 'MISSING_MEMBERSHIP_SCOPED_HOME_READ_POLICY','homes','No membership-scoped home SELECT policy found'
+where not exists (
+ select 1 from pg_policies p
+ where p.schemaname='public' and p.tablename='homes' and p.cmd in ('SELECT','ALL')
+ and (coalesce(p.qual,'') ilike '%home_memberships%'
+      or coalesce(p.qual,'') ilike '%household_can_access%')
+)
+union all
+select 'MISSING_MEMBERSHIP_SCOPED_TASK_READ_POLICY','tasks','No membership-scoped task SELECT policy found'
+where not exists (
+ select 1 from pg_policies p
+ where p.schemaname='public' and p.tablename='tasks' and p.cmd in ('SELECT','ALL')
+ and (coalesce(p.qual,'') ilike '%home_memberships%'
+      or coalesce(p.qual,'') ilike '%household_can_access%')
+)
+union all
 select 'MISSING_STORAGE_OBJECTS_TABLE','storage.objects','Storage objects table absent; cannot validate file access'
 where to_regclass('storage.objects') is null
 union all
