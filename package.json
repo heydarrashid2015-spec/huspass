@@ -9,7 +9,7 @@
     "cap:sync": "cap sync",
     "cap:android": "cap open android",
     "cap:ios": "cap open ios",
-    "test:password-recovery": "node --test tests/password-recovery-request-runtime.test.mjs"
+    "test:password-recovery": "node --test tests/password-recovery*.test.mjs"
   },
   "dependencies": {
     "next": "16.4.3",
