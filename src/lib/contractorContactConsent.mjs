@@ -9,7 +9,7 @@ function parseConsentTimestamp(value) {
   const [, year, month, day, hour, minute, second, zone] = match;
   const offsetHour = zone === 'Z' ? 0 : Number(zone.slice(1, 3));
   const offsetMinute = zone === 'Z' ? 0 : Number(zone.slice(4, 6));
-  if (+month < 1 || +month > 12 || +day < 1 || +hour > 23 || +minute > 59 || +second > 59 || offsetHour > 23 || offsetMinute > 59) return NaN;
+  if (+month < 1 || +month > 12 || +day < 1 || +hour > 23 || +minute > 59 || +second > 59 || offsetHour > 14 || (offsetHour === 14 && offsetMinute !== 0) || offsetMinute > 59) return NaN;
   const calendar = new Date(Date.UTC(+year, +month - 1, +day));
   if (calendar.getUTCFullYear() !== +year || calendar.getUTCMonth() !== +month - 1 || calendar.getUTCDate() !== +day) return NaN;
   const timestamp = Date.parse(value);
