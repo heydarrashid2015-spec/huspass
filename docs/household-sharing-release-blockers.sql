@@ -41,6 +41,21 @@ from (values ('homes'),('tasks'),('documents'),('home_memberships'),('home_invit
 left join pg_class c on c.oid = to_regclass('public.' || required.table_name)
 where c.oid is null or not c.relrowsecurity
 
+
+union all
+select 'MISSING_SHARING_ACCESS_POLICY', required.table_name, required.cmd || ' policy absent'
+from (values
+  ('home_memberships','SELECT'),
+  ('home_invitations','SELECT'),
+  ('home_invitations','INSERT')
+) as required(table_name,cmd)
+where to_regclass('public.' || required.table_name) is not null
+ and not exists (
+   select 1 from pg_policies p
+   where p.schemaname='public' and p.tablename=required.table_name
+     and p.cmd in (required.cmd,'ALL')
+ )
+
 union all
 select 'MISSING_STORAGE_OBJECTS_TABLE','storage.objects','Storage objects table absent; cannot validate file access'
 where to_regclass('storage.objects') is null
