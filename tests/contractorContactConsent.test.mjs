@@ -43,3 +43,14 @@ test('accepts only plain consent records, not arrays or class instances', () => 
   assert.equal(check(Object.assign(new (class Consent {})(), valid)), false);
   assert.equal(check(Object.assign(Object.create(null), valid)), true);
 });
+
+test('rejects ambiguous timestamps and normalized invalid calendar dates', () => {
+  for (const approvedAt of ['2026-11-17', '2026-11-17T07:00:00', '2026-02-30T07:00:00Z', '2026-11-17T25:00:00Z', '2026-11-17T07:00:00+24:00']) {
+    assert.equal(check({...valid, approvedAt}), false, approvedAt);
+  }
+  assert.equal(check({...valid, expiresAt: '2026-11-18T07:00:00'}), false);
+});
+
+test('accepts valid offset timestamps without changing their instant', () => {
+  assert.equal(check({...valid, approvedAt: '2026-11-17T08:00:00+01:00', expiresAt: '2026-11-18T08:00:00+01:00'}), true);
+});
