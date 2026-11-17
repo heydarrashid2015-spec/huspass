@@ -36,7 +36,14 @@ export function extractQuotePriceEvidence(input) {
     // VAT evidence is ambiguous when more than one price occurs on a line.
     const lineText = input.slice(lineStart, lineEnd);
     const amountsOnLine = [...lineText.matchAll(/(?:\d{1,3}(?:[. \u00a0\u202f]\d{3})+|\d+)(?:,\d{1,2})?\s*(?:kr\.?|dkk)\b/giu)].length;
-    const vatContext = amountsOnLine === 1 ? before + ' ' + after : '';
+    // For multiple prices on one line, attribute VAT only when explicitly
+    // written immediately after this amount and before the next price.
+    // Never borrow a VAT marker from a neighbouring amount.
+    const following = lineText.slice(end - lineStart);
+    const nextAmount = /(?:\\d{1,3}(?:[. \\u00a0\\u202f]\\d{3})+|\\d+)(?:,\\d{1,2})?\\s*(?:kr\\.?|dkk)\\b/iu.exec(following);
+    const localAfter = (nextAmount ? following.slice(0, nextAmount.index) : following)
+      .slice(0, 45).toLocaleLowerCase('da-DK');
+    const vatContext = amountsOnLine === 1 ? before + ' ' + after : localAfter;
     const includesVat = /(?:inkl\.?|inklusive)\s*(?:25\s*%\s*)?moms|med\s+moms/u.test(vatContext);
     const excludesVat = /(?:ekskl\.?|excl\.?|eksklusive)\s*(?:25\s*%\s*)?moms|uden\s+moms/u.test(vatContext);
     results.push({
