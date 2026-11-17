@@ -54,3 +54,9 @@ test('rejects ambiguous timestamps and normalized invalid calendar dates', () =>
 test('accepts valid offset timestamps without changing their instant', () => {
   assert.equal(check({...valid, approvedAt: '2026-11-17T08:00:00+01:00', expiresAt: '2026-11-18T08:00:00+01:00'}), true);
 });
+
+test('accepts an exact RFC3339 UTC timestamp and rejects escaped digit literals', () => {
+  assert.equal(check({...valid, approvedAt: '2026-11-17T07:00:00Z'}), true);
+  assert.equal(check({...valid, approvedAt: 'dddd-11-17T07:00:00Z'}), false);
+  assert.equal(check({...valid, approvedAt: '2026-11-17T07:00:00.123Z'}), true);
+});
