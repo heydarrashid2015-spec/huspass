@@ -22,11 +22,15 @@ jobs:
         run: |
           shopt -s nullglob
           tests=(tests/document-*.test.mjs)
-          if (( ${#tests[@]} == 0 )); then
+          unit_tests=()
+          for test_file in "${tests[@]}"; do
+            [[ "$test_file" == tests/document-supabase-rls.integration.test.mjs ]] || unit_tests+=("$test_file")
+          done
+          if (( ${#unit_tests[@]} == 0 )); then
             echo 'No document unit tests found' >&2
             exit 1
           fi
-          node --test "${tests[@]}"
+          node --test "${unit_tests[@]}"
       - run: npm run build
       - run: npm install --no-save --package-lock=false @playwright/test
       - run: npx playwright install --with-deps chromium
