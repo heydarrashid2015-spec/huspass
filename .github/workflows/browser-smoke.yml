@@ -16,7 +16,8 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --no-package-lock
-      - run: node --test tests/document-*.test.mjs
+      # Unit tests must not depend on integration credentials. RLS remains a separate required, fail-closed job.
+      - run: find tests -maxdepth 1 -name 'document-*.test.mjs' ! -name 'document-supabase-rls.integration.test.mjs' -print0 | xargs -0 -r node --test
       - run: npm run build
       - run: npm install --no-save --package-lock=false @playwright/test
       - run: npx playwright install --with-deps chromium
