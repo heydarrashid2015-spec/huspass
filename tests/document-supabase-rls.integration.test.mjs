@@ -73,6 +73,19 @@ integration("Supabase documents RLS and private storage reject a second authenti
  assert.equal(ownRows[0].file_path,env.DOCUMENT_TEST_FILE_PATH,"fixture must match the stored object");
  const otherRows=await other.row();
  assert.deepEqual(otherRows,[],"other account must not read owner's document metadata");
+ // A normal unfiltered document listing is a separate attack surface from
+ // fetching a known document id: RLS must hide every victim-owned row.
+ const allOtherUrl=new URL(`${normalizeSupabaseUrl(env.SUPABASE_URL)}/rest/v1/documents`);
+ allOtherUrl.searchParams.set("select","id,user_id,home_id,file_path");
+ const allOtherResponse=await fetch(allOtherUrl,{
+  headers:{apikey:env.SUPABASE_ANON_KEY,Authorization:`Bearer ${env.DOCUMENT_TEST_OTHER_JWT}`}
+ });
+ assert.equal(allOtherResponse.status,200,"other account listing must succeed with RLS filtering");
+ const allOtherRows=await allOtherResponse.json();
+ assert.ok(Array.isArray(allOtherRows),"document listing must be an array");
+ assert.ok(!allOtherRows.some(row=>row.id===env.DOCUMENT_TEST_ID||row.file_path===env.DOCUMENT_TEST_FILE_PATH),
+  "unfiltered listing must not expose the owner's fixture");
+
  // A list endpoint filtered by the victim's home_id must not leak documents,
  // even when an attacker knows the home identifier from another source.
  assert.ok(ownRows[0].home_id,"fixture must include the owner's home identifier");
