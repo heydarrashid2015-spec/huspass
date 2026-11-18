@@ -113,6 +113,16 @@ integration("Supabase documents RLS and private storage reject a second authenti
  if(anonymousObjectResponse.body)await anonymousObjectResponse.body.cancel();
  assert.ok([400,401,403,404].includes(anonymousObjectResponse.status),
   `anonymous caller must not download owner's private object (HTTP ${anonymousObjectResponse.status})`);
+ // Anonymous access to signed URL creation is a distinct authorization path.
+ const anonymousSignResponse=await fetch(`${base}/storage/v1/object/sign/home-documents/${encodedPath}`,{
+  method:"POST",headers:{...anonymousHeaders,"Content-Type":"application/json"},
+  body:JSON.stringify({expiresIn:60}),redirect:"manual"
+ });
+ const anonymousSignBody=await anonymousSignResponse.json().catch(()=>({}));
+ assert.ok([400,401,403,404].includes(anonymousSignResponse.status),
+  `anonymous caller must not sign owner's private object (HTTP ${anonymousSignResponse.status})`);
+ assert.ok(!anonymousSignBody.signedURL&&!anonymousSignBody.signedUrl,
+  "anonymous caller must not receive a signed URL");
  const ownerDownloadStatus=await owner.download();
  assert.equal(ownerDownloadStatus,200,"owner must be able to read their private object directly");
  const otherDownloadStatus=await other.download();
