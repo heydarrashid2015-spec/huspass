@@ -15,3 +15,14 @@ test("real OCR text still replaces incomplete PDF metadata",()=>{
  const recognized="Faktura 2026-184\nDato: 18.11.2026\nAt betale 1.250,00 DKK";
  assert.equal(selectPdfPageText(layer,recognized),recognized);
 });
+
+test("OCR scanner footer and bare invoice heading must not erase invoice metadata",()=>{
+ const layer="Faktura 2026-184\nDato: 18.11.2026\nCVR 12345678";
+ const recognized="Faktura\nScanned with CamScanner\nPage 1";
+ assert.equal(selectPdfPageText(layer,recognized),layer);
+});
+test("OCR with a payable amount must supersede incomplete PDF metadata despite scanner footer",()=>{
+ const layer="Faktura 2026-184\nDato: 18.11.2026\nCVR 12345678";
+ const recognized="Faktura\nAt betale 1.250,00 DKK\nScanned with CamScanner";
+ assert.equal(selectPdfPageText(layer,recognized),recognized);
+});
