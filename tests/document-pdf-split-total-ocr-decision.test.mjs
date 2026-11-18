@@ -18,3 +18,8 @@ test("OCR a bare total followed by unrelated payment metadata",()=>{
  assert.equal(parseDanishDocumentText(text).amount,null);
  assert.equal(needsPdfPageOcr(text),true);
 });
+
+test("a second incomplete total must trigger OCR despite another complete total",()=>{
+ const text="Faktura\nNord El ApS\nTotal: 100,00\nAt betale\nSide 1";
+ assert.equal(needsPdfPageOcr(text),true);
+});
