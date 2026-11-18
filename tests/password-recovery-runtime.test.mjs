@@ -230,3 +230,17 @@ test('rejected password update never exposes recovery tokens, email or password'
   const feedback = JSON.stringify([...h.state.messages, ...h.state.notifications]);
   for (const secret of [password, email, token]) assert.equal(feedback.includes(secret), false);
 });
+
+
+test('reused recovery link is rejected without navigating or exposing token details', async () => {
+  const h = harness(async () => ({ error: { message: 'Invalid Refresh Token: already used' } }));
+  await h.submit('SecurePass123')({ preventDefault() {} });
+  assert.equal(h.state.updates, 1);
+  assert.deepEqual(h.state.busy, [true, false]);
+  assert.equal(h.passwordRecoveryActiveRef.current, true);
+  assert.deepEqual(h.state.recovery, []);
+  assert.deepEqual(h.state.views, []);
+  assert.deepEqual(h.state.clearedPassword, []);
+  assert.deepEqual(h.state.notifications, []);
+  assert.equal(h.state.messages.at(-1), 'Adgangskoden kunne ikke ændres.');
+});
