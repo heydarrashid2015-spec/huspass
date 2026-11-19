@@ -5,6 +5,7 @@ on:
     paths:
       - 'app/page.js'
       - 'docs/household-sharing-*.sql'
+      - 'supabase/migrations/**'
       - 'docs/household-sharing-*.md'
       - 'tests/household-sharing-*.test.mjs'
       - 'package.json'
@@ -16,6 +17,7 @@ on:
     paths:
       - 'app/page.js'
       - 'docs/household-sharing-*.sql'
+      - 'supabase/migrations/**'
       - 'docs/household-sharing-*.md'
       - 'tests/household-sharing-*.test.mjs'
       - 'package.json'
