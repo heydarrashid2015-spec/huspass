@@ -144,3 +144,15 @@ test('release blocker requires membership-scoped home and task read policies', (
     assert.match(sql, new RegExp("tablename='" + table + "'"));
   }
 });
+
+test('task revocation guard remains restrictive and covers read, update and delete', () => {
+  const sql = read('supabase/migrations/20261119131500_household_task_membership_guards.sql')
+    .replace(/--[^\n]*/g, '');
+  for (const [action,write] of [['select',false],['update',true],['delete',true]]) {
+    const name = 'tasks_household_membership_' + action + '_guard';
+    assert.match(sql, new RegExp('create\\s+policy\\s+' + name + '\\s+on\\s+public\\.tasks\\s+as\\s+restrictive\\s+for\\s+' + action + '\\s+to\\s+authenticated', 'i'));
+    assert.match(sql, new RegExp('using\\s*\\(public\\.household_can_access\\(home_id,\\s*' + write + '\\)\\)', 'i'));
+  }
+  assert.match(sql, /with\s+check\s*\(public\.household_can_access\(home_id,\s*true\)\)/i);
+  assert.doesNotMatch(sql, /\b(?:grant|disable\s+row\s+level\s+security)\b/i);
+});
