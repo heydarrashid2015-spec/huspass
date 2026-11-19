@@ -149,7 +149,7 @@ integration("Supabase documents RLS and private storage reject a second authenti
  assert.ok(!anonymousSignBody.signedURL&&!anonymousSignBody.signedUrl,
   "anonymous caller must not receive a signed URL");
  // Storage object listing is separate from metadata SELECT and direct download.
- // An attacker who knows a folder prefix must not enumerate private filenames.
+ // Search for the exact fixture filename within its folder: an unfiltered first\n // page can miss a leaked object when a folder contains more than 100 files.
  const fixturePrefix=env.DOCUMENT_TEST_FILE_PATH.includes("/")
   ?env.DOCUMENT_TEST_FILE_PATH.slice(0,env.DOCUMENT_TEST_FILE_PATH.lastIndexOf("/")+1):"";
  for(const [label,headers] of [
@@ -158,7 +158,7 @@ integration("Supabase documents RLS and private storage reject a second authenti
  ]){
   const listing=await fetch(`${base}/storage/v1/object/list/home-documents`,{
    method:"POST",headers:{...headers,"Content-Type":"application/json"},
-   body:JSON.stringify({prefix:fixturePrefix,limit:100,offset:0})
+   body:JSON.stringify({prefix:fixturePrefix,search:env.DOCUMENT_TEST_FILE_PATH.split("/").at(-1),limit:100,offset:0})
   });
   assert.ok([200,400,401,403,404].includes(listing.status),
    `${label} storage listing returned unexpected HTTP ${listing.status}`);
