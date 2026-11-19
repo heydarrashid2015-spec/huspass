@@ -120,6 +120,19 @@ integration("Supabase documents RLS and private storage reject a second authenti
  assert.ok(!anonymousListRows.some(row=>row.id===env.DOCUMENT_TEST_ID||row.file_path===env.DOCUMENT_TEST_FILE_PATH),
   "anonymous unfiltered listing must not expose the owner's document");
 
+ // Knowing a victim home id must not reveal either its rows or its count
+ // to anonymous callers; check this separately from unfiltered enumeration.
+ const anonymousHomeUrl=new URL(`${base}/rest/v1/documents`);
+ anonymousHomeUrl.searchParams.set("home_id",`eq.${ownRows[0].home_id}`);
+ anonymousHomeUrl.searchParams.set("select","id,user_id,home_id,file_path");
+ const anonymousHomeResponse=await fetch(anonymousHomeUrl,{
+  headers:{...anonymousHeaders,"Prefer":"count=exact"}
+ });
+ assert.equal(anonymousHomeResponse.status,200,"anonymous home listing must be RLS-filtered");
+ assert.deepEqual(await anonymousHomeResponse.json(),[],"anonymous caller must not enumerate victim home documents");
+ assert.ok((anonymousHomeResponse.headers.get("content-range")||"").endsWith("/0"),
+  "anonymous caller must not infer victim document count");
+
  const encodedPath=env.DOCUMENT_TEST_FILE_PATH.split("/").map(encodeURIComponent).join("/");
  const anonymousObjectResponse=await fetch(`${base}/storage/v1/object/authenticated/home-documents/${encodedPath}`,{headers:anonymousHeaders,redirect:"manual"});
  if(anonymousObjectResponse.body)await anonymousObjectResponse.body.cancel();
