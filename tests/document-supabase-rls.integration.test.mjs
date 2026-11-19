@@ -108,6 +108,18 @@ integration("Supabase documents RLS and private storage reject a second authenti
  const anonymousRowsResponse=await fetch(anonymousUrl,{headers:anonymousHeaders});
  assert.equal(anonymousRowsResponse.status,200,"anonymous documents SELECT should be RLS-filtered");
  assert.deepEqual(await anonymousRowsResponse.json(),[],"anonymous caller must not read document metadata");
+
+ // An anonymous unfiltered list is another RLS surface: filtering a known id
+ // alone cannot prove that the collection endpoint hides the owner's rows.
+ const anonymousListUrl=new URL(`${base}/rest/v1/documents`);
+ anonymousListUrl.searchParams.set("select","id,user_id,home_id,file_path");
+ const anonymousListResponse=await fetch(anonymousListUrl,{headers:anonymousHeaders});
+ assert.equal(anonymousListResponse.status,200,"anonymous listing must be RLS-filtered");
+ const anonymousListRows=await anonymousListResponse.json();
+ assert.ok(Array.isArray(anonymousListRows),"anonymous listing must return an array");
+ assert.ok(!anonymousListRows.some(row=>row.id===env.DOCUMENT_TEST_ID||row.file_path===env.DOCUMENT_TEST_FILE_PATH),
+  "anonymous unfiltered listing must not expose the owner's document");
+
  const encodedPath=env.DOCUMENT_TEST_FILE_PATH.split("/").map(encodeURIComponent).join("/");
  const anonymousObjectResponse=await fetch(`${base}/storage/v1/object/authenticated/home-documents/${encodedPath}`,{headers:anonymousHeaders,redirect:"manual"});
  if(anonymousObjectResponse.body)await anonymousObjectResponse.body.cancel();
