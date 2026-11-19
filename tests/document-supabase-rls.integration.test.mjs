@@ -148,6 +148,28 @@ integration("Supabase documents RLS and private storage reject a second authenti
   `anonymous caller must not sign owner's private object (HTTP ${anonymousSignResponse.status})`);
  assert.ok(!anonymousSignBody.signedURL&&!anonymousSignBody.signedUrl,
   "anonymous caller must not receive a signed URL");
+ // Storage object listing is separate from metadata SELECT and direct download.
+ // An attacker who knows a folder prefix must not enumerate private filenames.
+ const fixturePrefix=env.DOCUMENT_TEST_FILE_PATH.includes("/")
+  ?env.DOCUMENT_TEST_FILE_PATH.slice(0,env.DOCUMENT_TEST_FILE_PATH.lastIndexOf("/")+1):"";
+ for(const [label,headers] of [
+  ["other user",{apikey:env.SUPABASE_ANON_KEY,Authorization:`Bearer ${env.DOCUMENT_TEST_OTHER_JWT}`}],
+  ["anonymous",anonymousHeaders]
+ ]){
+  const listing=await fetch(`${base}/storage/v1/object/list/home-documents`,{
+   method:"POST",headers:{...headers,"Content-Type":"application/json"},
+   body:JSON.stringify({prefix:fixturePrefix,limit:100,offset:0})
+  });
+  assert.ok([200,400,401,403,404].includes(listing.status),
+   `${label} storage listing returned unexpected HTTP ${listing.status}`);
+  if(listing.status===200){
+   const objects=await listing.json();
+   assert.ok(Array.isArray(objects),`${label} storage listing must return an array`);
+   const fixtureName=env.DOCUMENT_TEST_FILE_PATH.split("/").at(-1);
+   assert.ok(!objects.some(object=>object.name===fixtureName),
+    `${label} must not enumerate the owner's private object filename`);
+  }else if(listing.body)await listing.body.cancel();
+ }
  const ownerDownloadStatus=await owner.download();
  assert.equal(ownerDownloadStatus,200,"owner must be able to read their private object directly");
  const otherDownloadStatus=await other.download();
