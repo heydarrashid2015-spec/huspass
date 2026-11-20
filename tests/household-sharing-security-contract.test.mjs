@@ -156,3 +156,10 @@ test('task revocation guard remains restrictive and covers read, update and dele
   assert.match(sql, /with\s+check\s*\(public\.household_can_access\(home_id,\s*true\)\)/i);
   assert.doesNotMatch(sql, /\b(?:grant|disable\s+row\s+level\s+security)\b/i);
 });
+
+
+test('task INSERT is restricted to current household editors, not merely task creators', () => {
+  const sql = read('supabase/migrations/20261119131500_household_task_membership_guards.sql').replace(/--[^\n]*/g, '');
+  assert.match(sql, /create\s+policy\s+tasks_household_membership_insert_guard\s+on\s+public\.tasks\s+as\s+restrictive\s+for\s+insert\s+to\s+authenticated/i);
+  assert.match(sql, /with\s+check\s*\(public\.household_can_access\(home_id,\s*true\)\)/i);
+});
