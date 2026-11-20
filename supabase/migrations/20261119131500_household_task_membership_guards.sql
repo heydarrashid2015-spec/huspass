@@ -18,3 +18,10 @@ drop policy if exists tasks_household_membership_delete_guard on public.tasks;
 create policy tasks_household_membership_delete_guard
 on public.tasks as restrictive for delete to authenticated
 using (public.household_can_access(home_id, true));
+
+-- INSERT must also require current editor/owner access to the target home.
+-- Prevents attaching a newly created task to another household via legacy INSERT policies.
+drop policy if exists tasks_household_membership_insert_guard on public.tasks;
+create policy tasks_household_membership_insert_guard
+on public.tasks as restrictive for insert to authenticated
+with check (public.household_can_access(home_id, true));
