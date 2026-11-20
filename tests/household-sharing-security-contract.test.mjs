@@ -163,3 +163,18 @@ test('task INSERT is restricted to current household editors, not merely task cr
   assert.match(sql, /create\s+policy\s+tasks_household_membership_insert_guard\s+on\s+public\.tasks\s+as\s+restrictive\s+for\s+insert\s+to\s+authenticated/i);
   assert.match(sql, /with\s+check\s*\(public\.household_can_access\(home_id,\s*true\)\)/i);
 });
+
+
+test('deployable ownership migration protects both home and task identity', () => {
+  const sql = read('supabase/migrations/20261119030000_household_immutable_ownership.sql').replace(/--[^\n]*/g, '');
+  assert.match(sql, /security\s+invoker\s+set\s+search_path\s*=\s*''/i);
+  for (const field of ['id', 'user_id']) {
+    assert.match(sql, new RegExp('new\\.' + field + '\\s+is\\s+distinct\\s+from\\s+old\\.' + field, 'i'));
+  }
+  assert.match(sql, /new\.home_id\s+is\s+distinct\s+from\s+old\.home_id/i);
+  for (const table of ['homes', 'tasks']) {
+    assert.match(sql, new RegExp('before\\s+update\\s+on\\s+public\\.' + table + '\\s+for\\s+each\\s+row', 'i'));
+  }
+  assert.match(sql, /revoke\s+all\s+on\s+function\s+public\.household_guard_immutable_ownership\(\)\s+from\s+public,\s*anon,\s*authenticated/i);
+  assert.doesNotMatch(sql, /\bdisable\s+(?:row\s+level\s+security|trigger)\b/i);
+});
