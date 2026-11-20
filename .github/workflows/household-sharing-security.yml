@@ -40,7 +40,9 @@ jobs:
           node-version: '22'
       - name: Verify household sharing remains disabled until integration validation
         run: npm run test:household-security
-      - name: Install dependencies reproducibly
-        run: npm ci
+      # The repository currently has no package-lock.json; npm ci fails before build.
+      # Temporary parity with browser-smoke workflow. Restore npm ci once a lockfile is committed.
+      - name: Install dependencies (lockfile pending)
+        run: npm install --no-package-lock --no-audit --no-fund
       - name: Build Next.js application
         run: npm run build
