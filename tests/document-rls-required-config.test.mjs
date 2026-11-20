@@ -10,7 +10,7 @@ function run(overrides = {}) {
   const env = { ...process.env, DOCUMENT_REQUIRE_RLS: "1" };
   for (const key of keys) delete env[key];
   Object.assign(env, overrides);
-  return spawnSync(process.execPath, ["--test", script], { env, encoding: "utf8", timeout: 10000 });
+  return spawnSync(process.execPath, [script], { env, encoding: "utf8", timeout: 10000 });
 }
 
 test("mandatory Supabase RLS verification fails closed without all six fixture values", () => {
@@ -30,5 +30,5 @@ test("mandatory Supabase RLS verification rejects partially configured fixtures"
 test("mandatory Supabase RLS verification does not silently skip when credentials are absent", () => {
   const result = run();
   assert.doesNotMatch(result.stdout + result.stderr, /# skipped 1/);
-  assert.match(result.stdout + result.stderr, /# fail 1/);
+  assert.match(result.stdout + result.stderr, /Required Supabase RLS integration test cannot run/);
 });
