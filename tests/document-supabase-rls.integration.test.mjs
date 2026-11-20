@@ -170,6 +170,14 @@ integration("Supabase documents RLS and private storage reject a second authenti
     `${label} must not enumerate the owner's private object filename`);
   }else if(listing.body)await listing.body.cancel();
  }
+ // A bucket accidentally configured as public bypasses authenticated object checks.
+ // Verify the public delivery route itself, without fetching document bytes.
+ const publicObjectResponse=await fetch(`${base}/storage/v1/object/public/home-documents/${encodedPath}`,{
+  headers:{apikey:env.SUPABASE_ANON_KEY},redirect:"manual"
+ });
+ if(publicObjectResponse.body)await publicObjectResponse.body.cancel();
+ assert.ok([400,401,403,404].includes(publicObjectResponse.status),
+  `private document must not be publicly downloadable (HTTP ${publicObjectResponse.status})`);
  const ownerDownloadStatus=await owner.download();
  assert.equal(ownerDownloadStatus,200,"owner must be able to read their private object directly");
  const otherDownloadStatus=await other.download();
