@@ -93,6 +93,24 @@ where not exists (
       or coalesce(p.qual,'') ilike '%household_can_access%')
 )
 union all
+-- Revocation safety: legacy permissive task policies remain usable without
+-- restrictive membership guards on every command.
+select 'MISSING_RESTRICTIVE_TASK_MEMBERSHIP_GUARD','tasks', required.cmd || ' restrictive policy absent'
+from (values
+ ('SELECT','tasks_household_membership_select_guard'),
+ ('INSERT','tasks_household_membership_insert_guard'),
+ ('UPDATE','tasks_household_membership_update_guard'),
+ ('DELETE','tasks_household_membership_delete_guard')
+) as required(cmd,policy_name)
+where not exists (
+ select 1 from pg_policies p
+ where p.schemaname='public' and p.tablename='tasks'
+ and p.policyname=required.policy_name and p.cmd=required.cmd
+ and p.permissive='RESTRICTIVE'
+ and p.roles @> array['authenticated']::name[]
+ and (coalesce(p.qual,'') ilike '%household_can_access%' or coalesce(p.with_check,'') ilike '%household_can_access%')
+)
+union all
 select 'MISSING_STORAGE_OBJECTS_TABLE','storage.objects','Storage objects table absent; cannot validate file access'
 where to_regclass('storage.objects') is null
 union all
