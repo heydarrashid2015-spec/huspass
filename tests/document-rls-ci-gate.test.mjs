@@ -11,6 +11,9 @@ function run(overrides = {}) {
   const env = { ...process.env };
   for (const key of keys) delete env[key];
   delete env.DOCUMENT_REQUIRE_RLS;
+  // Node sets this for test workers; inheriting it makes nested `node --test`
+  // silently skip all files and exit 0, falsely passing the fail-closed gate.
+  delete env.NODE_TEST_CONTEXT;
   Object.assign(env, overrides);
   return spawnSync(process.execPath, ["--test", script.pathname], {
     env, encoding: "utf8", timeout: 15000
@@ -33,4 +36,11 @@ test("optional RLS test explicitly skips when no credentials are configured", ()
   const result = run();
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /SKIP Supabase integration credentials not configured/);
+});
+
+// Simulate a parent Node test worker: the child must still execute the RLS gate.
+test("nested Node test context cannot silently bypass required RLS gate", () => {
+  const result = run({ NODE_TEST_CONTEXT: "child-v8", DOCUMENT_REQUIRE_RLS: "1" });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr + result.stdout, /Required Supabase RLS integration test cannot run/);
 });
