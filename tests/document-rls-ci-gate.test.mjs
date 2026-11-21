@@ -13,8 +13,8 @@ function run(overrides = {}) {
   delete env.DOCUMENT_REQUIRE_RLS;
   // Node sets this for test workers; inheriting it makes nested `node --test`
   // silently skip all files and exit 0, falsely passing the fail-closed gate.
-  delete env.NODE_TEST_CONTEXT;
   Object.assign(env, overrides);
+  delete env.NODE_TEST_CONTEXT;
   return spawnSync(process.execPath, ["--test", script.pathname], {
     env, encoding: "utf8", timeout: 15000
   });
