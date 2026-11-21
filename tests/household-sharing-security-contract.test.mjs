@@ -187,3 +187,13 @@ test('release audit fails closed when task revocation guards are missing', () =>
     assert.match(sql, new RegExp("'"+action+"','tasks_household_membership_"+action.toLowerCase()+"_guard'"));
   }
 });
+
+test('shared document metadata is readable only by current household members, without write grants', () => {
+  const sql = read('supabase/migrations/20261121210500_household_document_member_read.sql')
+    .replace(/--[^\n]*/g, '');
+  assert.match(sql, /create\s+policy\s+documents_household_member_read\s+on\s+public\.documents/i);
+  assert.match(sql, /for\s+select\s+to\s+authenticated/i);
+  assert.match(sql, /home_id\s+is\s+not\s+null/i);
+  assert.match(sql, /public\.household_can_access\(home_id,\s*false\)/i);
+  assert.doesNotMatch(sql, /\b(?:grant|for\s+(?:update|insert|delete)|disable\s+row\s+level\s+security)\b/i);
+});
