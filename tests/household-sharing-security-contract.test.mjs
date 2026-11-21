@@ -197,3 +197,15 @@ test('shared document metadata is readable only by current household members, wi
   assert.match(sql, /public\.household_can_access\(home_id,\s*false\)/i);
   assert.doesNotMatch(sql, /\b(?:grant|for\s+(?:update|insert|delete)|disable\s+row\s+level\s+security)\b/i);
 });
+
+test('document sharing migration cannot weaken owner write policies or expose anonymous access', () => {
+  const sql = read('supabase/migrations/20261121210500_household_document_member_read.sql')
+    .replace(/--[^\n]*/g, '');
+  const drops = [...sql.matchAll(/drop\s+policy\s+if\s+exists\s+([a-z_]+)\s+on\s+public\.documents/gi)]
+    .map(match => match[1].toLowerCase());
+  assert.deepEqual(drops, ['documents_household_member_read']);
+  assert.match(sql, /as\s+permissive\s+for\s+select\s+to\s+authenticated/i);
+  assert.match(sql, /home_id\s+is\s+not\s+null\s+and\s+public\.household_can_access\(home_id,\s*false\)/i);
+  assert.doesNotMatch(sql, /\b(?:grant|revoke|alter\s+table|create\s+function|security\s+definer)\b/i);
+  assert.doesNotMatch(sql, /\bto\s+(?:anon|public)\b/i);
+});
