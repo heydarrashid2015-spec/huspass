@@ -195,7 +195,7 @@ test('provider errors containing private email and token details are not reflect
 
 
 test('email input cannot override the trusted recovery redirect destination', async () => {
-  const address = 'person+redirectTo=https://attacker.example@example.com';
+  const address = 'person+redirectTo%3Dhttps%3A%2F%2Fattacker.example@example.com';
   const result = await run(address, async () => ({ error: null }));
   assert.equal(result.calls.length, 1);
   assert.deepEqual(result.calls[0], [address, { redirectTo: 'https://huspass.dk' }]);
