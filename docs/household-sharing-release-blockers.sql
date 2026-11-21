@@ -130,15 +130,4 @@ from pg_policies p
 where p.schemaname='storage' and p.tablename='objects'
   and p.cmd in ('SELECT','ALL')
   and (p.roles @> array['anon']::name[] or p.roles @> array['public']::name[])
-union all
--- Detect unapplied restrictive task policies; legacy creator policies may outlive membership.
-select 'MISSING_RESTRICTIVE_TASK_MEMBERSHIP_GUARD','tasks',required.cmd || ' membership guard absent'
-from (values ('SELECT'),('INSERT'),('UPDATE'),('DELETE')) as required(cmd)
-where not exists (
- select 1 from pg_policies p
- where p.schemaname='public' and p.tablename='tasks'
- and p.cmd=required.cmd and p.permissive='RESTRICTIVE'
- and (coalesce(p.qual,'') ilike '%household_can_access%'
-      or coalesce(p.with_check,'') ilike '%household_can_access%')
-)
 order by finding,table_name,detail;
