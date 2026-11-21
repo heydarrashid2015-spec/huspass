@@ -178,3 +178,12 @@ test('deployable ownership migration protects both home and task identity', () =
   assert.match(sql, /revoke\s+all\s+on\s+function\s+public\.household_guard_immutable_ownership\(\)\s+from\s+public,\s*anon,\s*authenticated/i);
   assert.doesNotMatch(sql, /\bdisable\s+(?:row\s+level\s+security|trigger)\b/i);
 });
+
+test('release audit fails closed when task revocation guards are missing', () => {
+  const sql = read('docs/household-sharing-release-blockers.sql').replace(/--[^\n]*/g, '');
+  assert.match(sql, /MISSING_RESTRICTIVE_TASK_MEMBERSHIP_GUARD/);
+  assert.match(sql, /p\.permissive\s*=\s*'RESTRICTIVE'/i);
+  for (const action of ['SELECT', 'INSERT', 'UPDATE', 'DELETE']) {
+    assert.match(sql, new RegExp("'"+action+"','tasks_household_membership_"+action.toLowerCase()+"_guard'"));
+  }
+});
